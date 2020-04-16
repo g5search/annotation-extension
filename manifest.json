@@ -2,5 +2,13 @@
   "name": "G5 Annotations",
   "version": "1.0.0",
   "description": "A Chrome Extension for the G5 Annotation Service",
+  "permissions": ["storage"],
+  "background": {
+    "scripts": ["src/background.js"],
+    "persistent": true
+  },
+  "page_action": {
+    "default_popup": "src/index.html"
+  },
   "manifest_version": 2
 }

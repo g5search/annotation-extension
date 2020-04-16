@@ -1,0 +1,6 @@
+{
+  "name": "G5 Annotations",
+  "version": "1.0.0",
+  "description": "A Chrome Extension for the G5 Annotation Service",
+  "manifest_version": 2
+}

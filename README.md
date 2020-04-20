@@ -4,7 +4,7 @@ Chrome extension for G5's COPS Annotation Service.
 
 ## Getting Started
 
-1. Clone this repo.
+1. Clone this repo in your favorite command line interface.
 ``` bash
 git clone https://github.com/pcktbot/annotation-extension.git
 ```
@@ -28,4 +28,5 @@ npm run build:dev
 ## Helpful Links
 
 [Chrome Extension Getting Started](https://developer.chrome.com/extensions/getstarted)
+
 [Vue Extention Boilerplate](https://github.com/Kocal/vue-web-extension)

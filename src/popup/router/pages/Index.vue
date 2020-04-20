@@ -1,11 +1,15 @@
 <template>
-  <p>Hello world!</p>
+  <div>
+    {{ msg }}
+  </div>
 </template>
 
 <script>
 export default {
   data () {
-    return {}
+    return {
+      msg: 'Popup Vue content'
+    }
   }
 }
 </script>

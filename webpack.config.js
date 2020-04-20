@@ -50,7 +50,7 @@ const config = {
         options: {
           name: '[name].[ext]',
           outputPath: '/images/',
-          emitFile: false,
+          emitFile: false
         },
       },
       {
@@ -59,7 +59,7 @@ const config = {
         options: {
           name: '[name].[ext]',
           outputPath: '/fonts/',
-          emitFile: false,
+          emitFile: false
         },
       },
     ],
@@ -69,13 +69,11 @@ const config = {
       global: 'window',
     }),
     new VueLoaderPlugin(),
-    new MiniCssExtractPlugin({
-      filename: '[name].css',
-    }),
+    new MiniCssExtractPlugin({ filename: '[name].css' }),
     new CopyPlugin([
       { from: 'icons', to: 'icons', ignore: ['icon.xcf'] },
-      { from: 'popup/popup.html', to: 'popup/popup.html', transform: transformHtml },
-      { from: 'options/options.html', to: 'options/options.html', transform: transformHtml },
+      { from: 'popup/popup.html', to: 'popup/popup.html' },
+      { from: 'options/options.html', to: 'options/options.html' },
       {
         from: 'manifest.json',
         to: 'manifest.json',
@@ -101,7 +99,7 @@ if (config.mode === 'production') {
         NODE_ENV: '"production"',
       },
     }),
-  ]);
+  ])
 }
 
 if (process.env.HMR === 'true') {
@@ -109,13 +107,14 @@ if (process.env.HMR === 'true') {
     new ExtensionReloader({
       manifest: __dirname + '/src/manifest.json',
     }),
-  ]);
+  ])
 }
 
+// TODO Are you needed? Because I don't like EJS
 function transformHtml(content) {
   return ejs.render(content.toString(), {
     ...process.env,
-  });
+  })
 }
 
 module.exports = config

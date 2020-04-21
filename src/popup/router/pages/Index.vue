@@ -11,10 +11,11 @@
 </template>
 
 <script>
+import pkg from '../../../../package.json'
 export default {
   data () {
     return {
-      msg: 'Popup Vue content'
+      msg: pkg.version
     }
   }
 }

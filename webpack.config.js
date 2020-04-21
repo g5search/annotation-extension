@@ -1,5 +1,5 @@
 const webpack = require('webpack')
-const ejs = require('ejs')
+// const ejs = require('ejs')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
 const ExtensionReloader = require('webpack-extension-reloader')
@@ -111,10 +111,10 @@ if (process.env.HMR === 'true') {
 }
 
 // TODO Are you needed? Because I don't like EJS
-function transformHtml(content) {
-  return ejs.render(content.toString(), {
-    ...process.env,
-  })
-}
+// function transformHtml(content) {
+//   return ejs.render(content.toString(), {
+//     ...process.env,
+//   })
+// }
 
 module.exports = config

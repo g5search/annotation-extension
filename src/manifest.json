@@ -11,6 +11,20 @@
     "default_title": "annotation-extension",
     "default_popup": "popup/popup.html"
   },
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+G",
+        "mac": "MacCtrl+G"
+      },
+      "description": "Open Annotations"
+    }
+  },
+  "permissions": [
+    "storage",
+    "declarativeContent",
+    "activeTab"
+  ],
   "background": {
     "scripts": [
       "background.js"

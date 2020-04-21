@@ -1,1 +1,1 @@
-export const UPDATE_FOO = 'UPDATE_FOO'
+export const SET_CLIENT = 'SET_CLIENT'

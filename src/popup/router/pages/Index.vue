@@ -1,7 +1,13 @@
 <template>
-  <div>
-    {{ msg }}
-  </div>
+  <b-container fluid class="p-3">
+    <b-row>
+      <b-col>
+        <b-card header="A header" class="border">
+          {{ msg }}
+        </b-card>
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>

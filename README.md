@@ -31,6 +31,17 @@ npm run build:dev
 - Click Load Unpacked and navigate to this repo's `dist/` directory.
 - Use 'Inspect Background Page' to view console for background process.
 
+### Publish to Chrome Store
+
+> TODO: joining developer Google group. Registering with Chrome Store and access to Google Payments (for managed Google accounts).
+
+
+### Contributing
+
+> TODO: pull requests, features and feedback, contributers.
+
+We do expect this to have a decent install base for internal teams.
+
 ### Helpful Links
 
 [Chrome Extension Getting Started](https://developer.chrome.com/extensions/getstarted)

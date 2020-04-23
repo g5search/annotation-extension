@@ -11,10 +11,13 @@
           </b-btn>
           <b-dropdown variant="outline-primary" right text="Menu" class="flex-grow-1">
             <b-dropdown-item>
-              Example
+              Utilities
+            </b-dropdown-item>
+            <b-dropdown-item>
+              Logout
             </b-dropdown-item>
           </b-dropdown>
-          <b-btn variant="outline-primary" class="flex-grow-0 px-2">
+          <b-btn to="/workq" variant="outline-primary" class="">
             <b-icon-inboxes />
           </b-btn>
           <b-btn variant="outline-primary" class="flex-grow-0 px-2">
@@ -23,10 +26,10 @@
           <b-btn variant="outline-primary" class="flex-grow-0 px-2">
             <b-icon-question-circle />
           </b-btn>
-          <b-btn variant="outline-primary" class="flex-grow-0 px-2">
+          <b-btn to="/" variant="outline-primary" class="flex-grow-0 px-2">
             <b-icon-house-door />
           </b-btn>
-          <b-btn variant="outline-primary" class="flex-grow-0 px-2">
+          <b-btn to="/trash" variant="outline-primary" class="flex-grow-0 px-2">
             <b-icon-trash />
           </b-btn>
           <slot name="append" />

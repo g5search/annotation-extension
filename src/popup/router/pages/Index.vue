@@ -20,77 +20,35 @@
         </template>
       </b-card>
     </b-sidebar>
-    <menu-toolbar>
-      <template v-slot:append>
-        <b-btn
-          v-b-toggle.sidebar-1
-          variant="primary"
-          class="flex-grow-0 px-2"
-        >
-          <b-icon-three-dots-vertical />
-        </b-btn>
-      </template>
-    </menu-toolbar>
     <b-row>
       <b-col>
         <b-card no-body footer-class="p-0">
           <b-tabs card>
-            <!-- <b-tab>
-              <template v-slot:title>
-                <b-icon-search />
-              </template>
-              <b-form-group
-                label="Client"
-              >
-                <b-form-select
-                  id="client-select"
-                  v-model="client"
-                  :options="clients"
-                />
-              </b-form-group>
-              <code>
-                {{ res }}
-              </code>
-            </b-tab> -->
-            <b-tab>
+            <b-tab
+              v-for="tab in tabs"
+              :key="`tab-${tab}}`"
+            >
               <template v-slot:title>
                 <b-icon-file-text />
-                Current
+                Draft-{{ tab }}
+                <b-btn
+                  @click="onClose(tab)"
+                  size="sm"
+                  variant="transparent"
+                >
+                  <b-icon-x-circle />
+                </b-btn>
               </template>
-              <b-form-group
-                label="Note Type"
-                label-cols="4"
-                label-size="sm"
-              >
-                <b-form-select
-                  v-model="type"
-                  :options="types"
-                  style="background: none;"
-                />
-              </b-form-group>
-              <div class="p-1 mb-3 border border-secondary">
-                <editor-content :editor="editor" />
-              </div>
-              <b-form-checkbox
-                v-model="isInternal"
-                size="sm"
-                switch
-              >
-                Internal-Only
-              </b-form-checkbox>
+              <da-note :tab="tab" />
             </b-tab>
-            <b-tab title-link-class="text-tertiary">
-              <template v-slot:title>
-                <b-icon-file-richtext />
-                Draft
-              </template>
-              <da-note />
-            </b-tab>
-            <b-tab title-link-class="roman text-secondary">
-              <template v-slot:title>
+            <template v-slot:tabs-end>
+              <b-nav-item
+                role="presentation"
+                @click.prevent="newTab"
+              >
                 <b-icon-plus />
-              </template>
-            </b-tab>
+              </b-nav-item>
+            </template>
           </b-tabs>
           <template v-slot:footer>
             <b-btn @click="getClients" variant="primary">
@@ -112,11 +70,9 @@
 <script>
 import { version } from '../../../../package.json'
 import { Editor, EditorContent } from 'tiptap'
-import MenuToolbar from '../../components/menu-toolbar'
 import DaNote from '../../components/da-note'
 export default {
   components: {
-    MenuToolbar,
     DaNote,
     EditorContent
   },
@@ -124,6 +80,8 @@ export default {
     return {
       currentTab: { active: true, currentWindow: true },
       version,
+      tabs: [],
+      tabCounter: 2,
       type: null,
       types: [
         'General Account Note',
@@ -156,6 +114,16 @@ export default {
     this.editor.destroy()
   },
   methods: {
+    newTab() {
+      this.tabs.push(this.tabCounter++)
+    },
+    onClose(x) {
+      for (let i = 0; i < this.tabs.length; i++) {
+        if (this.tabs[i] === x) {
+          this.tabs.splice(i, 1)
+        }
+      }
+    },
     onMessage(res) {
       this.res.push(res)
     },

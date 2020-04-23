@@ -1,11 +1,26 @@
 <template>
   <div>
+    <menu-toolbar>
+      <template v-slot:append>
+        <b-btn
+          v-b-toggle.sidebar-1
+          variant="primary"
+          class="flex-grow-0 px-2"
+        >
+          <b-icon-three-dots-vertical />
+        </b-btn>
+      </template>
+    </menu-toolbar>
     <router-view />
   </div>
 </template>
 
 <script>
+import MenuToolbar from '../popup/components/menu-toolbar'
 export default {
+  components: {
+    MenuToolbar
+  },
   data () {
     return {}
   }

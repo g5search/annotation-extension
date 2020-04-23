@@ -40,7 +40,21 @@ npm run build:dev
 
 > TODO: pull requests, features and feedback, contributers.
 
-We do expect this to have a decent install base for internal teams.
+We do expect this to have a decent install base for internal teams. This configuration let's you keep the Extension installed and loaded.
+
+1. Update current branch.
+``` bash
+cd annotation-service
+git pull
+```
+2. Install additional dependencies.
+``` bash
+npm i
+```
+3. Start the Development Server.
+``` bash
+npm run watch:dev
+```
 
 ### Helpful Links
 

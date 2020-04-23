@@ -2,14 +2,14 @@
   <b-container fluid class="px-0">
     <b-row no-gutters>
       <b-col>
-        <b-btn-group size="sm">
-          <b-btn variant="outline-primary" class="flex-grow-0 px-2">
+        <b-btn-group size="sm" class="d-flex w-100">
+          <!-- <b-btn variant="outline-primary" class="flex-grow-0 px-2">
             <b-icon-pencil-square />
-          </b-btn>
+          </b-btn> -->
           <b-btn variant="outline-primary" class="flex-grow-0 px-2">
             <b-icon-file-plus />
           </b-btn>
-          <b-dropdown variant="outline-primary" right text="Ex">
+          <b-dropdown variant="outline-primary" right text="Menu" class="flex-grow-1">
             <b-dropdown-item>
               Example
             </b-dropdown-item>
@@ -27,7 +27,7 @@
             <b-icon-house-door />
           </b-btn>
           <b-btn variant="outline-primary" class="flex-grow-0 px-2">
-            <b-icon-trash-fill />
+            <b-icon-trash />
           </b-btn>
           <slot name="append" />
         </b-btn-group>

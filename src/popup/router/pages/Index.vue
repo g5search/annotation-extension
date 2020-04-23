@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid class="p-3">
+  <b-container fluid class="p-1">
     <b-sidebar
       id="sidebar-1"
       title="Options"
@@ -24,7 +24,7 @@
       <template v-slot:append>
         <b-btn
           v-b-toggle.sidebar-1
-          variant="outline-primary"
+          variant="primary"
           class="flex-grow-0 px-2"
         >
           <b-icon-three-dots-vertical />
@@ -33,7 +33,7 @@
     </menu-toolbar>
     <b-row>
       <b-col>
-        <b-card no-body>
+        <b-card no-body footer-class="p-0">
           <b-tabs card>
             <!-- <b-tab>
               <template v-slot:title>
@@ -54,7 +54,8 @@
             </b-tab> -->
             <b-tab>
               <template v-slot:title>
-                <b-icon-plus />
+                <b-icon-file-text />
+                Current
               </template>
               <b-form-group
                 label="Note Type"
@@ -78,13 +79,28 @@
                 Internal-Only
               </b-form-checkbox>
             </b-tab>
+            <b-tab title-link-class="text-tertiary">
+              <template v-slot:title>
+                <b-icon-file-richtext />
+                Draft
+              </template>
+              <da-note />
+            </b-tab>
+            <b-tab title-link-class="roman text-secondary">
+              <template v-slot:title>
+                <b-icon-plus />
+              </template>
+            </b-tab>
           </b-tabs>
           <template v-slot:footer>
-            <b-btn @click="getClients">
+            <b-btn @click="getClients" variant="primary">
               Action 1
             </b-btn>
-            <b-btn @click="getClients">
+            <b-btn @click="getClients" variant="tertiary">
               Action 2
+            </b-btn>
+            <b-btn @click="getClients" variant="quaternary" class="roman">
+              Action 3
             </b-btn>
           </template>
         </b-card>
@@ -97,9 +113,11 @@
 import { version } from '../../../../package.json'
 import { Editor, EditorContent } from 'tiptap'
 import MenuToolbar from '../../components/menu-toolbar'
+import DaNote from '../../components/da-note'
 export default {
   components: {
     MenuToolbar,
+    DaNote,
     EditorContent
   },
   data () {
@@ -161,5 +179,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.roman {
+  font-family:'Times New Roman', Times, serif;
+  font-style: italic;
+  font-weight: bold;
+}
 </style>

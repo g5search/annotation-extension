@@ -20,7 +20,10 @@ $theme-colors: (
   'tertiary': #e8513e,
   'quaternary': #eee23e
 );
-$body-bg: #e1e5e9;
+// $body-bg: #e1e5e9;
+$enable-rounded: false;
+$enable-shadows: false;
+$enable-gradients: false;
 $font-family-base: 'Fira Sans', sans-serif;
 $headings-font-family: 'Roboto Condensed', sans-serif;
 @import 'node_modules/bootstrap/scss/bootstrap';

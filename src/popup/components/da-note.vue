@@ -1,6 +1,25 @@
 <template>
-  <b-card no-body class="border-0" footer-class="p-0">
+  <b-card
+    :bg-variant="isInternal ? 'quaternary-lt4' : 'white'"
+    class="border-0 py-2 px-4"
+    footer-class="p-0"
+    footer-bg-variant="white"
+    no-body
+  >
     <text-area />
+    <b-form-group>
+      <b-form-select />
+    </b-form-group>
+    <b-form-checkbox
+      v-model="isInternal"
+      switch
+      size="sm"
+      class="my-3"
+    >
+      <b-icon-eye-fill v-if="!isInternal" />
+      <b-icon-eye-slash v-else />
+      {{ isInternal ? 'Internal-Only' : 'Ok to Share' }}
+    </b-form-checkbox>
     <template v-slot:footer>
       <b-btn-group class="d-flex w-100 justify-content-evenly">
         <b-btn variant="outline-secondary">Draft Saved</b-btn>
@@ -18,6 +37,11 @@ import TextArea from './text-area'
 export default {
   components: {
     TextArea
+  },
+  data() {
+    return {
+      isInternal: false
+    }
   }
 }
 </script>

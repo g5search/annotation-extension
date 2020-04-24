@@ -23,21 +23,29 @@
     <b-row>
       <b-col>
         <b-card no-body footer-class="p-0">
-          <b-tabs card>
+          <b-tabs
+            v-model="tabSelected"
+            card
+          >
             <b-tab
               v-for="tab in tabs"
               :key="`tab-${tab}}`"
+              class="p-0"
             >
               <template v-slot:title>
-                <b-icon-file-text />
-                Draft-{{ tab }}
-                <b-btn
-                  @click="onClose(tab)"
-                  size="sm"
-                  variant="transparent"
-                >
-                  <b-icon-x-circle />
-                </b-btn>
+                <div class="close-container">
+                  <b-spinner v-if="isBusy" small />
+                  <b-icon-file-text v-else />
+                  {{ tab }}
+                  <b-btn
+                    @click="onClose(tab)"
+                    size="sm"
+                    variant="outline-tertiary"
+                    class="close-tab"
+                  >
+                    <b-icon-x />
+                  </b-btn>
+                </div>
               </template>
               <da-note :tab="tab" />
             </b-tab>
@@ -45,6 +53,7 @@
               <b-nav-item
                 role="presentation"
                 @click.prevent="newTab"
+                class="add-btn"
               >
                 <b-icon-plus />
               </b-nav-item>
@@ -81,7 +90,8 @@ export default {
       currentTab: { active: true, currentWindow: true },
       version,
       tabs: [],
-      tabCounter: 2,
+      tabCounter: 1,
+      tabSelected: 1,
       type: null,
       types: [
         'General Account Note',
@@ -151,5 +161,46 @@ export default {
   font-family:'Times New Roman', Times, serif;
   font-style: italic;
   font-weight: bold;
+}
+.close-container {
+  position: relative;
+  & .close-tab {
+    position: absolute;
+    right: 0;
+    border-radius: 50%;
+    padding: 0 0.05em;
+    transform: translate(75%, -275%);
+    transition: all 200ms ease;
+    opacity: 0;
+    transition-delay: 100ms;;
+  }
+  &:hover .close-tab {
+    transform: translate(75%, -75%);
+    opacity: 1;
+  }
+}
+.add-btn {
+  position: relative;
+  border: none;
+  margin-left: 0.15em;
+  padding: 0;
+  transition: 200ms ease-in-out;
+  &:hover,
+  &:active {
+    background-color: #dee2e6;
+    border: none;
+    outline: none;
+    & .nav-link::after {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      height: 100%;
+      content: "new";
+    }
+  }
+  & .nav-link {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 </style>

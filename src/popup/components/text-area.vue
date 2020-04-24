@@ -20,6 +20,21 @@
           <b-icon-type-italic />
         </b-btn>
         <b-btn
+          :class="[{ 'is-active': isActive.underline() }, 'menubar__btn']"
+          @click="commands.underline"
+          variant="outline-primary"
+        >
+          <b-icon-type-underline />
+        </b-btn>
+        <b-btn
+          :class="[{ 'is-active': isActive.strike() }, 'menubar__btn']"
+          @click="commands.strike"
+          variant="outline-primary"
+        >
+          <b-icon-type-strikethrough />
+        </b-btn>
+        <div class="menubar__spacer bg-primary" />
+        <b-btn
           :class="[{ 'is-active': isActive.heading({ level: 1 }) }, 'menubar__btn']"
           @click="commands.heading({ level: 1 })"
           variant="outline-primary"
@@ -41,13 +56,6 @@
           <b-icon-type-h3 />
         </b-btn>
         <b-btn
-          :class="[{ 'is-active': isActive.strike() }, 'menubar__btn']"
-          @click="commands.strike"
-          variant="outline-primary"
-        >
-          <b-icon-type-strikethrough />
-        </b-btn>
-        <b-btn
           :class="[{ 'is-active': isActive.ordered_list() }, 'menubar__btn']"
           @click="commands.ordered_list"
           variant="outline-primary"
@@ -60,6 +68,14 @@
           variant="outline-primary"
         >
           <b-icon-list-ul />
+        </b-btn>
+        <div class="menubar__spacer bg-primary" />
+        <b-btn
+          :class="[{ 'is-active': isActive.link() }, 'menubar__btn']"
+          @click="commands.link"
+          variant="outline-primary"
+        >
+          <b-icon-link45deg />
         </b-btn>
       </div>
     </editor-menu-bar>
@@ -120,7 +136,16 @@ export default {
     font-size: 0.9em;
   }
   & .menubar {
-    margin-bottom: 0.5em;
+    margin-bottom: 0.75em;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    transition: 200ms ease-out;
+    display: flex;
+    &:hover {
+      box-shadow: 0 5px 7px rgba(0, 0, 0, 0.5);
+    }
+    &__spacer {
+      flex: 1 1 auto;
+    }
     &__btn {
       padding: 0.15em 0.25em;
       margin: 0;

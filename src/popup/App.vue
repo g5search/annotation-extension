@@ -33,7 +33,8 @@ $theme-colors: (
   'primary': #0b233f,
   'secondary': #7898ad,
   'tertiary': #e8513e,
-  'quaternary': #eee23e
+  'quaternary': #eee23e,
+  'quaternary-lt4': rgba(236, 233, 178, 0.5)
 );
 // $body-bg: #e1e5e9;
 $enable-rounded: false;

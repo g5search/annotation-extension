@@ -34,7 +34,7 @@
           <b-icon-type-strikethrough />
         </b-btn>
         <div class="menubar__spacer bg-primary" />
-        <b-btn
+        <!-- <b-btn
           :class="[{ 'is-active': isActive.heading({ level: 1 }) }, 'menubar__btn']"
           @click="commands.heading({ level: 1 })"
           variant="outline-primary"
@@ -68,7 +68,7 @@
           variant="outline-primary"
         >
           <b-icon-list-ul />
-        </b-btn>
+        </b-btn> -->
         <div class="menubar__spacer bg-primary" />
         <b-btn
           :class="[{ 'is-active': isActive.link() }, 'menubar__btn']"
@@ -77,6 +77,20 @@
         >
           <b-icon-link45deg />
         </b-btn>
+        <!-- <b-btn
+          :class="[{ 'is-active': isActive.undo() }, 'menubar__btn']"
+          @click="commands.undo"
+          variant="outline-primary"
+        >
+          <b-icon-arrow-counterclockwise />
+        </b-btn>
+        <b-btn
+          :class="[{ 'is-active': isActive.redo() }, 'menubar__btn']"
+          @click="commands.redo"
+          variant="outline-primary"
+        >
+          <b-icon-arrow-clockwise />
+        </b-btn> -->
       </div>
     </editor-menu-bar>
     <editor-content :editor="editor" class="editor__content" />

@@ -20,15 +20,22 @@
       "description": "Open Annotations"
     }
   },
+  "content_scripts": [],
+  "web_accessible_resources": [],
   "permissions": [
     "storage",
     "declarativeContent",
-    "activeTab"
+    "activeTab",
+    "tabs",
+    "webRequest",
+    "webNavigation",
+    "downloads"
   ],
   "background": {
     "scripts": [
       "background.js"
-    ]
+    ],
+    "persistent": true
   },
   "options_ui": {
     "page": "options/options.html",

@@ -2,23 +2,18 @@ import axios from 'axios'
 // import store from './store'
 
 const opex = 'http://localhost:9541'
+const logColor = 'color: #e8513e;'
 
 chrome.runtime.onInstalled.addListener(async () => {
-  console.log('%c 🧶 onInstalled', 'color: #e8513e;')
-  const clients = await getClients()
-  console.log({ clients })
-  chrome.storage.sync.set({ color: '#e8513e' }, () => {
-    console.log('%c 🧶 Storage Sync Set', 'color: #e8513e;')
+  console.log('%c 🧶 onInstalled', logColor)
+  chrome.storage.sync.set({ counter: 1 }, () => {
+    console.log('%c 🧶 "counter" set', logColor)
   })
 })
 
-chrome.runtime.onConnect.addListener((port) => {
-  console.log('%c 🧶 onConnect', 'color: #e8513e;')
-  console.log({ port })
-  port.onMessage.addListener((msg) => {
-    console.log({ msg })
-    port.postMessage('received')
-  })
+chrome.runtime.onMessage.addListener((req, sender, res) => {
+  console.log('%c 🧶 onMessage', logColor)
+  console.log({ req, sender, res })
 })
 
 async function getClients() {

@@ -44,4 +44,7 @@ $font-family-base: 'Fira Sans', sans-serif;
 $headings-font-family: 'Roboto Condensed', sans-serif;
 @import 'node_modules/bootstrap/scss/bootstrap';
 @import 'node_modules/bootstrap-vue/src/index.scss';
+.custom-select {
+  background: none !important;
+}
 </style>

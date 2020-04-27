@@ -8,8 +8,12 @@
   >
     <text-area />
     <b-form-group>
-      <b-form-select />
+      <b-form-select
+        v-model="client"
+        :options="clients"
+      />
     </b-form-group>
+    {{ client }}
     <b-form-checkbox
       v-model="isInternal"
       switch
@@ -38,8 +42,10 @@ export default {
   components: {
     TextArea
   },
+  props: ['tab', 'clients'],
   data() {
     return {
+      client: null,
       isInternal: false
     }
   }

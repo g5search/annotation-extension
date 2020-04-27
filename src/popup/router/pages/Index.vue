@@ -47,7 +47,7 @@
                   </b-btn>
                 </div>
               </template>
-              <da-note :tab="tab" />
+              <da-note :tab="tab" :clients="clients" />
             </b-tab>
             <template v-slot:tabs-end>
               <b-nav-item
@@ -65,13 +65,7 @@
               </div>
             </template>
           </b-tabs>
-          <code class="roman">
-            {{ res }}
-          </code>
           <template v-slot:footer>
-            <b-btn @click="getClients" variant="primary">
-              Action 1
-            </b-btn>
             <b-btn @click="getClients" variant="tertiary">
               Action 2
             </b-btn>
@@ -95,8 +89,9 @@ export default {
   data () {
     return {
       version,
-      tabs: [1],
-      tabCounter: 1,
+      isBusy: false,
+      tabs: [],
+      tabCounter: 0,
       tabSelected: 1,
       client: null,
       clients: [],
@@ -110,6 +105,9 @@ export default {
   },
   methods: {
     newTab() {
+      chrome.storage.sync.set({
+        tabCounter: this.tabCounter
+      }, (res) => console.log({ res }))
       this.tabs.push(this.tabCounter++)
     },
     onClose(x) {
@@ -120,12 +118,6 @@ export default {
       }
     },
     getClients() {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        this.res.push({ tabs })
-        chrome.sendMessage(tabs[0].id, { tabCounter: this.tabCounter }, (res) => {
-          this.res.push({ res })
-        })
-      })
     }
   }
 }
@@ -171,7 +163,7 @@ export default {
       left: 50%;
       transform: translate(-50%, -50%);
       height: 100%;
-      content: "new";
+      content: "add";
     }
   }
   & .nav-link {

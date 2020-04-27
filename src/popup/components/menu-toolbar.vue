@@ -23,7 +23,7 @@
           <b-btn variant="outline-primary" class="flex-grow-0 px-2">
             <b-icon-paperclip />
           </b-btn>
-          <b-btn variant="outline-primary" class="flex-grow-0 px-2">
+          <b-btn to="/tutorial" variant="outline-primary" class="flex-grow-0 px-2">
             <b-icon-question-circle />
           </b-btn>
           <b-btn to="/" variant="outline-primary" class="flex-grow-0 px-2">

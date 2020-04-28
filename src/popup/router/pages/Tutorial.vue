@@ -2,22 +2,6 @@
   <b-container fluid class="px-0">
     <b-row>
       <b-col>
-        <b-card>
-          <b-btn @click="viewOptions">
-            <b-icon-option />
-          </b-btn>
-           <b-btn @click="getClients">
-            <b-icon-forward />
-            Start Workflow
-          </b-btn>
-          <b-btn @click="getStorage">
-            Load Current
-          </b-btn>
-        </b-card>
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col>
         <b-card
           header="Hub Selector via Local Storage"
         >
@@ -36,39 +20,16 @@
             />
           </b-form-group>
           <b-form-group
-            v-show="clients.length > 0"
             label="Location"
           >
             <vue-multiselect
               v-model="location"
               :options="locations"
-              :custom-label="getLocationContext"
+              :custom-label="getLocationName"
             />
           </b-form-group>
-          <b-card-footer>
-            <b-input-group>
-              <b-form-select
-                v-model="key"
-                :options="keys"
-              />
-              <template v-slot:append>
-                <b-btn @click="getByKey(key)" variant="outline-secondary">
-                  Get Selected
-                </b-btn>
-                <b-btn @click="removeByKey(key)" variant="tertiary" class="roman">
-                  Drop Selected
-                </b-btn>
-                <b-btn @click="clearStorage" variant="tertiary" class="roman">
-                  Clear All Storage
-                </b-btn>
-              </template>
-            </b-input-group>
-          </b-card-footer>
         </b-card>
       </b-col>
-    </b-row>
-    <b-row>
-      {{ clients }}
     </b-row>
   </b-container>
 </template>
@@ -84,9 +45,7 @@ export default {
   data() {
     return {
       client: null,
-      // clients: [],
       location: null,
-      locations: [],
       storage: [],
       key: 'clients',
       keys: ['clients', 'locations']
@@ -95,6 +54,9 @@ export default {
   computed: {
     clients() {
       return this.$store.getters.clients
+    },
+    locations() {
+      return this.$store.getters.locations.payload
     }
   },
   methods: {

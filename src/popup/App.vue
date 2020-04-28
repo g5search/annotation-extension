@@ -1,5 +1,25 @@
 <template>
   <div>
+     <b-sidebar
+      id="sidebar-1"
+      title="Options"
+      right
+      shadow
+    >
+      <b-card class="p-1">
+        <template v-slot:header>
+          Vuex Store
+        </template>
+        <code lang="json" class="d-block text-tertiary">
+          {{ store }}
+        </code>
+        <template v-slot:footer>
+          <b-form-text class="text-right">
+            {{ version }}
+          </b-form-text>
+        </template>
+      </b-card>
+    </b-sidebar>
     <menu-toolbar>
       <template v-slot:append>
         <b-btn
@@ -16,13 +36,24 @@
 </template>
 
 <script>
+import { version } from '../../package.json'
 import MenuToolbar from '../popup/components/menu-toolbar'
 export default {
   components: {
     MenuToolbar
   },
   data () {
-    return {}
+    return {
+      version
+    }
+  },
+  computed: {
+    store() {
+      return this.$store.state
+    }
+  },
+  created() {
+    console.log(this)
   }
 }
 </script>

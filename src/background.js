@@ -1,55 +1,17 @@
 import axios from 'axios'
 import store from './store'
-global.browser = require('webextension-polyfill')
-const logColor = 'color: #e8513e;'
-const curClients = mapState()
-console.log({ curClients })
 
 chrome.contextMenus.onClicked.addListener(onClick)
 
 chrome.runtime.onInstalled.addListener(async () => {
   onLog('Installed')
-  const contexts = [
-    'page',
-    'selection',
-    'link',
-    'editable'
-  ]
-  contexts.forEach((context) => {
-    const id = chrome.contextMenus.create({
-      title: context,
-      contexts: [context],
-      id: `context-${context}`
-    })
-    onLog(`Context Menu, ${id}, installed`)
-  })
   createContextMenus()
+  // TODO check for persistent store data before fetching update
   const clients = await getClients()
-  console.log(mapState()) // loaded into store correctly.
-  // store.dispatch('getClients', clients)
   chrome.storage.local.set({ clients: clients.slice(0, 200) })
 })
 
 chrome.runtime.onMessage.addListener(onMessage)
-// chrome.runtime.onMessage.addListener((req, sender, res) => {
-  // onLog(req)
-//   if (req === 'get-locations') {
-//     chrome.storage.local.get('urn', async (data) => {
-//       const locations = await getLocations(data.urn)
-//       chrome.storage.local.set({ locations })
-//       res('done')
-//     })
-//   }
-// })
-
-// TODO Not sure this is how vuex in this context
-function mapState() {
-  // return {
-  //   clients() {
-      return store.getters.clients
-  //   }
-  // }
-}
 
 async function getClients() {
   const clients = await axios({
@@ -77,6 +39,8 @@ async function getLocations(urn) {
       'Access-Control-Allow-Origin': ''
     }
   })
+  onLog(locations.data)
+  await store.dispatch('getLocations', locations.data)
   return locations
 }
 
@@ -88,14 +52,35 @@ function createContextMenus() {
     id: 'checkbox-1'
   })
   onLog(id)
+  const contexts = [
+    'page',
+    'selection',
+    'link',
+    'editable'
+  ]
+  contexts.forEach((context) => {
+    const id = chrome.contextMenus.create({
+      title: context,
+      contexts: [context],
+      id: `context-${context}`
+    })
+    onLog(`Context Menu, ${id}, installed`)
+  })
 }
 
-function onMessage(req, sender, res) {
+async function onMessage(req, sender, res) {
   onLog(req)
+  if (req === 'locations') {
+    const urn = store.state.client.urn
+    onLog(urn)
+    const locations = await getLocations(urn)
+    // store.dispatch('getLocations', locations.data)
+  }
   chrome.runtime.sendMessage({ req, sender, res })
 }
 
 function onLog(msg) {
+  const logColor = 'color: #e8513e;'
   typeof msg === 'string'
     ? console.log(`%c 🧶 ${msg}`, logColor)
     : console.log(msg)

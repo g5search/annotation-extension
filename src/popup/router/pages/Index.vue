@@ -1,25 +1,5 @@
 <template>
   <b-container fluid class="p-1">
-    <b-sidebar
-      id="sidebar-1"
-      title="Options"
-      right
-      shadow
-    >
-      <b-card class="p-1">
-        <template v-slot:header>
-          Vuex Store
-        </template>
-        <code lang="json" class="d-block text-tertiary">
-          {{ all }}
-        </code>
-        <template v-slot:footer>
-          <b-form-text class="text-right">
-            {{ version }}
-          </b-form-text>
-        </template>
-      </b-card>
-    </b-sidebar>
     <b-row>
       <b-col>
         <b-card no-body footer-class="p-0">
@@ -80,7 +60,6 @@
 </template>
 
 <script>
-import { version } from '../../../../package.json'
 import DaNote from '../../components/da-note'
 export default {
   components: {
@@ -88,7 +67,6 @@ export default {
   },
   data () {
     return {
-      version,
       isBusy: false,
       tabs: [],
       tabCounter: 0,

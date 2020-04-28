@@ -10,7 +10,7 @@ export default {
       this.$store.dispatch('setClient', client)
       const { urn } = client
       chrome.storage.local.set({ urn })
-      chrome.runtime.sendMessage('get-locations', (res) => {
+      chrome.runtime.sendMessage('locations', (res) => {
         console.log(res)
       })
     },

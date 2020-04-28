@@ -21,6 +21,7 @@
     "tiptap": "^1.27.0",
     "tiptap-extensions": "^1.29.1",
     "vue": "^2.6.10",
+    "vue-multiselect": "^2.1.6",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
   },

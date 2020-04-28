@@ -42,9 +42,33 @@ $enable-shadows: false;
 $enable-gradients: false;
 $font-family-base: 'Fira Sans', sans-serif;
 $headings-font-family: 'Roboto Condensed', sans-serif;
+
+// @import 'node_modules/vue-multiselect/dist/vue-multiselect.min.css';
 @import 'node_modules/bootstrap/scss/bootstrap';
 @import 'node_modules/bootstrap-vue/src/index.scss';
 .custom-select {
   background: none !important;
+}
+
+.multiselect__spinner:after,
+.multiselect__spinner:before {
+  border-top-color: #0b233f;
+}
+.multiselect__tag,
+.multiselect__option--highlight,
+.multiselect__option--highlight:after {
+  background: #0b233f;
+}
+.multiselect__tag-icon:hover {
+  background:#0b233f;
+}
+.multiselect__tag-icon:after {
+  color:#b1c4d2;
+}
+.multiselect__option--selected.multiselect__option--highlight,
+.multiselect__option--selected.multiselect__option--highlight:after,
+.multiselect__option--group-selected.multiselect__option--highlight,
+.multiselect__option--group-selected.multiselect__option--highlight:after {
+  background:#e94f3c;
 }
 </style>

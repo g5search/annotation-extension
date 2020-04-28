@@ -26,6 +26,8 @@
     "storage",
     "declarativeContent",
     "activeTab",
+    "cookies",
+    "desktopCapture",
     "tabs",
     "webRequest",
     "webNavigation",

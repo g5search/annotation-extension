@@ -8,7 +8,12 @@
     >
       <b-card class="p-1">
         <template v-slot:header>
-          Vuex Store
+          <b-btn
+            @click="openOptions"
+            variant="outline-tertiary"
+          >
+            Open Extension Options Page
+          </b-btn>
         </template>
         <code lang="json" class="d-block text-tertiary">
           {{ store }}
@@ -54,29 +59,42 @@ export default {
   },
   created() {
     console.log(this)
+  },
+  methods: {
+     openOptions() {
+      if (chrome.runtime.openOptionsPage) {
+        chrome.runtime.openOptionsPage()
+      } else {
+        window.open(chrome.runtime.getURL('options.html'))
+      }
+    },
   }
 }
 </script>
 
 <style lang="scss">
-@import url('https://fonts.googleapis.com/css?family=Fira+Sans:400,700|Roboto+Condensed:700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Roboto:400,700&display=swap');
 $theme-colors: (
   'primary': #0b233f,
   'secondary': #7898ad,
   'tertiary': #e8513e,
   'quaternary': #eee23e,
-  'quaternary-lt4': rgba(236, 233, 178, 0.5)
+  'quaternary-lt4': rgba(236, 233, 178, 0.5),
+  'success': #52be99
 );
 // $body-bg: #e1e5e9;
 $enable-rounded: false;
 $enable-shadows: false;
 $enable-gradients: false;
-$font-family-base: 'Fira Sans', sans-serif;
-$headings-font-family: 'Roboto Condensed', sans-serif;
+$font-family-base: 'Roboto', sans-serif;
+$headings-font-family: 'Roboto Slab', sans-serif;
 
 // @import 'node_modules/vue-multiselect/dist/vue-multiselect.min.css';
 @import 'node_modules/bootstrap/scss/bootstrap';
 @import 'node_modules/bootstrap-vue/src/index.scss';
+h1,h2,h3 {
+  font-weight: 700;
+}
 .custom-select {
   background: none !important;
 }

@@ -8,32 +8,32 @@
         <b-btn
           :class="[{ 'is-active': isActive.bold() }, 'menubar__btn']"
           @click="commands.bold"
-          variant="outline-primary"
+          variant="outline-secondary"
         >
           <b-icon-type-bold />
         </b-btn>
         <b-btn
           :class="[{ 'is-active': isActive.italic() }, 'menubar__btn']"
           @click="commands.italic"
-          variant="outline-primary"
+          variant="outline-secondary"
         >
           <b-icon-type-italic />
         </b-btn>
         <b-btn
           :class="[{ 'is-active': isActive.underline() }, 'menubar__btn']"
           @click="commands.underline"
-          variant="outline-primary"
+          variant="outline-secondary"
         >
           <b-icon-type-underline />
         </b-btn>
         <b-btn
           :class="[{ 'is-active': isActive.strike() }, 'menubar__btn']"
           @click="commands.strike"
-          variant="outline-primary"
+          variant="outline-secondary"
         >
           <b-icon-type-strikethrough />
         </b-btn>
-        <div class="menubar__spacer bg-primary" />
+        <div class="menubar__spacer bg-secondary" />
         <!-- <b-btn
           :class="[{ 'is-active': isActive.heading({ level: 1 }) }, 'menubar__btn']"
           @click="commands.heading({ level: 1 })"
@@ -69,11 +69,11 @@
         >
           <b-icon-list-ul />
         </b-btn> -->
-        <div class="menubar__spacer bg-primary" />
+        <div class="menubar__spacer bg-secondary" />
         <b-btn
           :class="[{ 'is-active': isActive.link() }, 'menubar__btn']"
           @click="commands.link"
-          variant="outline-primary"
+          variant="outline-secondary"
         >
           <b-icon-link45deg />
         </b-btn>
@@ -104,6 +104,8 @@ import {
   OrderedList,
   BulletList,
   ListItem,
+  Focus,
+  Placeholder,
   Bold,
   Italic,
   Link,
@@ -116,6 +118,7 @@ export default {
     EditorContent,
     EditorMenuBar
   },
+  props: ['theme', 'content'],
   data() {
     return {
       editor: null
@@ -133,9 +136,22 @@ export default {
         new Link(),
         new Strike(),
         new Underline(),
-        new History()
+        new History(),
+        new Focus({
+          className: 'has-focus',
+          nested: true
+        }),
+        new Placeholder({
+          emptyEditorClass: 'is-editor-empty',
+          emptyNodeClass: 'is-empty',
+          emptyNodeText: 'Enter your note here...',
+          showOnlyWhenEditable: true
+        })
       ],
-      content: '<p>🐙This is editor content.</p><p>click to edit</p>'
+      content: this.content,
+      onUpdate: ({ state, getHTML, getJSON, transaction }) => {
+        this.$emit('text-update', { html: getHTML(), json: getJSON() })
+      }
     })
   },
   beforeDestroy() {
@@ -148,15 +164,17 @@ export default {
 .editor {
   &__content {
     font-size: 0.9em;
+    padding: 0.25em 0.5em;
+    border: 1px dotted red;
   }
   & .menubar {
     margin-bottom: 0.75em;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    // box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     transition: 200ms ease-out;
     display: flex;
-    &:hover {
-      box-shadow: 0 5px 7px rgba(0, 0, 0, 0.5);
-    }
+    // &:hover {
+    //   // box-shadow: 0 5px 7px rgba(0, 0, 0, 0.5);
+    // }
     &__spacer {
       flex: 1 1 auto;
     }
@@ -164,7 +182,7 @@ export default {
       padding: 0.15em 0.25em;
       margin: 0;
       & .is-active {
-        background-color: #0b233f;
+        background-color: #7898ad;
         color: white;
       }
     }

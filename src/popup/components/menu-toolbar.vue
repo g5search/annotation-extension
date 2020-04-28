@@ -3,10 +3,10 @@
     <b-row no-gutters>
       <b-col>
         <b-btn-group size="sm" class="d-flex w-100">
-          <!-- <b-btn variant="outline-primary" class="flex-grow-0 px-2">
+          <!-- <b-btn variant="outline-primary" class="flex-grow-0">
             <b-icon-pencil-square />
           </b-btn> -->
-          <b-btn variant="outline-primary" class="flex-grow-0 px-2">
+          <b-btn variant="outline-primary" class="flex-grow-0">
             <b-icon-file-plus />
           </b-btn>
           <b-dropdown variant="outline-primary" right text="Menu" class="flex-grow-1">
@@ -20,16 +20,16 @@
           <b-btn to="/workq" variant="outline-primary" class="">
             <b-icon-inboxes />
           </b-btn>
-          <b-btn variant="outline-primary" class="flex-grow-0 px-2">
+          <b-btn variant="outline-primary" class="flex-grow-0">
             <b-icon-paperclip />
           </b-btn>
-          <b-btn to="/tutorial" variant="outline-primary" class="flex-grow-0 px-2">
+          <b-btn to="/tutorial" variant="outline-primary" class="flex-grow-0">
             <b-icon-question-circle />
           </b-btn>
-          <b-btn to="/" variant="outline-primary" class="flex-grow-0 px-2">
+          <b-btn to="/" variant="outline-primary" class="flex-grow-0">
             <b-icon-house-door />
           </b-btn>
-          <b-btn to="/trash" variant="outline-primary" class="flex-grow-0 px-2">
+          <b-btn to="/trash" variant="outline-primary" class="flex-grow-0">
             <b-icon-trash />
           </b-btn>
           <slot name="append" />

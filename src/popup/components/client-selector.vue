@@ -1,12 +1,14 @@
 <template>
   <b-container fluid class="px-0">
-    <b-row>
-      <b-col cols="8" offset="2">
+    <b-row no-gutters>
+      <b-col>
         <b-form-group
-          v-show="clients.length > 0"
-          label="Client"
-          class="my-3"
+          class="mb-1 text-secondary"
         >
+          <template v-slot:label>
+            <b-icon-briefcase />
+            Client
+          </template>
           <vue-multiselect
             v-model="client"
             :options="clients"
@@ -17,12 +19,18 @@
           />
         </b-form-group>
         <b-form-group
-          label="Location"
+          class="mb-1 text-secondary"
         >
+          <template v-slot:label>
+            <b-icon-building />
+            Location
+          </template>
           <vue-multiselect
+            v-show="locations"
             v-model="location"
             :options="locations"
             :custom-label="getLocationName"
+            @input="setComplete"
           />
         </b-form-group>
       </b-col>
@@ -45,12 +53,22 @@ export default {
     }
   },
   computed: {
-     clients() {
+    isComplete() {
+      return this.client !== null && this.location !== null
+    },
+    clients() {
       return this.$store.getters.clients
     },
     // TODO something off here, I am having to traverse payload
     locations() {
       return this.$store.getters.locations.payload
+    }
+  },
+  methods: {
+    setComplete() {
+      this.isComplete
+        ? this.$emit('hub-ready')
+        : this.$emit('error')
     }
   }
 }

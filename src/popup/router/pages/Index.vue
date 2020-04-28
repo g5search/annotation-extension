@@ -27,6 +27,18 @@
                   </b-btn>
                 </div>
               </template>
+              <b-btn
+                v-b-toggle="`${tab}-collapse`"
+                variant="outline-secondary"
+                class="px-5"
+              >
+                Clients
+              </b-btn>
+              <b-collapse
+                :id="`${tab}-collapse`"
+              >
+                <client-selector />
+              </b-collapse>
               <da-note :tab="tab" :clients="clients" />
             </b-tab>
             <template v-slot:tabs-end>
@@ -61,9 +73,11 @@
 
 <script>
 import DaNote from '../../components/da-note'
+import ClientSelector from '../../components/client-selector'
 export default {
   components: {
-    DaNote
+    DaNote,
+    ClientSelector
   },
   data () {
     return {
@@ -71,8 +85,8 @@ export default {
       tabs: [],
       tabCounter: 0,
       tabSelected: 1,
-      client: null,
-      clients: [],
+      // client: null,
+      // clients: [],
       res: []
     }
   },

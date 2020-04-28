@@ -55,6 +55,7 @@ export default {
     clients() {
       return this.$store.getters.clients
     },
+    // TODO something off here, I am having to traverse payload
     locations() {
       return this.$store.getters.locations.payload
     }

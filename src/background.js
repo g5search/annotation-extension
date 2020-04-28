@@ -1,15 +1,14 @@
 import axios from 'axios'
 import store from './store'
-
+global.browser = require('webextension-polyfill')
 const logColor = 'color: #e8513e;'
-
-const client = mapState()
-console.log({ store })
+const curClients = mapState()
+console.log({ curClients })
 
 chrome.contextMenus.onClicked.addListener(onClick)
 
 chrome.runtime.onInstalled.addListener(async () => {
-  console.log('%c 🧶 onInstalled', logColor)
+  onLog('Installed')
   const contexts = [
     'page',
     'selection',
@@ -26,28 +25,30 @@ chrome.runtime.onInstalled.addListener(async () => {
   })
   createContextMenus()
   const clients = await getClients()
-  store.dispatch('getClients', clients)
+  console.log(mapState()) // loaded into store correctly.
+  // store.dispatch('getClients', clients)
   chrome.storage.local.set({ clients: clients.slice(0, 200) })
 })
 
-chrome.runtime.onMessage.addListener((req, sender, res) => {
+chrome.runtime.onMessage.addListener(onMessage)
+// chrome.runtime.onMessage.addListener((req, sender, res) => {
   // onLog(req)
-  if (req === 'get-locations') {
-    chrome.storage.local.get('urn', async (data) => {
-      const locations = await getLocations(data.urn)
-      chrome.storage.local.set({ locations })
-      res('done')
-    })
-  }
-})
+//   if (req === 'get-locations') {
+//     chrome.storage.local.get('urn', async (data) => {
+//       const locations = await getLocations(data.urn)
+//       chrome.storage.local.set({ locations })
+//       res('done')
+//     })
+//   }
+// })
 
 // TODO Not sure this is how vuex in this context
 function mapState() {
-  return {
-    client() {
-      return store.state.client()
-    }
-  }
+  // return {
+  //   clients() {
+      return store.getters.clients
+  //   }
+  // }
 }
 
 async function getClients() {
@@ -61,6 +62,7 @@ async function getClients() {
       'Access-Control-Allow-Origin': ''
     }
   })
+  await store.dispatch('getClients', clients.data)
   return clients.data
 }
 
@@ -86,6 +88,11 @@ function createContextMenus() {
     id: 'checkbox-1'
   })
   onLog(id)
+}
+
+function onMessage(req, sender, res) {
+  onLog(req)
+  chrome.runtime.sendMessage({ req, sender, res })
 }
 
 function onLog(msg) {

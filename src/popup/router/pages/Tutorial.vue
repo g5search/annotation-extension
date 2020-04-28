@@ -68,7 +68,7 @@
       </b-col>
     </b-row>
     <b-row>
-      {{ storage }}
+      {{ clients }}
     </b-row>
   </b-container>
 </template>
@@ -84,12 +84,17 @@ export default {
   data() {
     return {
       client: null,
-      clients: [],
+      // clients: [],
       location: null,
       locations: [],
       storage: [],
       key: 'clients',
       keys: ['clients', 'locations']
+    }
+  },
+  computed: {
+    clients() {
+      return this.$store.getters.clients
     }
   },
   methods: {
@@ -102,7 +107,7 @@ export default {
     },
     getClients() {
       chrome.storage.local.get('clients', (data) => {
-        this.clients = data.clients
+        // this.clients = data.clients
         chrome.storage.local.get('locations', (data) => {
           this.locations = data.locations.data
         })

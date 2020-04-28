@@ -7,6 +7,7 @@ export default {
       return `${(brandedName === '' || brandedName === null) ? name : brandedName}`
     },
     async getLocations(client) {
+      this.$store.dispatch('setClient', client)
       const { urn } = client
       chrome.storage.local.set({ urn })
       chrome.runtime.sendMessage('get-locations', (res) => {

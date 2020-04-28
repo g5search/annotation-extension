@@ -10,6 +10,9 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     client: {},
+    clients: [],
+    location: {},
+    locations: [],
     user: {}
   },
   getters,

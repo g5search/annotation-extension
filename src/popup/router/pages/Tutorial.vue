@@ -75,12 +75,12 @@
 
 <script>
 import VueMultiselect from 'vue-multiselect'
-import Helpers from '../mixin'
+import HubHelpers from '../hub-helpers'
 export default {
   components: {
     VueMultiselect
   },
-  mixins: [Helpers],
+  mixins: [HubHelpers],
   data() {
     return {
       client: null,

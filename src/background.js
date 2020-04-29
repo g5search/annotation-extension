@@ -16,7 +16,8 @@ chrome.runtime.onMessage.addListener(onMessage)
 async function getClients() {
   const clients = await axios({
     method: 'GET',
-    url: 'http://localhost:9541/api/extension/clients?seo_active=false',
+    // url: 'https://notes.g5marketingcloud.com/api/hub/clients',
+    url: 'http://localhost:4242/api/hub/clients',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
@@ -31,7 +32,8 @@ async function getClients() {
 async function getLocations(urn) {
   const locations = await axios({
     method: 'GET',
-    url: `http://localhost:9541/api/extension/locations?client_urn=${urn}`,
+    // url: `https://notes.g5marketingcloud.com/api/hub/clients/${urn}/locations`,
+    url: `http://localhost:4242/api/hub/clients/${urn}/locations`,
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',

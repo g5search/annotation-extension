@@ -89,7 +89,6 @@ $enable-gradients: false;
 $font-family-base: 'Roboto', sans-serif;
 $headings-font-family: 'Roboto Slab', sans-serif;
 
-// @import 'node_modules/vue-multiselect/dist/vue-multiselect.min.css';
 @import 'node_modules/bootstrap/scss/bootstrap';
 @import 'node_modules/bootstrap-vue/src/index.scss';
 h1,h2,h3 {

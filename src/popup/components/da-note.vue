@@ -11,7 +11,7 @@
         <b-btn
           :id="`hub-toggle-${tab}`"
           v-b-toggle="`${tab}-collapse`"
-          :variant="`${clientComplete ? 'success' : 'outline-primary bg-white'}`"
+          :variant="`${clientComplete ? 'success' : 'outline-primary'}`"
           class="px-2 shake-vertical"
         >
           <b-icon-building />
@@ -23,7 +23,7 @@
         <b-btn
           @click="draftSaved = !draftSaved"
           variant="outline-primary"
-          class="menubar__btn"
+          class="menubar__btn draft-btn"
         >
           <b-icon-file-earmark-diff v-if="!draftSaved" />
           <b-icon-file-earmark-check v-else />
@@ -39,6 +39,7 @@
     <div class="pb-3 pt-1">
       <b-collapse
         :id="`${tab}-collapse`"
+        visible
       >
         <client-selector @hub-ready="clientComplete = !clientComplete" />
       </b-collapse>
@@ -86,7 +87,7 @@ export default {
         json: null
       },
       isInternal: false,
-      draftSaved: false,
+      draftSaved: true,
       theme: 'secondary'
     }
   },
@@ -119,11 +120,22 @@ export default {
       flex: 1 1 auto;
     }
     &__btn {
+      position: relative;
       padding: 0.15em 0.25em;
       margin: 0;
       & .is-active {
         background-color: #0b233f;
         color: white;
+      }
+      &:hover {
+        &.draft-btn::after {
+          content: 'save';
+          position: absolute;
+          color: #0b233f;
+          left: 50%;
+          transform: translate(-50%, -80%);
+          height: 100%;
+        }
       }
     }
   }
@@ -151,18 +163,18 @@ export default {
   30%,
   50%,
   70% {
-    transform: translateY(-8px);
+    transform: translateY(-4px);
   }
   20%,
   40%,
   60% {
-    transform: translateY(8px);
+    transform: translateY(4px);
   }
   80% {
-    transform: translateY(6.4px);
+    transform: translateY(2px);
   }
   90% {
-    transform: translateY(-6.4px);
+    transform: translateY(-2.2px);
   }
 }
 

@@ -88,8 +88,7 @@ async function onMessage(req, sender, res) {
   } else if (req === 'login') {
     onLog(req)
     const email = store.state.user.email
-    const token = onLogin(email)
-    chrome.storage.sync.set({ key: token })
+    getApiKey(email)
   }
   chrome.runtime.sendMessage({ req, sender, res })
 }

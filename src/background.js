@@ -111,3 +111,18 @@ function onClick(context, tab) {
   })
   console.table(table)
 }
+
+async function getApiKey(email) {
+  const { data } = await axios.post(
+    'https://notes.g5marketingcloud.com/api/v1/key',
+    { email }
+  )
+  chrome.storage.sync.set({ apiKey: data.key })
+}
+
+function createNote(annotation){
+  chrome.storage.sync.get('apiKey', (res) => {
+    const { apiKey } = res
+    axios.post(`https://notes.g5marketingcloud.com/api/note?key=${apiKey}`, { annotation })
+  })
+}

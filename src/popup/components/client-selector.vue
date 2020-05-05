@@ -25,13 +25,13 @@
             <b-icon-building />
             Location
           </template>
-          <vue-multiselect
-            v-show="locations"
+          <!-- <vue-multiselect
+            v-show="locations.length > 0"
             v-model="location"
             :options="locations"
             :custom-label="getLocationName"
             @input="setComplete"
-          />
+          /> -->
         </b-form-group>
       </b-col>
     </b-row>

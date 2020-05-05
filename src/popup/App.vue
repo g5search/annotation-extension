@@ -57,9 +57,6 @@ export default {
       return this.$store.state
     }
   },
-  created() {
-    console.log(this)
-  },
   methods: {
      openOptions() {
       if (chrome.runtime.openOptionsPage) {
@@ -67,7 +64,7 @@ export default {
       } else {
         window.open(chrome.runtime.getURL('options.html'))
       }
-    },
+    }
   }
 }
 </script>

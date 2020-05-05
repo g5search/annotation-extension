@@ -27,20 +27,6 @@
                   </b-btn>
                 </div>
               </template>
-              <!-- <b-btn
-                v-b-toggle="`${tab}-collapse`"
-                variant="outline-secondary"
-                pill
-                class="px-2 mb-3"
-              >
-                <b-icon-building />
-              </b-btn>
-              <b-collapse
-                :id="`${tab}-collapse`"
-                class="mt-2"
-              >
-                <client-selector />
-              </b-collapse> -->
               <da-note :tab="tab" :clients="clients" />
             </b-tab>
             <template v-slot:tabs-end>
@@ -60,16 +46,11 @@
               </div>
             </template>
           </b-tabs>
-          <!-- <template v-slot:footer>
-            <b-btn @click="getClients" variant="tertiary">
-              Action 2
-            </b-btn>
-            <b-btn @click="getClients" variant="quaternary" class="roman">
-              Action 3
-            </b-btn>
-          </template> -->
         </b-card>
       </b-col>
+    </b-row>
+    <b-row>
+      {{ drafts }}
     </b-row>
   </b-container>
 </template>
@@ -88,21 +69,31 @@ export default {
       tabs: [],
       tabCounter: 0,
       tabSelected: 1,
-      // client: null,
-      // clients: [],
       res: []
     }
   },
   computed: {
-    all() {
-      return this.$store.state
+    // all() {
+    //   return this.$store.state
+    // },
+    drafts() {
+      return this.$store.state.drafts
     }
   },
   methods: {
     newTab() {
-      chrome.storage.sync.set({
-        tabCounter: this.tabCounter
-      }, (res) => console.log({ res }))
+      // this.$store.dispatch('createDraft', {
+      //   id: this.tabCounter++,
+      //   client: null,
+      //   locations: [],
+      //   note: {
+      //     html: '',
+      //     json: null
+      //   }
+      // })
+      // chrome.storage.sync.set({
+      //   tabCounter: this.tabCounter
+      // }, (res) => console.log({ res }))
       this.tabs.push(this.tabCounter++)
     },
     onClose(x) {

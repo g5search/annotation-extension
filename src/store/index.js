@@ -9,13 +9,17 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   plugins: [new VuexWebExtensions({
-    persistentStates: ['clients', 'user']
+    persistentStates: [
+      'clients',
+      'user',
+      'drafts'
+    ]
   })],
   state: {
-    client: {},
     clients: [],
-    location: {},
-    locations: [],
+    drafts: [
+      { id: 0, client: null, locations: [], note: { html: '', json: null } }
+    ],
     user: {}
   },
   getters,

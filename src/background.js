@@ -1,29 +1,34 @@
 import axios from 'axios'
 import store from './store'
 
+const headers = {
+  'Accept': 'application/json',
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Headers': '*',
+  'Access-Control-Allow-Origin': ''
+}
+
 chrome.contextMenus.onClicked.addListener(onClick)
 
 chrome.runtime.onInstalled.addListener(async () => {
   onLog('Installed')
   createContextMenus()
   // TODO check for persistent store data before fetching update
-  const clients = await getClients()
-  chrome.storage.local.set({ clients: clients.slice(0, 200) })
+  chrome.storage.sync.get('key', (res) => {
+    getClients(res.token)
+  })
+  // await getClients()
+  // chrome.storage.local.set({ clients: clients.slice(0, 200) })
 })
 
 chrome.runtime.onMessage.addListener(onMessage)
 
-async function getClients() {
+async function getClients(token) {
   const clients = await axios({
     method: 'GET',
     // url: 'https://notes.g5marketingcloud.com/api/hub/clients',
     url: 'http://localhost:4242/api/hub/clients',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Headers': '*',
-      'Access-Control-Allow-Origin': ''
-    }
+    headers
   })
   await store.dispatch('getClients', clients.data)
   return clients.data
@@ -34,12 +39,7 @@ async function getLocations(urn) {
     method: 'GET',
     // url: `https://notes.g5marketingcloud.com/api/hub/clients/${urn}/locations`,
     url: `http://localhost:4242/api/hub/clients/${urn}/locations`,
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Headers': '*',
-      'Access-Control-Allow-Origin': ''
-    }
+    headers
   })
   onLog(locations.data)
   await store.dispatch('getLocations', locations.data)
@@ -70,6 +70,14 @@ function createContextMenus() {
   })
 }
 
+async function onLogin(email) {
+  const token = await axios({
+    method: 'GET',
+    headers
+  })
+  return token
+}
+
 async function onMessage(req, sender, res) {
   onLog(req)
   if (req === 'locations') {
@@ -77,6 +85,11 @@ async function onMessage(req, sender, res) {
     onLog(urn)
     const locations = await getLocations(urn)
     // store.dispatch('getLocations', locations.data)
+  } else if (req === 'login') {
+    onLog(req)
+    const email = store.state.user.email
+    const token = onLogin(email)
+    chrome.storage.sync.set({ key: token })
   }
   chrome.runtime.sendMessage({ req, sender, res })
 }

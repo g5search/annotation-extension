@@ -1,6 +1,5 @@
 <template>
   <b-card
-    :bg-variant="isInternal ? 'quaternary-lt4' : 'white'"
     class="border-0 py-1 note"
     header-class="p-0"
     footer-class="p-0"
@@ -11,27 +10,28 @@
         <b-btn
           :id="`hub-toggle-${tab}`"
           v-b-toggle="`${tab}-collapse`"
-          :variant="`${clientComplete ? 'success' : 'outline-primary'}`"
-          class="px-2 shake-vertical"
+          :variant="`${clientComplete ? 'success' : 'outline-secondary'}`"
+          class="px-2"
         >
           <b-icon-building />
+          <b-icon-caret />
         </b-btn>
-        <div class="menubar__spacer bg-primary" />
-        <div class="bg-primary text-white d-flex align-items-center px-3">
+        <div class="menubar__spacer bg-pale" />
+        <div class="bg-pale text-white d-flex align-items-center px-3">
           <b-spinner v-show="!draftSaved" small />
         </div>
         <b-btn
           @click="draftSaved = !draftSaved"
-          variant="outline-primary"
+          variant="outline-secondary"
           class="menubar__btn draft-btn"
         >
           <b-icon-file-earmark-diff v-if="!draftSaved" />
           <b-icon-file-earmark-check v-else />
         </b-btn>
-        <b-btn variant="outline-primary" class="menubar__btn">
+        <b-btn variant="outline-secondary" class="menubar__btn">
           <b-icon-bookmark />
         </b-btn>
-        <b-btn variant="outline-primary" class="menubar__btn">
+        <b-btn variant="outline-secondary" class="menubar__btn">
           <b-icon-trash />
         </b-btn>
       </div>
@@ -44,27 +44,58 @@
         <client-selector @hub-ready="clientComplete = !clientComplete" />
       </b-collapse>
     </div>
-    <b-form-group class="text-secondary">
+    <b-form-group
+      label-class="text-secondary"
+    >
       <template v-slot:label>
-        <b-icon-file-richtext />
-        Note
+        <b-icon-collection />
+        Category
       </template>
-      <text-area
-        :theme="theme"
-        :content="content.html"
-        @text-update="onUpdate"
+      <b-form-select
+        v-model="category"
+        :options="categories"
       />
     </b-form-group>
-    <b-form-checkbox
-      v-model="isInternal"
-      switch
-      size="sm"
-      class="my-3"
+    <b-form-group
+      v-show="category !== null"
+      label-class="text-secondary"
     >
-      <b-icon-eye-fill v-if="!isInternal" />
-      <b-icon-eye-slash v-else />
-      {{ isInternal ? 'Internal-Only' : 'Ok to Share' }}
-    </b-form-checkbox>
+      <template v-slot:label>
+        <b-icon-puzzle />
+        Action Type
+      </template>
+      <b-form-select
+        v-model="actionType"
+        :options="actionTypes[category]"
+      />
+    </b-form-group>
+    <b-card
+      :bg-variant="isInternal ? 'quaternary-lt4' : 'white'"
+      no-body
+      class="border-0"
+    >
+      <b-form-group class="text-secondary">
+        <template v-slot:label>
+          <b-icon-file-richtext />
+          Note
+        </template>
+        <text-area
+          :theme="theme"
+          :content="content.html"
+          @text-update="onUpdate"
+        />
+      </b-form-group>
+      <b-form-checkbox
+        v-model="isInternal"
+        switch
+        size="sm"
+        class="my-3 text-secondary"
+      >
+        <b-icon-eye-fill v-if="!isInternal" />
+        <b-icon-eye-slash v-else />
+        {{ isInternal ? 'Internal-Only' : 'Ok to Share' }}
+      </b-form-checkbox>
+    </b-card>
     {{ content.html }}
   </b-card>
 </template>
@@ -86,7 +117,27 @@ export default {
         html: '',
         json: null
       },
-      isInternal: false,
+      category: null,
+      categories: [
+        'Account Changes',
+        'Customer Contact',
+        'General Note',
+        'Optmizations',
+        'Other',
+        'Technical Issue'
+      ],
+      actionType: null,
+      actionTypes: {
+        'Account Changes': [
+          'Dynamic Ads Updates',
+          'Branded Name Change'
+        ],
+        'Customer Contact': [
+          'Action Items',
+          'Analysis/Notes'
+        ]
+      },
+      isInternal: true,
       draftSaved: true,
       theme: 'secondary'
     }
@@ -110,11 +161,11 @@ export default {
   }
   & .menubar {
     // margin-bottom: 0.75em;
-    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 10px rgba(120, 152, 173, 0.2);
     transition: 200ms ease-out;
     display: flex;
     &:hover {
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 15px rgba(120, 152, 173, 0.2);
     }
     &__spacer {
       flex: 1 1 auto;

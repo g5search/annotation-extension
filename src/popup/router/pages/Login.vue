@@ -2,10 +2,15 @@
   <b-container fluid>
     <b-row>
       <b-col>
-        <b-card>
+        <b-card class="my-2">
           <b-form-group
-            label="We need your email"
+            label-class="text-secondary"
+            description="Your getg5 email"
           >
+            <template v-slot:label>
+              <b-icon-envelope />
+              Your Email
+            </template>
             <b-form-input
               id="email-input"
               :value="email"
@@ -13,7 +18,14 @@
               type="email"
             />
           </b-form-group>
-          <b-btn @click="getId">Id</b-btn>
+          <b-btn
+            :disabled="!isEmail"
+            @click="getId"
+            block
+            pill
+          >
+            Fetch Token
+          </b-btn>
         </b-card>
       </b-col>
     </b-row>
@@ -29,7 +41,9 @@ export default {
   },
   computed: {
     isEmail() {
-      return true
+      return this.email === null
+        ? null
+        : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)
     }
   },
   methods: {

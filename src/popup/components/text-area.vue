@@ -34,41 +34,20 @@
           <b-icon-type-strikethrough />
         </b-btn>
         <div class="menubar__spacer bg-secondary" />
-        <!-- <b-btn
-          :class="[{ 'is-active': isActive.heading({ level: 1 }) }, 'menubar__btn']"
-          @click="commands.heading({ level: 1 })"
-          variant="outline-primary"
-        >
-          <b-icon-type-h1 />
-        </b-btn>
-        <b-btn
-          :class="[{ 'is-active': isActive.heading({ level: 2 }) }, 'menubar__btn']"
-          @click="commands.heading({ level: 2 })"
-          variant="outline-primary"
-        >
-          <b-icon-type-h2 />
-        </b-btn>
-        <b-btn
-          :class="[{ 'is-active': isActive.heading({ level: 3 }) }, 'menubar__btn']"
-          @click="commands.heading({ level: 3 })"
-          variant="outline-primary"
-        >
-          <b-icon-type-h3 />
-        </b-btn>
         <b-btn
           :class="[{ 'is-active': isActive.ordered_list() }, 'menubar__btn']"
           @click="commands.ordered_list"
-          variant="outline-primary"
+          variant="outline-secondary"
         >
           <b-icon-list-ol />
         </b-btn>
         <b-btn
           :class="[{ 'is-active': isActive.bullet_list() }, 'menubar__btn']"
           @click="commands.bullet_list"
-          variant="outline-primary"
+          variant="outline-secondary"
         >
           <b-icon-list-ul />
-        </b-btn> -->
+        </b-btn>
         <div class="menubar__spacer bg-secondary" />
         <b-btn
           :class="[{ 'is-active': isActive.link() }, 'menubar__btn']"
@@ -93,14 +72,13 @@
         </b-btn> -->
       </div>
     </editor-menu-bar>
-    <editor-content :editor="editor" class="editor__content" />
+    <editor-content :editor="editor" class="editor__content pt-1" />
   </div>
 </template>
 
 <script>
 import { Editor, EditorContent, EditorMenuBar } from 'tiptap'
 import {
-  Heading,
   OrderedList,
   BulletList,
   ListItem,
@@ -127,7 +105,6 @@ export default {
   mounted() {
     this.editor = new Editor({
       extensions: [
-        new Heading({ levels: [1, 2, 3] }),
         new OrderedList(),
         new BulletList(),
         new ListItem(),
@@ -165,16 +142,13 @@ export default {
   &__content {
     font-size: 0.9em;
     padding: 0.25em 0.5em;
-    border: 1px dotted red;
+    border: 1px solid #7898ad;
+    border-top: none;
   }
   & .menubar {
-    margin-bottom: 0.75em;
-    // box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    // margin-bottom: 0.15em;
     transition: 200ms ease-out;
     display: flex;
-    // &:hover {
-    //   // box-shadow: 0 5px 7px rgba(0, 0, 0, 0.5);
-    // }
     &__spacer {
       flex: 1 1 auto;
     }

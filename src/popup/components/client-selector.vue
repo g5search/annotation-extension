@@ -26,7 +26,6 @@
             Location
           </template>
           <!-- <vue-multiselect
-            v-show="locations.length > 0"
             v-model="location"
             :options="locations"
             :custom-label="getLocationName"

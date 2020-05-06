@@ -3,12 +3,38 @@
     <b-row no-gutters>
       <b-col>
         <b-btn-group size="sm" class="d-flex w-100">
-          <b-btn to="/login" variant="outline-primary" class="flex-grow-0">
+          <b-btn
+            id="login"
+            to="/login"
+            variant="outline-primary"
+            class="flex-grow-0"
+          >
             <b-icon-gear />
           </b-btn>
-          <b-btn to="/" variant="outline-primary" class="flex-grow-0">
+          <b-tooltip
+            target="login"
+            triggers="hover"
+            variant="primary"
+            placement="bottom"
+          >
+            Configure
+          </b-tooltip>
+          <b-btn
+            id="home"
+            to="/"
+            variant="outline-primary"
+            class="flex-grow-0"
+          >
             <b-icon-house-door />
           </b-btn>
+          <b-tooltip
+            target="home"
+            triggers="hover"
+            variant="primary"
+            placement="bottom"
+          >
+            Notes
+          </b-tooltip>
           <div class="flex-grow-1 bg-primary" />
           <slot name="append" />
         </b-btn-group>
@@ -25,5 +51,8 @@ export default {}
 .menu-toolbar {
   box-shadow: 0 2px 15px rgba(12, 35, 63, 0.5);
   transition: 200ms ease-out;
+  &:hover {
+    box-shadow: 0 2px 25px rgba(12, 35, 63, 0.5);
+  }
 }
 </style>

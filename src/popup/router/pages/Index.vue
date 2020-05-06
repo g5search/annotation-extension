@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid class="p-1">
+  <b-container fluid class="p-1 my-2">
     <b-row>
       <b-col>
         <b-card no-body footer-class="p-0">

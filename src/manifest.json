@@ -25,16 +25,7 @@
   "web_accessible_resources": [],
   "permissions": [
     "storage",
-    "declarativeContent",
-    "activeTab",
-    "cookies",
-    "desktopCapture",
-    "contextMenus",
-    "tabs",
-    "identity",
-    "webRequest",
-    "webNavigation",
-    "downloads"
+    "declarativeContent"
   ],
   "background": {
     "scripts": [

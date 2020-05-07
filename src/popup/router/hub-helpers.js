@@ -17,7 +17,7 @@ export default {
     getLocationName(location) {
       return `${location.name}`
     },
-    getLocationContext({ name, displayName, status, offPlatform }) {
+    getLocationContext({ name, displayName, offPlatform }) {
       return `${(displayName === null || displayName === '') ? name : displayName} ${offPlatform === 'true' ? '[Off-Platform]' : ''}`
     }
   }

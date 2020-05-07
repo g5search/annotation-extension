@@ -1,6 +1,7 @@
 <template>
   <b-card
-    class="border-0 py-1 note"
+    no-body
+    class="border-0 py-1 px-2 note"
     header-class="p-0"
     footer-class="p-0"
     footer-bg-variant="white"
@@ -15,6 +16,19 @@
         >
           <b-icon-building />
         </b-btn>
+        <b-dropdown variant="outline-secondary" right>
+          <template v-slot:button-content>
+            <b-icon-life-preserver />
+            Quick Note
+          </template>
+          <b-dropdown-item
+            v-for="macro in macros"
+            :key="macro.text"
+            @click="onRun(macro.data)"
+          >
+            {{ macro.text }}
+          </b-dropdown-item>
+        </b-dropdown>
         <div class="menubar__spacer bg-pale" />
         <div class="bg-pale text-white d-flex align-items-center px-3">
           <b-spinner v-show="!draftSaved" small />
@@ -35,12 +49,41 @@
         </b-btn>
       </div>
     </template>
-    <div class="pb-3 pt-1">
+    <div class="pb-3 pt-1 px-0">
       <b-collapse
         :id="`${tab}-collapse`"
         visible
       >
-        <client-selector @hub-ready="clientComplete = !clientComplete" />
+        <!-- <client-selector @hub-ready="clientComplete = !clientComplete" /> -->
+        <b-form-group
+          class="mb-2 text-secondary"
+        >
+          <template v-slot:label>
+            <b-icon-briefcase />
+            Client
+          </template>
+          <vue-multiselect
+            v-model="client"
+            :options="clients"
+            :custom-label="getClientName"
+            @input="onClientSelect"
+            track-by="urn"
+            label="name"
+          />
+        </b-form-group>
+        <b-form-group
+          class="mb-1 text-secondary"
+        >
+          <template v-slot:label>
+            <b-icon-building />
+            Location
+          </template>
+          <vue-multiselect
+            v-model="location"
+            :options="locations"
+            :custom-label="getLocationName"
+          />
+        </b-form-group>
       </b-collapse>
     </div>
     <b-form-group
@@ -71,7 +114,7 @@
     <b-card
       :bg-variant="isInternal ? 'quaternary-lt4' : 'white'"
       no-body
-      class="border-0"
+      class="border-0 p-2"
     >
       <b-form-group
         label-class="d-flex w-100 align-items-center justify-content-between"
@@ -105,22 +148,38 @@
 </template>
 
 <script>
-import ClientSelector from './client-selector'
+// import ClientSelector from './client-selector'
+import VueMultiselect from 'vue-multiselect'
+import HubHelpers from '../router/hub-helpers'
 import TextArea from './text-area'
 export default {
   components: {
-    ClientSelector,
+    VueMultiselect,
+    // ClientSelector,
     TextArea
   },
+  mixins: [HubHelpers],
   props: ['tab', 'clients'],
   data() {
     return {
       client: null,
+      clientLocations: [],
+      locations: [],
       clientComplete: false,
       content: {
         html: '',
         json: null
       },
+      macros: [
+        {
+          text: 'Team Member Change',
+          data: {
+            category: 'Account Changes',
+            actionType: 'Team Member Change',
+            isInternal: true
+          }
+        }
+      ],
       category: null,
       categories: [
         { text: 'Select Option', value: null },
@@ -141,7 +200,8 @@ export default {
           'Specials/Promotions',
           'Spend Optimizer Version Change',
           'URL Change',
-          'Whitelisting events change'
+          'Whitelisting Events Change',
+          'Team Member Change'
         ],
         'General Note': [
           { text: '-', value: null }
@@ -180,12 +240,35 @@ export default {
       theme: 'secondary'
     }
   },
-  afterCreated() {
-    this.toggleShowStart()
+  computed: {
+    clients() {
+      return this.$store.getters.clients
+    }
+  },
+  created() {
+    this.$store.dispatch('createDraft', {
+      id: this.tab,
+      urn: '',
+      locations: [],
+      category: null,
+      actionType: null,
+      isInternal: true
+    })
   },
   methods: {
     onUpdate(payload) {
       this.content = payload
+    },
+    onClientSelect(payload) {
+      this.clientComplete = true
+      console.log({ payload })
+      this.$store.dispatch('updateDraft', payload)
+      chrome.runtime.sendMessage('fetchLocations', payload.urn)
+    },
+    onRun(payload) {
+      this.category = payload.category
+      this.actionType = payload.actionType
+      this.isInternal = payload.isInternal
     }
   }
 }

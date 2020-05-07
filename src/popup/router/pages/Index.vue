@@ -1,6 +1,6 @@
 <template>
   <b-container fluid class="p-1 my-2">
-    <b-row>
+    <b-row no-gutters>
       <b-col>
         <b-card no-body footer-class="p-0">
           <b-tabs
@@ -14,8 +14,7 @@
             >
               <template v-slot:title>
                 <div class="close-container">
-                  <b-spinner v-if="isBusy" small />
-                  <b-icon-file-text v-else />
+                  <b-icon-file-text />
                   {{ tab }}
                   <b-btn
                     @click="onClose(tab)"
@@ -27,7 +26,7 @@
                   </b-btn>
                 </div>
               </template>
-              <da-note :tab="tab" :clients="clients" />
+              <da-note :tab="tab" />
             </b-tab>
             <template v-slot:tabs-end>
               <b-nav-item
@@ -49,9 +48,6 @@
         </b-card>
       </b-col>
     </b-row>
-    <b-row>
-      {{ drafts }}
-    </b-row>
   </b-container>
 </template>
 
@@ -72,28 +68,8 @@ export default {
       res: []
     }
   },
-  computed: {
-    // all() {
-    //   return this.$store.state
-    // },
-    drafts() {
-      return this.$store.state.drafts
-    }
-  },
   methods: {
     newTab() {
-      // this.$store.dispatch('createDraft', {
-      //   id: this.tabCounter++,
-      //   client: null,
-      //   locations: [],
-      //   note: {
-      //     html: '',
-      //     json: null
-      //   }
-      // })
-      // chrome.storage.sync.set({
-      //   tabCounter: this.tabCounter
-      // }, (res) => console.log({ res }))
       this.tabs.push(this.tabCounter++)
     },
     onClose(x) {

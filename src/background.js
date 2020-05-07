@@ -1,6 +1,9 @@
 import axios from 'axios'
 import store from './store'
 
+// const host = 'https://notes.g5marketingcloud.com'
+const host = 'http://localhost:4242'
+
 const headers = {
   'Accept': 'application/json',
   'Content-Type': 'application/json',
@@ -14,11 +17,9 @@ chrome.runtime.onInstalled.addListener(async () => {
   onLog('Installed')
   createContextMenus()
   // TODO check for persistent store data before fetching update
-  chrome.storage.sync.get('key', (res) => {
+  chrome.storage.sync.get('apiKey', (res) => {
     getClients(res.token)
   })
-  // await getClients()
-  // chrome.storage.local.set({ clients: clients.slice(0, 200) })
 })
 
 chrome.runtime.onMessage.addListener(onMessage)
@@ -26,8 +27,7 @@ chrome.runtime.onMessage.addListener(onMessage)
 async function getClients(token) {
   const clients = await axios({
     method: 'GET',
-    // url: 'https://notes.g5marketingcloud.com/api/hub/clients',
-    url: 'http://localhost:4242/api/hub/clients',
+    url: `${host}/api/hub/clients`,
     headers
   })
   await store.dispatch('getClients', clients.data)
@@ -37,12 +37,11 @@ async function getClients(token) {
 async function getLocations(urn) {
   const locations = await axios({
     method: 'GET',
-    // url: `https://notes.g5marketingcloud.com/api/hub/clients/${urn}/locations`,
-    url: `http://localhost:4242/api/hub/clients/${urn}/locations`,
+    url: `${host}/api/hub/clients/${urn}/locations`,
     headers
   })
   onLog(locations.data)
-  await store.dispatch('getLocations', locations.data)
+  // await store.dispatch('getLocations', locations.data)
   return locations
 }
 
@@ -79,15 +78,15 @@ async function onLogin(email) {
 }
 
 async function onMessage(req, sender, res) {
-  onLog(req)
-  if (req === 'locations') {
-    const urn = store.state.client.urn
-    onLog(urn)
+  if (req.msg === 'locations') {
+    // onLog(req)
+    const { urn } = req
     const locations = await getLocations(urn)
-    // store.dispatch('getLocations', locations.data)
-  } else if (req === 'login') {
+    console.table(locations)
+    store.dispatch('updateDraft', urn)
+  } else if (req.msg === 'login') {
     onLog(req)
-    const email = store.state.user.email
+    const { email } = req
     getApiKey(email)
   }
   chrome.runtime.sendMessage({ req, sender, res })
@@ -112,16 +111,18 @@ function onClick(context, tab) {
 }
 
 async function getApiKey(email) {
-  const { data } = await axios.post(
-    'https://notes.g5marketingcloud.com/api/v1/key',
-    { email }
-  )
+  const { data } = await axios({
+    method: 'POST',
+    url: `${host}/api/v1/key`,
+    headers,
+    data: { email }
+  })
   chrome.storage.sync.set({ apiKey: data.key })
 }
 
 function createNote(annotation){
   chrome.storage.sync.get('apiKey', (res) => {
     const { apiKey } = res
-    axios.post(`https://notes.g5marketingcloud.com/api/note?key=${apiKey}`, { annotation })
+    axios.post(`${host}/api/note?key=${apiKey}`, { annotation })
   })
 }

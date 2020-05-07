@@ -52,7 +52,7 @@ export default {}
   box-shadow: 0 2px 15px rgba(12, 35, 63, 0.5);
   transition: 200ms ease-out;
   &:hover {
-    box-shadow: 0 2px 25px rgba(12, 35, 63, 0.5);
+    box-shadow: 0 2px 5px rgba(12, 35, 63, 0.8);
   }
 }
 </style>

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexWebExtensions from 'vuex-webextensions'
+// import * as state from './state'
 import * as getters from './getters'
 import mutations from './mutations'
 import * as actions from './actions'
@@ -17,9 +18,8 @@ export default new Vuex.Store({
   })],
   state: {
     clients: [],
-    drafts: [
-      { id: 0, client: null, locations: [], note: { html: '', json: null } }
-    ],
+    drafts: [],
+    lastUpdated: '',
     user: {}
   },
   getters,

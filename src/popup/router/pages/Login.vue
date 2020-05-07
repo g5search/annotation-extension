@@ -5,7 +5,7 @@
         <b-card class="my-2">
           <b-form-group
             label-class="text-secondary"
-            description="Your getg5 email"
+            description="first.last@getg5.com"
           >
             <template v-slot:label>
               <b-icon-envelope />
@@ -14,18 +14,18 @@
             <b-form-input
               id="email-input"
               :value="email"
+              :state="isEmail"
               @input="updateEmail"
               type="email"
             />
           </b-form-group>
           <b-btn
             :disabled="!isEmail"
-            @click="getId"
-            block
-            pill
-          >
+            @click="fetchToken"
+            block          >
             Fetch Token
           </b-btn>
+          {{ email }}
         </b-card>
       </b-col>
     </b-row>
@@ -47,11 +47,19 @@ export default {
     }
   },
   methods: {
-    getId() {
-      chrome.identity.getProfileUserInfo(res => console.log({ res }))
+    updateEmail(val) {
+      this.email = val
     },
-    updateEmail(evt) {
-      console.log({ evt })
+    onClear() {
+      this.email = null
+    },
+    fetchToken() {
+      chrome.runtime.sendMessage({
+        msg: 'login',
+        email: this.email
+      }, () => {
+        this.onClear()
+      })
     }
   }
 }

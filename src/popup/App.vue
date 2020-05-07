@@ -54,7 +54,7 @@ export default {
   },
   computed: {
     store() {
-      return this.$store.state
+      return this.$store.getters.drafts
     }
   },
   methods: {

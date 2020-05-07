@@ -11,14 +11,17 @@ const headers = {
   'Access-Control-Allow-Origin': ''
 }
 
-chrome.contextMenus.onClicked.addListener(onClick)
+// chrome.contextMenus.onClicked.addListener(onClick)
 
 chrome.runtime.onInstalled.addListener(async () => {
   onLog('Installed')
-  createContextMenus()
+  // createContextMenus()
   // TODO check for persistent store data before fetching update
   chrome.storage.sync.get('apiKey', (res) => {
-    getClients(res.token)
+    if (res) {
+      store.dispatch('hasToken')
+    }
+    getClients()
   })
 })
 
@@ -88,6 +91,8 @@ async function onMessage(req, sender, res) {
     onLog(req)
     const { email } = req
     getApiKey(email)
+  } else if (req.msg === 'createNote') {
+    createNote(req.data)
   }
   chrome.runtime.sendMessage({ req, sender, res })
 }
@@ -123,6 +128,7 @@ async function getApiKey(email) {
 function createNote(annotation){
   chrome.storage.sync.get('apiKey', (res) => {
     const { apiKey } = res
-    axios.post(`${host}/api/note?key=${apiKey}`, { annotation })
+    console.log({ apiKey })
+    axios.post(`${host}/api/v1/note?key=${apiKey}`, { annotation })
   })
 }

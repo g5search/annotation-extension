@@ -41,7 +41,7 @@
           <b-icon-file-earmark-diff v-if="!draftSaved" />
           <b-icon-file-earmark-check v-else />
         </b-btn>
-        <b-btn variant="outline-secondary" class="menubar__btn">
+        <b-btn @click="onSubmit" variant="outline-secondary" class="menubar__btn">
           <b-icon-bookmark />
         </b-btn>
         <b-btn variant="outline-secondary" class="menubar__btn">
@@ -178,6 +178,14 @@ export default {
             actionType: 'Team Member Change',
             isInternal: true
           }
+        },
+        {
+          text: 'Dynamic Pricing Start',
+          data: {
+            category: 'Implementation Dates',
+            actionType:'Dynamic Pricing Start',
+            isInternal: false
+          }
         }
       ],
       category: null,
@@ -260,15 +268,30 @@ export default {
       this.content = payload
     },
     onClientSelect(payload) {
+      this.draftSaved = false
       this.clientComplete = true
-      console.log({ payload })
       this.$store.dispatch('updateDraft', payload)
-      chrome.runtime.sendMessage('fetchLocations', payload.urn)
+      chrome.runtime.sendMessage({
+        msg: 'fetchLocations',
+        urn: this.client.urn
+      }, (res) => {
+        this.draftSaved = true
+      })
     },
     onRun(payload) {
       this.category = payload.category
       this.actionType = payload.actionType
       this.isInternal = payload.isInternal
+    },
+    onSubmit() {
+      chrome.runtime.sendMessage({
+        msg: 'createNote',
+        data: {
+          category: this.category,
+          actionType: this.actionType,
+          urn: this.urn
+        }
+      }, (res) => console.log(res))
     }
   }
 }

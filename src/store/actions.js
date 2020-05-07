@@ -9,7 +9,11 @@ export const setClient = async ({ commit }, payload) => {
   chrome.runtime.sendMessage('fetchLocations')
 }
 
+export const hasToken = async ({ commit }) => {
+  commit(types.HAS_TOKEN, true)
+}
+
 export const createDraft = ({ commit }, payload) => {
-  console.log({ payload })
+  // console.log({ payload })
   commit(types.CREATE_DRAFT, payload)
 }

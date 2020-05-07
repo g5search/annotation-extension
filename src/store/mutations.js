@@ -1,6 +1,9 @@
 import * as types from './mutation-types'
 
 export default {
+  [types.HAS_TOKEN] (state, payload) {
+    state.user.hasToken = payload
+  },
   [types.GET_CLIENTS] (state, payload) {
     state.clients = payload
   },

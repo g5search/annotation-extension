@@ -4,12 +4,12 @@ export default {
   [types.HAS_TOKEN] (state, payload) {
     state.user.hasToken = payload
   },
-  [types.GET_CLIENTS] (state, payload) {
+  [types.SET_CLIENTS] (state, payload) {
     state.clients = payload
   },
   [types.UPDATE_DRAFT] (state, payload) {
     const i = state.drafts.findIndex(draft => draft.id === payload.id)
-    state.drafts[i] = payload
+    state.drafts[i][payload.prop] = payload.value
   },
   [types.CREATE_DRAFT] (state, payload) {
     state.drafts.push(payload)

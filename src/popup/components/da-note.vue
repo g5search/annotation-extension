@@ -18,8 +18,7 @@
         </b-btn>
         <b-dropdown variant="outline-secondary" right>
           <template v-slot:button-content>
-            <b-icon-life-preserver />
-            Quick Note
+            <b-icon-lightning-fill />
           </template>
           <b-dropdown-item
             v-for="macro in macros"
@@ -254,26 +253,27 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('createDraft', {
-      id: this.tab,
-      urn: '',
-      locations: [],
-      category: null,
-      actionType: null,
-      isInternal: true
-    })
+
   },
   methods: {
-    onUpdate(payload) {
-      this.content = payload
+    onUpdate({ prop, value }) {
+      this.$store.dispatch('updateDraft', {
+        id: this.tab,
+        prop,
+        value,
+      })
+      // this.content = payload
     },
     onClientSelect(payload) {
       this.draftSaved = false
       this.clientComplete = true
-      this.$store.dispatch('updateDraft', payload)
       chrome.runtime.sendMessage({
-        msg: 'fetchLocations',
-        urn: this.client.urn
+        msg: 'locations',
+        data: {
+          id: this.tab,
+          prop: 'urn',
+          value: this.client.urn
+        }
       }, (res) => {
         this.draftSaved = true
       })
@@ -289,7 +289,9 @@ export default {
         data: {
           category: this.category,
           actionType: this.actionType,
-          urn: this.urn
+          urn: this.urn,
+          locations: this.locations,
+          internal: isInternal
         }
       }, (res) => console.log(res))
     }

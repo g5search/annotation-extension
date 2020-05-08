@@ -26,6 +26,7 @@
                   </b-btn>
                 </div>
               </template>
+              {{ drafts[tab] }}
               <da-note :tab="tab" />
             </b-tab>
             <template v-slot:tabs-end>
@@ -68,14 +69,29 @@ export default {
       res: []
     }
   },
+  computed: {
+    drafts() {
+      return this.$store.getters.drafts
+    }
+  },
   methods: {
     newTab() {
       this.tabs.push(this.tabCounter++)
+      this.$store.dispatch('createDraft', {
+        id: this.tab,
+        urn: '',
+        locations: [],
+        category: null,
+        actionType: null,
+        isInternal: true,
+        annotation: {}
+      })
     },
     onClose(x) {
       for (let i = 0; i < this.tabs.length; i++) {
         if (this.tabs[i] === x) {
           this.tabs.splice(i, 1)
+          this.$store.dispatch('dropDraft', i)
         }
       }
     }

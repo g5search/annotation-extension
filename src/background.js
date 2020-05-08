@@ -27,13 +27,17 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 chrome.runtime.onMessage.addListener(onMessage)
 
+function refetchRequired() {
+  // in epoch, current - store.lastupdated > 10000, call get clients.
+}
+
 async function getClients(token) {
   const clients = await axios({
     method: 'GET',
     url: `${host}/api/hub/clients`,
     headers
   })
-  await store.dispatch('getClients', clients.data)
+  await store.dispatch('setClients', clients.data)
   return clients.data
 }
 
@@ -43,8 +47,6 @@ async function getLocations(urn) {
     url: `${host}/api/hub/clients/${urn}/locations`,
     headers
   })
-  onLog(locations.data)
-  // await store.dispatch('getLocations', locations.data)
   return locations
 }
 
@@ -82,11 +84,19 @@ async function onLogin(email) {
 
 async function onMessage(req, sender, res) {
   if (req.msg === 'locations') {
-    // onLog(req)
-    const { urn } = req
+    onLog(req)
+    const { urn, id, annotation, isInternal, category, actionType } = req.data
     const locations = await getLocations(urn)
-    console.table(locations)
-    store.dispatch('updateDraft', urn)
+    console.table(locations.data)
+    store.dispatch('updateDraft', {
+      id,
+      urn,
+      locations: locations.data,
+      category,
+      actionType,
+      annotation,
+      isInternal
+    })
   } else if (req.msg === 'login') {
     onLog(req)
     const { email } = req
@@ -94,7 +104,7 @@ async function onMessage(req, sender, res) {
   } else if (req.msg === 'createNote') {
     createNote(req.data)
   }
-  chrome.runtime.sendMessage({ req, sender, res })
+  // chrome.runtime.sendMessage({ req, sender, res })
 }
 
 function onLog(msg) {
@@ -112,7 +122,7 @@ function onClick(context, tab) {
       context[key]
     ]
   })
-  console.table(table)
+  console.table(table.data)
 }
 
 async function getApiKey(email) {

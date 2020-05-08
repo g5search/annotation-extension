@@ -12,11 +12,17 @@
             @click="openOptions"
             variant="outline-tertiary"
           >
-            Open Extension Options Page
+            Options
+          </b-btn>
+          <b-btn
+            @click="$store.dispatch('dropDraft', 0)"
+            variant="quaternary"
+          >
+            Drop
           </b-btn>
         </template>
         <code lang="json" class="d-block text-tertiary">
-          {{ store }}
+          {{ drafts }}
         </code>
         <template v-slot:footer>
           <b-form-text class="text-right">
@@ -53,17 +59,15 @@ export default {
     }
   },
   computed: {
-    store() {
+    drafts() {
       return this.$store.getters.drafts
     }
   },
   methods: {
-     openOptions() {
-      if (chrome.runtime.openOptionsPage) {
-        chrome.runtime.openOptionsPage()
-      } else {
-        window.open(chrome.runtime.getURL('options.html'))
-      }
+    openOptions() {
+      (chrome.runtime.openOptionsPage)
+        ? chrome.runtime.openOptionsPage()
+        : window.open(chrome.runtime.getURL('options.html'))
     }
   }
 }

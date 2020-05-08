@@ -1,12 +1,12 @@
 import * as types from './mutation-types'
 
-export const getClients = ({ commit }, payload) => {
-  commit(types.GET_CLIENTS, payload)
+export const setClients = ({ commit }, clients) => {
+  commit(types.SET_CLIENTS, clients)
 }
 
 export const setClient = async ({ commit }, payload) => {
   await commit(types.UPDATE_DRAFT, payload)
-  chrome.runtime.sendMessage('fetchLocations')
+  chrome.runtime.sendMessage({ msg: 'locations' })
 }
 
 export const hasToken = async ({ commit }) => {
@@ -16,4 +16,13 @@ export const hasToken = async ({ commit }) => {
 export const createDraft = ({ commit }, payload) => {
   // console.log({ payload })
   commit(types.CREATE_DRAFT, payload)
+}
+
+export const updateDraft = ({ commit }, updates) => {
+  commit(types.UPDATE_DRAFT, updates)
+}
+
+export const dropDraft = ({ commit }, index) => {
+  console.log('DROPPED')
+  commit(types.DROP_DRAFT, index)
 }

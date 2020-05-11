@@ -7,6 +7,9 @@ export default {
   [types.SET_CLIENTS] (state, payload) {
     state.clients = payload
   },
+  [types.SET_LOCATIONS] (state, payload) {
+    state.locations = payload.payload
+  },
   [types.UPDATE_DRAFT] (state, payload) {
     const i = state.drafts.findIndex(draft => draft.id === payload.id)
     state.drafts[i][payload.prop] = payload.value

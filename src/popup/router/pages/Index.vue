@@ -2,98 +2,279 @@
   <b-container fluid class="p-1 my-2">
     <b-row no-gutters>
       <b-col>
-        <b-card no-body footer-class="p-0">
-          <b-tabs
-            v-model="tabSelected"
-            card
+        <b-card
+    no-body
+    class="border-0 py-1 px-2 note"
+    header-class="p-0"
+    footer-class="p-0"
+    footer-bg-variant="white"
+  >
+    <template v-slot:header>
+      <div class="d-flex w-100 justify-content-start menubar">
+        <b-dropdown variant="outline-secondary" right>
+          <template v-slot:button-content>
+            <b-icon-lightning-fill />
+          </template>
+          <b-dropdown-item
+            v-for="macro in macros"
+            :key="macro.text"
+            @click="onRun(macro.data)"
           >
-            <b-tab
-              v-for="tab in tabs"
-              :key="`tab-${tab}}`"
-              class="p-0"
-            >
-              <template v-slot:title>
-                <div class="close-container">
-                  <b-icon-file-text />
-                  {{ tab }}
-                  <b-btn
-                    @click="onClose(tab)"
-                    size="sm"
-                    variant="outline-tertiary"
-                    class="close-tab"
-                  >
-                    <b-icon-x />
-                  </b-btn>
-                </div>
-              </template>
-              {{ drafts[tab] }}
-              <da-note :tab="tab" />
-            </b-tab>
-            <template v-slot:tabs-end>
-              <b-nav-item
-                id="add-new"
-                role="presentation"
-                @click.prevent="newTab"
-                class="add-btn shake-bottom"
-              >
-                <b-icon-plus />
-              </b-nav-item>
-            </template>
-            <template v-slot:empty>
-              <div class="text-center text-muted">
-                There are no open notes.<br>
-                Create a new note using the <b>+</b> button above.
-              </div>
-            </template>
-          </b-tabs>
-        </b-card>
+            {{ macro.text }}
+          </b-dropdown-item>
+        </b-dropdown>
+        <div class="menubar__spacer bg-pale" />
+        <div class="bg-pale text-white d-flex align-items-center px-3">
+          <b-spinner v-show="!draftSaved" small />
+        </div>
+        <b-btn
+          @click="draftSaved = !draftSaved"
+          variant="outline-secondary"
+          class="menubar__btn draft-btn"
+        >
+          <b-icon-file-earmark-diff v-if="!draftSaved" />
+          <b-icon-file-earmark-check v-else />
+        </b-btn>
+        <b-btn @click="onSubmit" variant="outline-secondary" class="menubar__btn">
+          <b-icon-bookmark />
+        </b-btn>
+        <b-btn variant="outline-secondary" class="menubar__btn">
+          <b-icon-trash />
+        </b-btn>
+      </div>
+    </template>
+    <b-form-group
+      class="mb-2 text-secondary"
+    >
+      <template v-slot:label>
+        <b-icon-briefcase />
+        Client
+      </template>
+      <vue-multiselect
+        v-model="client"
+        :options="clients"
+        :custom-label="getClientName"
+        @input="onClientSelect"
+        track-by="urn"
+        label="name"
+      />
+    </b-form-group>
+    <b-form-group
+      class="mb-1 text-secondary"
+    >
+      <template v-slot:label>
+        <b-icon-building />
+        Location
+      </template>
+      <vue-multiselect
+        v-model="locations"
+        :options="clientLocations"
+        :custom-label="getLocationName"
+      />
+    </b-form-group>
+    <b-form-group
+      label-class="text-secondary"
+    >
+      <template v-slot:label>
+        <b-icon-collection />
+        Category
+      </template>
+      <b-form-select
+        v-model="category"
+        :options="categories"
+      />
+    </b-form-group>
+    <b-form-group
+      v-show="category !== null"
+      label-class="text-secondary"
+    >
+      <template v-slot:label>
+        <b-icon-puzzle />
+        Action Type
+      </template>
+      <b-form-select
+        :value="actionType"
+        :options="actionTypes[category]"
+      />
+    </b-form-group>
+    <b-card
+      :bg-variant="isInternal ? 'quaternary-lt4' : 'white'"
+      no-body
+      class="border-0 p-2"
+    >
+      <b-form-group
+        label-class="d-flex w-100 align-items-center justify-content-between"
+        class="text-secondary"
+      >
+        <template v-slot:label>
+          <span>
+            <b-icon-file-richtext />
+            Note
+          </span>
+          <b-form-checkbox
+            v-model="isInternal"
+            switch
+            size="sm"
+            class="text-secondary"
+          >
+            <b-icon-eye-fill v-if="!isInternal" />
+            <b-icon-eye-slash v-else />
+            {{ isInternal ? 'Internal-Only' : 'Ok to Share' }}
+          </b-form-checkbox>
+        </template>
+        <text-area
+          :theme="theme"
+          :content="annotation.html"
+          @text-update="updateText"
+        />
+      </b-form-group>
+    </b-card>
+    {{ annotation.html }}
+    {{ clientLocations }}
+  </b-card>
       </b-col>
     </b-row>
   </b-container>
 </template>
 
 <script>
-import DaNote from '../../components/da-note'
-import ClientSelector from '../../components/client-selector'
+import VueMultiselect from 'vue-multiselect'
+import HubHelpers from '../hub-helpers'
+import TextArea from '../../components/text-area'
 export default {
   components: {
-    DaNote,
-    ClientSelector
+    VueMultiselect,
+    TextArea
   },
+  mixins: [HubHelpers],
   data () {
     return {
-      isBusy: false,
-      tabs: [],
-      tabCounter: 0,
-      tabSelected: 1,
-      res: []
+      theme: 'secondary',
+      client: null,
+      // clientLocations: [],
+      locations: [],
+      category: null,
+      actionType: null,
+      isInternal: true,
+      annotation: {
+        html: '',
+        json: ''
+      },
+      macros: [
+        {
+          text: 'Team Member Change',
+          data: {
+            category: 'Account Changes',
+            actionType: 'Team Member Change',
+            isInternal: true
+          }
+        },
+        {
+          text: 'Dynamic Pricing Start',
+          data: {
+            category: 'Implementation Dates',
+            actionType:'Dynamic Pricing Start',
+            isInternal: false
+          }
+        }
+      ],
+      category: null,
+      categories: [
+        { text: 'Select Option', value: null },
+        'Account Changes',
+        'Customer Contact',
+        'General Note',
+        'Optmizations',
+        'Other',
+        'Technical Issue'
+      ],
+      actionType: null,
+      actionTypes: {
+        'Account Changes': [
+          { text: 'Select Option', value: null },
+          'Dynamic Ads Updates',
+          'Branded Name Change',
+          'Smart Bidding Strategy Change',
+          'Specials/Promotions',
+          'Spend Optimizer Version Change',
+          'URL Change',
+          'Whitelisting Events Change',
+          'Team Member Change'
+        ],
+        'General Note': [
+          { text: '-', value: null }
+        ],
+        'Customer Contact': [
+          { text: 'Select Option', value: null },
+          'Action Items',
+          'Analysis/Notes'
+        ],
+        'Optmizations': [
+          { text: 'Select Option', value: null },
+          'Added Negative Keywords',
+          'Changed Location Strategy',
+          'Paused Campaign',
+          'Enabled Campaign',
+          'Refreshed Ad Copy',
+          'Testing',
+          'T & O Added',
+          'Manual Spend Adjustments',
+          'Manual Bid Adjustments'
+        ],
+        'Other': [
+          { text: 'Select Option', value: null },
+          'Uncontrollable Circumstances'
+        ],
+        'Technical Issue': [
+          { text: 'Select Option', value: null },
+          'DA WoW',
+          'Dynamic Pricing',
+          'Dynamic Availability',
+          'Reporting Issue'
+        ]
+      },
+      isInternal: true,
+      draftSaved: true
     }
   },
   computed: {
-    drafts() {
-      return this.$store.getters.drafts
+    clients() {
+      return this.$store.getters.clients
+    },
+    clientLocations() {
+      return this.$store.getters.locations
     }
   },
   methods: {
-    newTab() {
-      this.tabs.push(this.tabCounter++)
-      this.$store.dispatch('createDraft', {
-        id: this.tab,
-        urn: '',
-        locations: [],
-        category: null,
-        actionType: null,
-        isInternal: true,
-        annotation: {}
+    onSubmit() {
+      chrome.runtime.sendMessage({
+        msg: 'create-note',
+        data: {
+
+        }
       })
     },
-    onClose(x) {
-      for (let i = 0; i < this.tabs.length; i++) {
-        if (this.tabs[i] === x) {
-          this.tabs.splice(i, 1)
-          this.$store.dispatch('dropDraft', i)
+    onRun(payload) {
+      this.category = payload.category
+      this.actionType = payload.actionType
+      this.isInternal = payload.isInternal
+    },
+    updateText(data) {
+      console.log({ data })
+      this.annotation = data
+    },
+    onClientSelect(payload) {
+      this.draftSaved = false
+      chrome.runtime.sendMessage({
+        msg: 'locations',
+        data: {
+          id: 1,
+          prop: 'urn',
+          value: this.client.urn
         }
-      }
+      }, () => {
+        this.draftSaved = true
+      })
     }
   }
 }
@@ -105,6 +286,41 @@ export default {
   font-family: 'Vollkorn', 'Times New Roman', Times, serif;
   font-style: italic;
   font-weight: 700;
+}
+.note {
+  &__content {
+    font-size: 0.9em;
+  }
+  & .menubar {
+    box-shadow: 0 2px 10px rgba(120, 152, 173, 0.2);
+    transition: 200ms ease-out;
+    display: flex;
+    &:hover {
+      box-shadow: 0 2px 15px rgba(120, 152, 173, 0.2);
+    }
+    &__spacer {
+      flex: 1 1 auto;
+    }
+    &__btn {
+      position: relative;
+      padding: 0.15em 0.25em;
+      margin: 0;
+      & .is-active {
+        background-color: #0b233f;
+        color: white;
+      }
+      &:hover {
+        &.draft-btn::after {
+          content: 'save';
+          position: absolute;
+          color: #0b233f;
+          left: 50%;
+          transform: translate(-50%, -80%);
+          height: 100%;
+        }
+      }
+    }
+  }
 }
 .close-container {
   position: relative;

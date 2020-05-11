@@ -47,7 +47,7 @@ async function getLocations(urn) {
     url: `${host}/api/hub/clients/${urn}/locations`,
     headers
   })
-  return locations
+  return locations.data.filter(l => l.status !== 'Deleted')
 }
 
 // TODO use to enable features on page
@@ -84,23 +84,16 @@ async function onLogin(email) {
 
 async function onMessage(req, sender, res) {
   if (req.msg === 'locations') {
-    onLog(req)
-    const { urn, id, annotation, isInternal, category, actionType } = req.data
-    const locations = await getLocations(urn)
-    console.table(locations.data)
-    store.dispatch('updateDraft', {
-      id,
-      urn,
-      locations: locations.data,
-      category,
-      actionType,
-      annotation,
-      isInternal
-    })
+    const { value } = req.data
+    const locations = await getLocations(value)
+    store.dispatch('setLocations', locations)
   } else if (req.msg === 'login') {
     onLog(req)
     const { email } = req
     getApiKey(email)
+  } else if (req.msg === 'createDraft') {
+    onLog(req.data)
+    store.dispatch('createDraft', req.data)
   } else if (req.msg === 'createNote') {
     createNote(req.data)
   }

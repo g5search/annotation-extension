@@ -9,8 +9,8 @@
     <template v-slot:header>
       <div class="d-flex w-100 justify-content-start menubar">
         <b-btn
-          :id="`hub-toggle-${tab}`"
-          v-b-toggle="`${tab}-collapse`"
+          :id="`hub-toggle-${tab.id}`"
+          v-b-toggle="`${tab.id}-collapse`"
           :variant="`${clientComplete ? 'success' : 'outline-secondary'}`"
           class="px-2"
         >
@@ -40,7 +40,7 @@
           <b-icon-file-earmark-diff v-if="!draftSaved" />
           <b-icon-file-earmark-check v-else />
         </b-btn>
-        <b-btn @click="onSubmit" variant="outline-secondary" class="menubar__btn">
+        <b-btn @click="onSubmit" variant="quaternary" class="menubar__btn">
           <b-icon-bookmark />
         </b-btn>
         <b-btn variant="outline-secondary" class="menubar__btn">
@@ -52,6 +52,7 @@
       <b-collapse
         :id="`${tab}-collapse`"
         visible
+        class="pb-1 border-bottom"
       >
         <!-- <client-selector @hub-ready="clientComplete = !clientComplete" /> -->
         <b-form-group
@@ -78,8 +79,8 @@
             Location
           </template>
           <vue-multiselect
-            v-model="location"
-            :options="locations"
+            v-model="locations"
+            :options="clientLocations"
             :custom-label="getLocationName"
           />
         </b-form-group>
@@ -106,8 +107,9 @@
         Action Type
       </template>
       <b-form-select
-        v-model="actionType"
+        :value="actionType"
         :options="actionTypes[category]"
+        @input="onUpdate({ prop: 'actionType', value: $event })"
       />
     </b-form-group>
     <b-card
@@ -138,7 +140,7 @@
         <text-area
           :theme="theme"
           :content="content.html"
-          @text-update="onUpdate"
+          @text-update="onUpdate({ prop: 'annotation', value: $event })"
         />
       </b-form-group>
     </b-card>
@@ -252,9 +254,6 @@ export default {
       return this.$store.getters.clients
     }
   },
-  created() {
-
-  },
   methods: {
     onUpdate({ prop, value }) {
       this.$store.dispatch('updateDraft', {
@@ -291,7 +290,8 @@ export default {
           actionType: this.actionType,
           urn: this.urn,
           locations: this.locations,
-          internal: isInternal
+          internal: this.isInternal,
+          annotation: this .content
         }
       }, (res) => console.log(res))
     }

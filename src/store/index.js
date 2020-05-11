@@ -19,6 +19,7 @@ export default new Vuex.Store({
   state: {
     clients: [],
     drafts: [],
+    locations: [],
     lastUpdated: '',
     user: {
       hasToken: false

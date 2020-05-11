@@ -5,22 +5,18 @@ export const setClients = ({ commit }, clients) => {
 }
 
 export const setClient = async ({ commit }, { payload }) => {
-  console.log({ payload })
   await commit(types.UPDATE_DRAFT, payload)
-  // chrome.runtime.sendMessage({ msg: 'locations' })
 }
 
 export const setLocations = async ({ commit }, payload) => {
-  console.log({ payload })
   await commit(types.SET_LOCATIONS, payload)
 }
 
-export const hasToken = async ({ commit }) => {
+export const hasToken = ({ commit }) => {
   commit(types.HAS_TOKEN, true)
 }
 
 export const createDraft = ({ commit }, payload) => {
-  // console.log({ payload })
   commit(types.CREATE_DRAFT, payload)
 }
 

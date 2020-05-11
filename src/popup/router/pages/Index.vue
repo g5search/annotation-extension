@@ -257,9 +257,15 @@ export default {
           category: this.category,
           actionType: this.actionType,
           html: this.annotation.html,
+          annotation: this.annotation.json,
           startDate: null,
           endDate: null
         }
+      }, () => {
+        this.client = null
+        this.locations = []
+        this.category = null
+        this.actionType = null
       })
     },
     onRun(payload) {

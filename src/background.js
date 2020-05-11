@@ -132,7 +132,8 @@ async function getApiKey(email) {
 function createNote(annotation){
   chrome.storage.sync.get('apiKey', (res) => {
     const { apiKey } = res
-    console.log({ apiKey })
-    axios.post(`${host}/api/v1/note?key=${apiKey}`, { annotation })
+    console.log({ apiKey, annotation })
+    axios.post(`${host}/api/v1/note?key=${apiKey}`, annotation)
+      .then(() => store.dispatch('allDone'))
   })
 }

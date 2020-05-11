@@ -3,12 +3,12 @@
     <b-row no-gutters>
       <b-col>
         <b-card
-    no-body
-    class="border-0 py-1 px-2 note"
-    header-class="p-0"
-    footer-class="p-0"
-    footer-bg-variant="white"
-  >
+          no-body
+          class="border-0 py-1 px-2 note"
+          header-class="p-0"
+          footer-class="p-0"
+          footer-bg-variant="white"
+        >
     <template v-slot:header>
       <div class="d-flex w-100 justify-content-start menubar">
         <b-dropdown variant="outline-secondary" right>
@@ -70,6 +70,10 @@
         v-model="locations"
         :options="clientLocations"
         :custom-label="getLocationName"
+        :multiple="true"
+        :close-on-select="false"
+        track-by="urn"
+        label="name"
       />
     </b-form-group>
     <b-form-group
@@ -93,7 +97,7 @@
         Action Type
       </template>
       <b-form-select
-        :value="actionType"
+        v-model="actionType"
         :options="actionTypes[category]"
       />
     </b-form-group>
@@ -129,8 +133,6 @@
         />
       </b-form-group>
     </b-card>
-    {{ annotation.html }}
-    {{ clientLocations }}
   </b-card>
       </b-col>
     </b-row>
@@ -154,7 +156,6 @@ export default {
       // clientLocations: [],
       locations: [],
       category: null,
-      actionType: null,
       isInternal: true,
       annotation: {
         html: '',
@@ -248,9 +249,16 @@ export default {
   methods: {
     onSubmit() {
       chrome.runtime.sendMessage({
-        msg: 'create-note',
+        msg: 'createNote',
         data: {
-
+          clientUrn: this.client.urn,
+          internal: this.isInternal,
+          locationUrns: this.locations.map(l => l.urn),
+          category: this.category,
+          actionType: this.actionType,
+          html: this.annotation.html,
+          startDate: null,
+          endDate: null
         }
       })
     },

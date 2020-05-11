@@ -95,6 +95,7 @@ async function onMessage(req, sender, res) {
     onLog(req.data)
     store.dispatch('createDraft', req.data)
   } else if (req.msg === 'createNote') {
+    console.log({ req })
     createNote(req.data)
   }
   // chrome.runtime.sendMessage({ req, sender, res })

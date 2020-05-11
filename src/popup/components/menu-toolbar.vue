@@ -5,7 +5,6 @@
         <b-btn-group size="sm" class="d-flex w-100">
           <b-btn
             id="login"
-            :disabled="hasToken"
             :variant="hasToken ? 'primary' : 'outline-primary'"
             to="/login"
             class="flex-grow-0"
@@ -49,6 +48,7 @@ export default {
   computed: {
     hasToken() {
       return this.$store.getters.hasToken
+      // return false
     }
   }
 }

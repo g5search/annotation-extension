@@ -9,131 +9,151 @@
           footer-class="p-0"
           footer-bg-variant="white"
         >
-    <template v-slot:header>
-      <div class="d-flex w-100 justify-content-start menubar">
-        <b-dropdown variant="outline-secondary" right>
-          <template v-slot:button-content>
-            <b-icon-lightning-fill />
+          <template v-slot:header>
+            <div class="d-flex w-100 justify-content-start menubar">
+              <b-dropdown
+                id="macro-dropdown"
+                variant="outline-secondary"
+                right
+              >
+                <template v-slot:button-content>
+                  <b-icon-lightning-fill />
+                </template>
+                <b-dropdown-item
+                  v-for="macro in macros"
+                  :key="macro.text"
+                  @click="onRun(macro.data)"
+                >
+                  {{ macro.text }}
+                </b-dropdown-item>
+              </b-dropdown>
+              <b-tooltip
+                target="macro-dropdown"
+                triggers="hover"
+                variant="secondary"
+                placement="right"
+              >
+                Quick Notes
+              </b-tooltip>
+              <div class="menubar__spacer bg-pale" />
+              <div class="bg-pale text-white d-flex align-items-center px-3">
+                <b-spinner v-if="!draftSaved" small />
+                <b-icon-check v-else />
+              </div>
+              <b-btn
+                :disabled="true"
+                variant="outline-secondary"
+                class="menubar__btn"
+              >
+                <b-icon-trash />
+              </b-btn>
+            </div>
           </template>
-          <b-dropdown-item
-            v-for="macro in macros"
-            :key="macro.text"
-            @click="onRun(macro.data)"
+          <b-form-group
+            class="my-2 text-secondary"
           >
-            {{ macro.text }}
-          </b-dropdown-item>
-        </b-dropdown>
-        <div class="menubar__spacer bg-pale" />
-        <div class="bg-pale text-white d-flex align-items-center px-3">
-          <b-spinner v-show="!draftSaved" small />
-        </div>
-        <b-btn
-          @click="draftSaved = !draftSaved"
-          variant="outline-secondary"
-          class="menubar__btn draft-btn"
-        >
-          <b-icon-file-earmark-diff v-if="!draftSaved" />
-          <b-icon-file-earmark-check v-else />
-        </b-btn>
-        <b-btn @click="onSubmit" variant="outline-secondary" class="menubar__btn">
-          <b-icon-bookmark />
-        </b-btn>
-        <b-btn variant="outline-secondary" class="menubar__btn">
-          <b-icon-trash />
-        </b-btn>
-      </div>
-    </template>
-    <b-form-group
-      class="mb-2 text-secondary"
-    >
-      <template v-slot:label>
-        <b-icon-briefcase />
-        Client
-      </template>
-      <vue-multiselect
-        v-model="client"
-        :options="clients"
-        :custom-label="getClientName"
-        @input="onClientSelect"
-        track-by="urn"
-        label="name"
-      />
-    </b-form-group>
-    <b-form-group
-      class="mb-1 text-secondary"
-    >
-      <template v-slot:label>
-        <b-icon-building />
-        Location
-      </template>
-      <vue-multiselect
-        v-model="locations"
-        :options="clientLocations"
-        :custom-label="getLocationName"
-        :multiple="true"
-        :close-on-select="false"
-        track-by="urn"
-        label="name"
-      />
-    </b-form-group>
-    <b-form-group
-      label-class="text-secondary"
-    >
-      <template v-slot:label>
-        <b-icon-collection />
-        Category
-      </template>
-      <b-form-select
-        v-model="category"
-        :options="categories"
-      />
-    </b-form-group>
-    <b-form-group
-      v-show="category !== null"
-      label-class="text-secondary"
-    >
-      <template v-slot:label>
-        <b-icon-puzzle />
-        Action Type
-      </template>
-      <b-form-select
-        v-model="actionType"
-        :options="actionTypes[category]"
-      />
-    </b-form-group>
-    <b-card
-      :bg-variant="isInternal ? 'quaternary-lt4' : 'white'"
-      no-body
-      class="border-0 p-2"
-    >
-      <b-form-group
-        label-class="d-flex w-100 align-items-center justify-content-between"
-        class="text-secondary"
-      >
-        <template v-slot:label>
-          <span>
-            <b-icon-file-richtext />
-            Note
-          </span>
-          <b-form-checkbox
-            v-model="isInternal"
-            switch
-            size="sm"
-            class="text-secondary"
+            <template v-slot:label>
+              <b-icon-briefcase />
+              Client
+            </template>
+            <vue-multiselect
+              v-model="client"
+              :options="clients"
+              :custom-label="getClientName"
+              @input="onClientSelect"
+              track-by="urn"
+              label="name"
+            />
+          </b-form-group>
+          <b-form-group
+            class="mb-2 text-secondary"
           >
-            <b-icon-eye-fill v-if="!isInternal" />
-            <b-icon-eye-slash v-else />
-            {{ isInternal ? 'Internal-Only' : 'Ok to Share' }}
-          </b-form-checkbox>
-        </template>
-        <text-area
-          :theme="theme"
-          :content="annotation.html"
-          @text-update="updateText"
-        />
-      </b-form-group>
-    </b-card>
-  </b-card>
+            <template v-slot:label>
+              <b-icon-building />
+              Location
+            </template>
+            <vue-multiselect
+              v-model="locations"
+              :options="clientLocations"
+              :custom-label="getLocationName"
+              :multiple="true"
+              :close-on-select="false"
+              track-by="urn"
+              label="name"
+            />
+          </b-form-group>
+          <b-form-group
+            label-class="text-secondary"
+          >
+            <template v-slot:label>
+              <b-icon-collection />
+              Category
+            </template>
+            <b-form-select
+              v-model="category"
+              :options="categories"
+              required
+            />
+          </b-form-group>
+          <b-form-group
+            v-show="category !== null"
+            label-class="text-secondary"
+          >
+            <template v-slot:label>
+              <b-icon-puzzle />
+              Action Type
+            </template>
+            <b-form-select
+              v-model="actionType"
+              :options="actionTypes[category]"
+              required
+            />
+          </b-form-group>
+          <b-card
+            :bg-variant="isInternal ? 'quaternary-lt4' : 'white'"
+            no-body
+            class="border-0 p-2 mb-2"
+          >
+            <b-form-group
+              label-class="d-flex w-100 align-items-center justify-content-between"
+              class="text-secondary"
+            >
+              <template v-slot:label>
+                <span>
+                  <b-icon-file-richtext />
+                  Note
+                </span>
+                <b-form-checkbox
+                  v-model="isInternal"
+                  switch
+                  size="sm"
+                  class="text-secondary"
+                >
+                  <b-icon-eye-fill v-if="!isInternal" />
+                  <b-icon-eye-slash v-else />
+                  {{ isInternal ? 'Internal-Only' : 'Ok to Share' }}
+                </b-form-checkbox>
+              </template>
+              <text-area
+                :theme="theme"
+                :content="annotation.html"
+                @text-update="updateText"
+              />
+            </b-form-group>
+          </b-card>
+          <template v-slot:footer>
+            <b-btn
+              @click="onSubmit"
+              :disabled="!isValid"
+              variant="secondary"
+              block
+              class="roman"
+            >
+              <b-icon-bookmark-plus />
+              Submit Note
+            </b-btn>
+          </template>
+        </b-card>
       </b-col>
     </b-row>
   </b-container>
@@ -153,7 +173,6 @@ export default {
     return {
       theme: 'secondary',
       client: null,
-      // clientLocations: [],
       locations: [],
       category: null,
       isInternal: true,
@@ -174,7 +193,7 @@ export default {
           text: 'Dynamic Pricing Start',
           data: {
             category: 'Implementation Dates',
-            actionType:'Dynamic Pricing Start',
+            actionType: 'Dynamic Pricing Start',
             isInternal: false
           }
         }
@@ -187,7 +206,8 @@ export default {
         'General Note',
         'Optmizations',
         'Other',
-        'Technical Issue'
+        'Technical Issue',
+        'Implementation Dates'
       ],
       actionType: null,
       actionTypes: {
@@ -232,6 +252,10 @@ export default {
           'Dynamic Pricing',
           'Dynamic Availability',
           'Reporting Issue'
+        ],
+        'Implementation Dates': [
+          { text: 'Select Option', value: null },
+          'Dynamic Pricing Start'
         ]
       },
       isInternal: true,
@@ -244,10 +268,17 @@ export default {
     },
     clientLocations() {
       return this.$store.getters.locations
+    },
+    isValid() {
+      return this.category !== null &&
+        this.actionType !== null &&
+        this.locations.length > 0 &&
+        this.client !== null
     }
   },
   methods: {
     onSubmit() {
+      this.draftSaved = false
       chrome.runtime.sendMessage({
         msg: 'createNote',
         data: {
@@ -262,10 +293,13 @@ export default {
           endDate: null
         }
       }, () => {
+        this.draftSaved = true
         this.client = null
         this.locations = []
         this.category = null
         this.actionType = null
+        this.annotation.html = ''
+        this.annotation.json = ''
       })
     },
     onRun(payload) {

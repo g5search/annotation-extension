@@ -92,13 +92,11 @@ async function onMessage(req, sender, res) {
     const { email } = req
     getApiKey(email)
   } else if (req.msg === 'createDraft') {
-    onLog(req.data)
     store.dispatch('createDraft', req.data)
   } else if (req.msg === 'createNote') {
-    console.log({ req })
     createNote(req.data)
+    res('OK')
   }
-  // chrome.runtime.sendMessage({ req, sender, res })
 }
 
 function onLog(msg) {
@@ -130,10 +128,10 @@ async function getApiKey(email) {
 }
 
 function createNote(annotation){
-  chrome.storage.sync.get('apiKey', (res) => {
+  return chrome.storage.sync.get('apiKey', (res) => {
     const { apiKey } = res
     console.log({ apiKey, annotation })
     axios.post(`${host}/api/v1/note?key=${apiKey}`, annotation)
-      .then(() => store.dispatch('allDone'))
+      .then(res => res)
   })
 }

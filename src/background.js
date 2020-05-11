@@ -1,8 +1,8 @@
 import axios from 'axios'
 import store from './store'
 
-// const host = 'https://notes.g5marketingcloud.com'
-const host = 'http://localhost:4242'
+const host = 'https://notes.g5marketingcloud.com'
+// const host = 'http://localhost:4242'
 
 const headers = {
   'Accept': 'application/json',

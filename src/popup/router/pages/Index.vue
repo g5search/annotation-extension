@@ -204,6 +204,46 @@ export default {
           }
         },
         {
+          text: 'Location DA Start',
+          data: {
+            category: 'Account Changes',
+            actionType: 'Location DA Start',
+            isInternal: false
+          }
+        },
+        {
+          text: 'Location DA End',
+          data: {
+            category: 'Account Changes',
+            actionType: 'Location DA End',
+            isInternal: false
+          }
+        },
+        {
+          text: 'Budget Change',
+          data: {
+            category: 'Account Changes',
+            actionType: 'Budget Change',
+            isInternal: false
+          }
+        },
+        {
+          text: 'Shape Autopilot Paused',
+          data: {
+            category: 'Account Changes',
+            actionType: 'Shape Autopilot Paused',
+            isInternal: true
+          }
+        },
+        {
+          text: 'Shape Autopilot Activated',
+          data: {
+            category: 'Account Changes',
+            actionType: 'Shape Autopilot Activated',
+            isInternal: true
+          }
+        },
+        {
           text: 'Dynamic Pricing Start',
           data: {
             category: 'Implementation Dates',
@@ -218,15 +258,7 @@ export default {
             actionType: 'Dynamic Pricing End',
             isInternal: false
           }
-        },
-        {
-          text: 'Dynamic Pricing Start',
-          data: {
-            category: 'Implementation Dates',
-            actionType: 'Dynamic Pricing Start',
-            isInternal: false
-          }
-        },
+        }
       ],
       category: null,
       categories: [

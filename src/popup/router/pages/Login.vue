@@ -25,7 +25,9 @@
             block          >
             Fetch Token
           </b-btn>
-          {{ email }}
+          <template v-slot:footer>
+            {{ hasToken ? 'Token Installed.' : 'Please fetch a new Token.' }}
+          </template>
         </b-card>
       </b-col>
     </b-row>
@@ -44,6 +46,9 @@ export default {
       return this.email === null
         ? null
         : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)
+    },
+    hasToken() {
+      return this.$store.getters.hasToken
     }
   },
   methods: {

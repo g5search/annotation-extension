@@ -72,7 +72,7 @@
         </b-btn> -->
       </div>
     </editor-menu-bar>
-    <editor-content :editor="editor" class="editor__content pt-1" />
+    <editor-content :editor="editor" class="editor__content" />
   </div>
 </template>
 
@@ -141,12 +141,14 @@ export default {
 .editor {
   &__content {
     font-size: 0.9em;
-    padding: 0.25em 0.5em;
+    padding: 0.5em 0.5em 0em;
     border: 1px solid #7898ad;
     border-top: none;
+    & .is-empty {
+      color: grey;
+    }
   }
   & .menubar {
-    // margin-bottom: 0.15em;
     transition: 200ms ease-out;
     display: flex;
     &__spacer {

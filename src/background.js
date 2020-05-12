@@ -11,24 +11,29 @@ const headers = {
   'Access-Control-Allow-Origin': ''
 }
 
-// chrome.contextMenus.onClicked.addListener(onClick)
-
-chrome.runtime.onInstalled.addListener(async () => {
-  onLog('Installed')
-  // createContextMenus()
-  // TODO check for persistent store data before fetching update
+chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.sync.get('apiKey', (res) => {
-    if (res) {
+    if (res.apiKey) {
       store.dispatch('hasToken')
+      getClients(res.apiKey)
     }
-    getClients()
   })
 })
 
 chrome.runtime.onMessage.addListener(onMessage)
 
-function refetchRequired() {
-  // in epoch, current - store.lastupdated > 10000, call get clients.
+async function onMessage(req, sender, res) {
+  if (req.msg === 'locations') {
+    const locations = await getLocations(req.data.value)
+    store.dispatch('setLocations', locations)
+  } else if (req.msg === 'login') {
+    getApiKey(req.email)
+  } else if (req.msg === 'createDraft') {
+    store.dispatch('createDraft', req.data)
+  } else if (req.msg === 'createNote') {
+    createNote(req.data)
+    res(201)
+  }
 }
 
 async function getClients(token) {
@@ -50,73 +55,6 @@ async function getLocations(urn) {
   return locations.data.filter(l => l.status !== 'Deleted')
 }
 
-// TODO use to enable features on page
-function createContextMenus() {
-  const id = chrome.contextMenus.create({
-    title: 'checkbox',
-    type: 'checkbox',
-    id: 'checkbox-1'
-  })
-  onLog(id)
-  const contexts = [
-    'page',
-    'selection',
-    'link',
-    'editable'
-  ]
-  contexts.forEach((context) => {
-    const id = chrome.contextMenus.create({
-      title: context,
-      contexts: [context],
-      id: `context-${context}`
-    })
-    onLog(`Context Menu, ${id}, installed`)
-  })
-}
-
-async function onLogin(email) {
-  const token = await axios({
-    method: 'GET',
-    headers
-  })
-  return token
-}
-
-async function onMessage(req, sender, res) {
-  if (req.msg === 'locations') {
-    const { value } = req.data
-    const locations = await getLocations(value)
-    store.dispatch('setLocations', locations)
-  } else if (req.msg === 'login') {
-    onLog(req)
-    const { email } = req
-    getApiKey(email)
-  } else if (req.msg === 'createDraft') {
-    store.dispatch('createDraft', req.data)
-  } else if (req.msg === 'createNote') {
-    createNote(req.data)
-    res('OK')
-  }
-}
-
-function onLog(msg) {
-  const logColor = 'color: #e8513e;'
-  typeof msg === 'string'
-    ? console.log(`%c 🧶 ${msg}`, logColor)
-    : console.log(msg)
-}
-
-function onClick(context, tab) {
-  onLog(tab.url)
-  const table = Object.keys(context).map((key) => {
-    return [
-      key,
-      context[key]
-    ]
-  })
-  console.table(table.data)
-}
-
 async function getApiKey(email) {
   const { data } = await axios({
     method: 'POST',
@@ -127,11 +65,8 @@ async function getApiKey(email) {
   chrome.storage.sync.set({ apiKey: data.key })
 }
 
-function createNote(annotation){
-  return chrome.storage.sync.get('apiKey', (res) => {
-    const { apiKey } = res
-    console.log({ apiKey, annotation })
-    axios.post(`${host}/api/v1/note?key=${apiKey}`, annotation)
-      .then(res => res)
+function createNote(annotation) {
+  chrome.storage.sync.get('apiKey', (res) => {
+    axios.post(`${host}/api/v1/note?key=${res.apiKey}`, annotation)
   })
 }

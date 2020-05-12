@@ -78,9 +78,23 @@
               :custom-label="getLocationName"
               :multiple="true"
               :close-on-select="false"
+              :clear-on-select="false"
+              placeholder="Search"
               track-by="urn"
               label="name"
-            />
+            >
+              <template
+                slot="selection"
+                slot-scope="{ values, search, isOpen }"
+              >
+                <span
+                  v-if="values.length && !isOpen"
+                  class="multiselect__single"
+                >
+                  {{ values.length }} location(s) selected
+                </span>
+              </template>
+            </vue-multiselect>
           </b-form-group>
           <b-form-group
             label-class="text-secondary"
@@ -196,7 +210,23 @@ export default {
             actionType: 'Dynamic Pricing Start',
             isInternal: false
           }
-        }
+        },
+        {
+          text: 'Dynamic Pricing End',
+          data: {
+            category: 'Implementation Dates',
+            actionType: 'Dynamic Pricing End',
+            isInternal: false
+          }
+        },
+        {
+          text: 'Dynamic Pricing Start',
+          data: {
+            category: 'Implementation Dates',
+            actionType: 'Dynamic Pricing Start',
+            isInternal: false
+          }
+        },
       ],
       category: null,
       categories: [
@@ -220,7 +250,12 @@ export default {
           'Spend Optimizer Version Change',
           'URL Change',
           'Whitelisting Events Change',
-          'Team Member Change'
+          'Team Member Change',
+          'Location DA Start',
+          'Location DA End',
+          'Budget Change',
+          'Shape Autopilot Activated',
+          'Shape Autopilot Paused'
         ],
         'General Note': [
           { text: '-', value: null }
@@ -255,7 +290,16 @@ export default {
         ],
         'Implementation Dates': [
           { text: 'Select Option', value: null },
-          'Dynamic Pricing Start'
+          'Dynamic Pricing Start',
+          'Dynamic Pricing End',
+          'Dynamic Availability Start',
+          'Dynamic Availability End',
+          'Spend Optimizer Start',
+          'Spend Optimizer End',
+          'Call Scoring Start',
+          'Call Scoring End',
+          'First Impressions',
+          'First Spend'
         ]
       },
       isInternal: true,

@@ -21,8 +21,10 @@
           </b-form-group>
           <b-btn
             :disabled="!isEmail"
+            :variant="isSuccess ? 'success' : 'secondary'"
             @click="fetchToken"
-            block          >
+            block
+          >
             Fetch Token
           </b-btn>
           <template v-slot:footer>
@@ -38,7 +40,8 @@
 export default {
   data() {
     return {
-      email: null
+      email: null,
+      isSuccess: false
     }
   },
   computed: {
@@ -63,6 +66,7 @@ export default {
         msg: 'login',
         email: this.email
       }, () => {
+        this.isSuccess = true
         this.onClear()
       })
     }

@@ -21,12 +21,12 @@
             Drop
           </b-btn>
         </template>
-        <code lang="json" class="d-block text-tertiary">
-          {{ drafts }}
+        <code>
+          {{ appState }}
         </code>
         <template v-slot:footer>
           <b-form-text class="text-right">
-            {{ version }}
+            Version {{ version }}
           </b-form-text>
         </template>
       </b-card>
@@ -59,8 +59,8 @@ export default {
     }
   },
   computed: {
-    drafts() {
-      return this.$store.getters.drafts
+    appState() {
+      return this.$store.state
     }
   },
   methods: {

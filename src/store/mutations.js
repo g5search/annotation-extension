@@ -5,7 +5,11 @@ export default {
     state.user.hasToken = payload
   },
   [types.SET_CLIENTS] (state, payload) {
+    console.log(payload.length)
     state.clients = payload
+  },
+  [types.SET_LAST_UPDATED] (state) {
+    state.lastUpdated = new Date.now()
   },
   [types.SET_LOCATIONS] (state, payload) {
     state.locations = payload.payload

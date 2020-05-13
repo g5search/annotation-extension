@@ -1,4 +1,5 @@
 export const SET_CLIENTS = 'SET_CLIENTS'
+export const SET_LAST_UPDATED = 'SET_LAST_UPDATED'
 export const SET_LOCATIONS = 'SET_LOCATIONS'
 export const UPDATE_DRAFT = 'UPDATE_DRAFT'
 export const DROP_DRAFT = 'DROP_DRAFT'

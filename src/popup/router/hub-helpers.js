@@ -14,11 +14,8 @@ export default {
         console.log(res)
       })
     },
-    getLocationName(location) {
-      return `${location.name}`
-    },
-    getLocationContext({ name, displayName, offPlatform }) {
-      return `${(displayName === null || displayName === '') ? name : displayName} ${offPlatform === 'true' ? '[Off-Platform]' : ''}`
+    getLocationName({ name, displayName }) {
+      return `${(displayName === null || displayName === '') ? name : displayName}`
     }
   }
 }

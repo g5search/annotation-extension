@@ -54,6 +54,15 @@ export default {
       return this.$store.getters.hasToken
     }
   },
+  mounted() {
+    chrome.storage.sync.get('apiKey', (res) => {
+      const { apiKey } = res
+      if (apiKey) {
+        this.isSuccess = true
+        this.$store.dispatch('hasToken')
+      }
+    })
+  },
   methods: {
     updateEmail(val) {
       this.email = val

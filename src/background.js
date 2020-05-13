@@ -12,11 +12,15 @@ const headers = {
 }
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.sync.get('apiKey', (res) => {
+  chrome.storage.sync.get('apiKey', async (res) => {
     if (res.apiKey) {
+      console.log(res.apiKey)
       store.dispatch('hasToken')
-      getClients(res.apiKey)
+    } else {
+      console.log('No Key Found!')
     }
+    const clients = await getClients()
+    store.dispatch('setClients', clients)
   })
 })
 
@@ -27,7 +31,10 @@ async function onMessage(req, sender, res) {
     const locations = await getLocations(req.data.value)
     store.dispatch('setLocations', locations)
   } else if (req.msg === 'login') {
-    getApiKey(req.email)
+    const key = await getApiKey(req.email)
+    chrome.storage.sync.set({ apiKey: key }, () => {
+      res('All Done!')
+    })
   } else if (req.msg === 'createDraft') {
     store.dispatch('createDraft', req.data)
   } else if (req.msg === 'createNote') {
@@ -42,7 +49,6 @@ async function getClients(token) {
     url: `${host}/api/hub/clients`,
     headers
   })
-  await store.dispatch('setClients', clients.data)
   return clients.data
 }
 
@@ -62,7 +68,7 @@ async function getApiKey(email) {
     headers,
     data: { email }
   })
-  chrome.storage.sync.set({ apiKey: data.key })
+  return data.key
 }
 
 function createNote(annotation) {

@@ -35,6 +35,29 @@
               >
                 Quick Notes
               </b-tooltip>
+              <b-btn
+                id="clear-clients"
+                variant="outline-tertiary"
+                @click="$store.dispatch('dropClients')"
+              >
+                <b-icon-egg-fried />
+              </b-btn>
+              <b-btn
+                id="refresh-client-list"
+                variant="outline-secondary"
+                @click="refreshClients"
+              >
+                <b-spinner v-if="isBusy" small />
+                <b-icon-arrow-clockwise v-else />
+              </b-btn>
+              <b-tooltip
+                target="refresh-client-list"
+                triggers="hover"
+                variant="secondary"
+                placement="right"
+              >
+                Reload Clients
+              </b-tooltip>
               <div class="menubar__spacer bg-pale" />
               <div class="bg-pale text-white d-flex align-items-center px-3">
                 <b-spinner v-if="!draftSaved" small />
@@ -57,6 +80,7 @@
               Client
             </template>
             <vue-multiselect
+              v-if="!isBusy"
               v-model="client"
               :options="clients"
               :custom-label="getClientName"
@@ -187,6 +211,7 @@ export default {
     return {
       theme: 'secondary',
       client: null,
+      isBusy: false,
       locations: [],
       category: null,
       isInternal: true,
@@ -353,6 +378,14 @@ export default {
     }
   },
   methods: {
+    refreshClients() {
+      this.isBusy = true
+      chrome.runtime.sendMessage({
+        msg: 'reload-clients'
+      }, () => {
+        this.isBusy = false
+      })
+    },
     onSubmit() {
       this.draftSaved = false
       chrome.runtime.sendMessage({
@@ -375,7 +408,6 @@ export default {
         this.category = null
         this.actionType = null
         this.annotation.html = ''
-        this.annotation.json = ''
       })
     },
     onRun(payload) {
@@ -384,7 +416,7 @@ export default {
       this.isInternal = payload.isInternal
     },
     updateText(data) {
-      console.log({ data })
+      // console.log({ data })
       this.annotation = data
     },
     onClientSelect(payload) {

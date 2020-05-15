@@ -14,10 +14,9 @@ const headers = {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.sync.get('apiKey', async (res) => {
     if (res.apiKey) {
-      console.log(res.apiKey)
       store.dispatch('hasToken')
     } else {
-      console.log('No Key Found!')
+      console.log('%c No apiKey Found!', 'color: red;')
     }
     const clients = await getClients()
     store.dispatch('setClients', clients)
@@ -30,13 +29,16 @@ async function onMessage(req, sender, res) {
   if (req.msg === 'locations') {
     const locations = await getLocations(req.data.value)
     store.dispatch('setLocations', locations)
+    res(200)
   } else if (req.msg === 'login') {
     const key = await getApiKey(req.email)
     chrome.storage.sync.set({ apiKey: key }, () => {
-      res('All Done!')
+      res(201)
     })
-  } else if (req.msg === 'createDraft') {
-    store.dispatch('createDraft', req.data)
+  } else if (req.msg === 'reload-clients') {
+    const clients = await getClients()
+    store.dispatch('setClients', clients)
+    res(200)
   } else if (req.msg === 'createNote') {
     createNote(req.data)
     res(201)

@@ -291,7 +291,7 @@ export default {
           urn: this.urn,
           locations: this.locations,
           internal: this.isInternal,
-          annotation: this .content
+          annotation: this.content
         }
       }, (res) => console.log(res))
     }

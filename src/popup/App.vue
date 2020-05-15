@@ -7,23 +7,6 @@
       shadow
     >
       <b-card class="p-1">
-        <template v-slot:header>
-          <b-btn
-            @click="openOptions"
-            variant="outline-tertiary"
-          >
-            Options
-          </b-btn>
-          <b-btn
-            @click="$store.dispatch('dropDraft', 0)"
-            variant="quaternary"
-          >
-            Drop
-          </b-btn>
-        </template>
-        <code>
-          {{ appState }}
-        </code>
         <template v-slot:footer>
           <b-form-text class="text-right">
             Version {{ version }}
@@ -56,18 +39,6 @@ export default {
   data () {
     return {
       version
-    }
-  },
-  computed: {
-    appState() {
-      return this.$store.state
-    }
-  },
-  methods: {
-    openOptions() {
-      (chrome.runtime.openOptionsPage)
-        ? chrome.runtime.openOptionsPage()
-        : window.open(chrome.runtime.getURL('options.html'))
     }
   }
 }

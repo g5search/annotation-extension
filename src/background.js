@@ -1,6 +1,9 @@
 import axios from 'axios'
 import store from './store'
 
+const host = 'https://notes.g5marketingcloud.com'
+// const host = 'http://localhost:4242'
+
 const headers = {
   'Accept': 'application/json',
   'Content-Type': 'application/json',
@@ -8,120 +11,70 @@ const headers = {
   'Access-Control-Allow-Origin': ''
 }
 
-chrome.contextMenus.onClicked.addListener(onClick)
-
-chrome.runtime.onInstalled.addListener(async () => {
-  onLog('Installed')
-  createContextMenus()
-  // TODO check for persistent store data before fetching update
-  chrome.storage.sync.get('key', (res) => {
-    getClients(res.token)
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.sync.get('apiKey', async (res) => {
+    if (res.apiKey) {
+      store.dispatch('hasToken')
+    } else {
+      console.log('%c No apiKey Found!', 'color: red;')
+    }
+    const clients = await getClients()
+    store.dispatch('setClients', clients)
   })
-  // await getClients()
-  // chrome.storage.local.set({ clients: clients.slice(0, 200) })
 })
 
 chrome.runtime.onMessage.addListener(onMessage)
 
+async function onMessage(req, sender, res) {
+  if (req.msg === 'locations') {
+    const locations = await getLocations(req.data.value)
+    store.dispatch('setLocations', locations)
+    res(200)
+  } else if (req.msg === 'login') {
+    const key = await getApiKey(req.email)
+    chrome.storage.sync.set({ apiKey: key }, () => {
+      res(201)
+    })
+  } else if (req.msg === 'reload-clients') {
+    const clients = await getClients()
+    store.dispatch('setClients', clients)
+    res(200)
+  } else if (req.msg === 'createNote') {
+    createNote(req.data)
+    res(201)
+  }
+}
+
 async function getClients(token) {
   const clients = await axios({
     method: 'GET',
-    // url: 'https://notes.g5marketingcloud.com/api/hub/clients?activeDa=true',
-    url: 'http://localhost:4242/api/hub/clients?activeDa=true',
+    url: `${host}/api/hub/clients?activeDa=true`,
     headers
   })
-  await store.dispatch('getClients', clients.data)
   return clients.data
 }
 
 async function getLocations(urn) {
   const locations = await axios({
     method: 'GET',
-    // url: `https://notes.g5marketingcloud.com/api/hub/clients/${urn}/locations`,
-    url: `http://localhost:4242/api/hub/clients/${urn}/locations`,
+    url: `${host}/api/hub/clients/${urn}/locations`,
     headers
   })
-  onLog(locations.data)
-  await store.dispatch('getLocations', locations.data)
-  return locations
-}
-
-// TODO use to enable features on page
-function createContextMenus() {
-  const id = chrome.contextMenus.create({
-    title: 'checkbox',
-    type: 'checkbox',
-    id: 'checkbox-1'
-  })
-  onLog(id)
-  const contexts = [
-    'page',
-    'selection',
-    'link',
-    'editable'
-  ]
-  contexts.forEach((context) => {
-    const id = chrome.contextMenus.create({
-      title: context,
-      contexts: [context],
-      id: `context-${context}`
-    })
-    onLog(`Context Menu, ${id}, installed`)
-  })
-}
-
-async function onLogin(email) {
-  const token = await axios({
-    method: 'GET',
-    headers
-  })
-  return token
-}
-
-async function onMessage(req, sender, res) {
-  onLog(req)
-  if (req === 'locations') {
-    const urn = store.state.client.urn
-    onLog(urn)
-    const locations = await getLocations(urn)
-    // store.dispatch('getLocations', locations.data)
-  } else if (req === 'login') {
-    onLog(req)
-    const email = store.state.user.email
-    getApiKey(email)
-  }
-  chrome.runtime.sendMessage({ req, sender, res })
-}
-
-function onLog(msg) {
-  const logColor = 'color: #e8513e;'
-  typeof msg === 'string'
-    ? console.log(`%c 🧶 ${msg}`, logColor)
-    : console.log(msg)
-}
-
-function onClick(context, tab) {
-  onLog(tab.url)
-  const table = Object.keys(context).map((key) => {
-    return [
-      key,
-      context[key]
-    ]
-  })
-  console.table(table)
+  return locations.data.filter(l => l.status !== 'Deleted')
 }
 
 async function getApiKey(email) {
-  const { data } = await axios.post(
-    'https://notes.g5marketingcloud.com/api/v1/key',
-    { email }
-  )
-  chrome.storage.sync.set({ apiKey: data.key })
+  const { data } = await axios({
+    method: 'POST',
+    url: `${host}/api/v1/key`,
+    headers,
+    data: { email }
+  })
+  return data.key
 }
 
-function createNote(annotation){
+function createNote(annotation) {
   chrome.storage.sync.get('apiKey', (res) => {
-    const { apiKey } = res
-    axios.post(`https://notes.g5marketingcloud.com/api/note?key=${apiKey}`, { annotation })
+    axios.post(`${host}/api/v1/note?key=${res.apiKey}`, annotation)
   })
 }

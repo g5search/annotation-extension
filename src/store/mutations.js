@@ -1,21 +1,17 @@
-import * as types from './mutation-types'
-
 export default {
-  [types.GET_CLIENTS] (state, payload) {
+  HAS_TOKEN(state, payload) {
+    state.user.hasToken = payload
+  },
+  SET_CLIENTS(state, payload) {
     state.clients = payload
   },
-  [types.GET_LOCATIONS] (state, payload) {
-    state.locations = payload
+  DROP_CLIENTS(state) {
+    state.clients = []
   },
-  [types.UPDATE_DRAFT] (state, payload) {
-    const i = state.drafts.findIndex(draft => draft.id === payload.id)
-    state.drafts[i] = payload
+  SET_LAST_UPDATED(state) {
+    state.lastUpdated = new Date.now()
   },
-  [types.CREATE_DRAFT] (state, payload) {
-    state.drafts.push(payload)
-  },
-  [types.DROP_DRAFT] (state, payload) {
-    const i = state.drafts.findIndex(draft => draft.id === payload.id)
-    state.drafts.splice(i, 1)
+  SET_LOCATIONS(state, payload) {
+    state.locations = payload.payload
   }
 }

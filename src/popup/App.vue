@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="app-root">
      <b-sidebar
       id="sidebar-1"
       title="Options"
@@ -7,20 +7,9 @@
       shadow
     >
       <b-card class="p-1">
-        <template v-slot:header>
-          <b-btn
-            @click="openOptions"
-            variant="outline-tertiary"
-          >
-            Open Extension Options Page
-          </b-btn>
-        </template>
-        <code lang="json" class="d-block text-tertiary">
-          {{ store }}
-        </code>
         <template v-slot:footer>
           <b-form-text class="text-right">
-            {{ version }}
+            Version {{ version }}
           </b-form-text>
         </template>
       </b-card>
@@ -29,10 +18,10 @@
       <template v-slot:append>
         <b-btn
           v-b-toggle.sidebar-1
-          variant="primary"
+          variant="outline-primary"
           class="flex-grow-0 px-2"
         >
-          <b-icon-three-dots-vertical />
+          <b-icon-question-circle />
         </b-btn>
       </template>
     </menu-toolbar>
@@ -51,20 +40,6 @@ export default {
     return {
       version
     }
-  },
-  computed: {
-    store() {
-      return this.$store.state
-    }
-  },
-  methods: {
-     openOptions() {
-      if (chrome.runtime.openOptionsPage) {
-        chrome.runtime.openOptionsPage()
-      } else {
-        window.open(chrome.runtime.getURL('options.html'))
-      }
-    }
   }
 }
 </script>
@@ -76,6 +51,7 @@ $theme-colors: (
   'secondary': #7898ad,
   'tertiary': #e8513e,
   'quaternary': #eee23e,
+  'pale': #dee2e6,
   'quaternary-lt4': rgba(236, 233, 178, 0.5),
   'success': #52be99
 );
@@ -93,6 +69,10 @@ h1,h2,h3 {
 }
 .custom-select {
   background: none !important;
+}
+
+#app-root {
+  min-width: 400px;
 }
 
 .multiselect__spinner:after,

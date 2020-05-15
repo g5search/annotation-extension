@@ -1,31 +1,41 @@
 <template>
-  <b-container fluid class="px-0">
+  <b-container fluid class="px-0 menu-toolbar">
     <b-row no-gutters>
       <b-col>
         <b-btn-group size="sm" class="d-flex w-100">
-          <b-btn variant="outline-primary" class="flex-grow-0">
-            <b-icon-file-plus />
+          <b-btn
+            id="login"
+            :variant="hasToken ? 'primary' : 'outline-primary'"
+            to="/login"
+            class="flex-grow-0"
+          >
+            <b-icon-gear />
           </b-btn>
-          <b-dropdown variant="outline-primary" right text="Menu" class="flex-grow-1">
-            <b-dropdown-item>
-              Utilities
-            </b-dropdown-item>
-            <b-dropdown-item>
-              Logout
-            </b-dropdown-item>
-          </b-dropdown>
-          <b-btn variant="outline-primary" class="flex-grow-0">
-            <b-icon-paperclip />
-          </b-btn>
-          <b-btn to="/login" variant="outline-primary" class="flex-grow-0">
-            <b-icon-question-circle />
-          </b-btn>
-          <b-btn to="/" variant="outline-primary" class="flex-grow-0">
+          <b-tooltip
+            target="login"
+            triggers="hover"
+            variant="primary"
+            placement="bottom"
+          >
+            Configure
+          </b-tooltip>
+          <b-btn
+            id="home"
+            to="/"
+            variant="outline-primary"
+            class="flex-grow-0"
+          >
             <b-icon-house-door />
           </b-btn>
-          <b-btn variant="outline-primary" class="flex-grow-0">
-            <b-icon-trash />
-          </b-btn>
+          <b-tooltip
+            target="home"
+            triggers="hover"
+            variant="primary"
+            placement="bottom"
+          >
+            Notes
+          </b-tooltip>
+          <div class="flex-grow-1 bg-primary" />
           <slot name="append" />
         </b-btn-group>
       </b-col>
@@ -35,6 +45,21 @@
 
 <script>
 export default {
-
+  computed: {
+    hasToken() {
+      return this.$store.getters.hasToken
+      // return false
+    }
+  }
 }
 </script>
+
+<style lang="scss">
+.menu-toolbar {
+  box-shadow: 0 2px 15px rgba(12, 35, 63, 0.5);
+  transition: 200ms ease-out;
+  &:hover {
+    box-shadow: 0 2px 5px rgba(12, 35, 63, 0.8);
+  }
+}
+</style>

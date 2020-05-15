@@ -26,7 +26,6 @@
             Location
           </template>
           <!-- <vue-multiselect
-            v-show="locations.length > 0"
             v-model="location"
             :options="locations"
             :custom-label="getLocationName"
@@ -39,6 +38,7 @@
 </template>
 
 <script>
+// TODO: DEPRECATE AND DELETE THIS COMPONENT
 import VueMultiselect from 'vue-multiselect'
 import HubHelpers from '../router/hub-helpers'
 export default {
@@ -58,10 +58,6 @@ export default {
     },
     clients() {
       return this.$store.getters.clients
-    },
-    // TODO something off here, I am having to traverse payload
-    locations() {
-      return this.$store.getters.locations.payload
     }
   },
   methods: {

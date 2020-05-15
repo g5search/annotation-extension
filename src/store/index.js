@@ -10,17 +10,21 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   plugins: [new VuexWebExtensions({
     persistentStates: [
-      'clients',
-      'user',
-      'drafts'
-    ]
+      // 'clients',
+      'drafts',
+      'lastUpdated',
+      'user'
+    ],
+    loggerLevel: 'debug'
   })],
   state: {
     clients: [],
-    drafts: [
-      { id: 0, client: null, locations: [], note: { html: '', json: null } }
-    ],
-    user: {}
+    drafts: [],
+    locations: [],
+    lastUpdated: '',
+    user: {
+      hasToken: false
+    }
   },
   getters,
   mutations,

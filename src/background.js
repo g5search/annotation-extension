@@ -26,8 +26,8 @@ chrome.runtime.onMessage.addListener(onMessage)
 async function getClients(token) {
   const clients = await axios({
     method: 'GET',
-    // url: 'https://notes.g5marketingcloud.com/api/hub/clients',
-    url: 'http://localhost:4242/api/hub/clients',
+    // url: 'https://notes.g5marketingcloud.com/api/hub/clients?activeDa=true',
+    url: 'http://localhost:4242/api/hub/clients?activeDa=true',
     headers
   })
   await store.dispatch('getClients', clients.data)

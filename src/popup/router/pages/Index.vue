@@ -35,7 +35,7 @@
               >
                 Quick Notes
               </b-tooltip>
-              <b-btn
+              <!-- <b-btn
                 id="clear-clients"
                 variant="outline-tertiary"
                 @click="$store.dispatch('dropClients')"
@@ -49,7 +49,7 @@
               >
                 <b-spinner v-if="isBusy" small />
                 <b-icon-arrow-clockwise v-else />
-              </b-btn>
+              </b-btn> -->
               <b-tooltip
                 target="refresh-client-list"
                 triggers="hover"

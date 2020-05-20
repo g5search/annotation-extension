@@ -10,7 +10,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   plugins: [new VuexWebExtensions({
     persistentStates: [
-      // 'clients',
+      'clients',
       'drafts',
       'lastUpdated',
       'user'

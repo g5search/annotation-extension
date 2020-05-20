@@ -3,7 +3,11 @@ export const setLastUpdated = ({ commit }) => {
 }
 
 export const setClients = async ({ commit }, clients) => {
-  await commit('SET_CLIENTS', clients)
+  if (clients.payload) {
+    await commit('SET_CLIENTS', clients.payload)
+  } else {
+    await commit('SET_CLIENTS', clients)
+  }
 }
 
 export const setClient = async ({ commit }, { payload }) => {

@@ -35,29 +35,6 @@
               >
                 Quick Notes
               </b-tooltip>
-              <!-- <b-btn
-                id="clear-clients"
-                variant="outline-tertiary"
-                @click="$store.dispatch('dropClients')"
-              >
-                <b-icon-egg-fried />
-              </b-btn>
-              <b-btn
-                id="refresh-client-list"
-                variant="outline-secondary"
-                @click="refreshClients"
-              >
-                <b-spinner v-if="isBusy" small />
-                <b-icon-arrow-clockwise v-else />
-              </b-btn> -->
-              <b-tooltip
-                target="refresh-client-list"
-                triggers="hover"
-                variant="secondary"
-                placement="right"
-              >
-                Reload Clients
-              </b-tooltip>
               <div class="menubar__spacer bg-pale" />
               <div class="bg-pale text-white d-flex align-items-center px-3">
                 <b-spinner v-if="!draftSaved" small />
@@ -78,9 +55,36 @@
             <template v-slot:label>
               <b-icon-briefcase />
               Client
+                <b-btn
+                  id="clear-clients"
+                  variant="outline-tertiary"
+                  @click="$store.dispatch('dropClients')"
+                  size="sm"
+                  pill
+                >
+                  <b-icon-trash2 />
+                </b-btn>
+                <b-btn
+                  id="refresh-client-list"
+                  variant="outline-secondary"
+                  @click="refreshClients"
+                  size="sm"
+                  pill
+                >
+                  <b-spinner v-if="isBusy" small />
+                  <b-icon-arrow-clockwise v-else />
+                  {{ clients.length }}
+                </b-btn>
+              <b-tooltip
+                target="refresh-client-list"
+                triggers="hover"
+                variant="secondary"
+                placement="right"
+              >
+                Reload Clients
+              </b-tooltip>
             </template>
             <vue-multiselect
-              v-if="!isBusy"
               v-model="client"
               :options="clients"
               :custom-label="getClientName"
@@ -198,6 +202,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import VueMultiselect from 'vue-multiselect'
 import HubHelpers from '../hub-helpers'
 import TextArea from '../../components/text-area'
@@ -364,9 +369,12 @@ export default {
     }
   },
   computed: {
-    clients() {
-      return this.$store.getters.clients
-    },
+    ...mapState({
+      clients: state => state.clients
+    }),
+    // clients() {
+    //   return this.$store.getters.clients
+    // },
     clientLocations() {
       return this.$store.getters.locations
     },

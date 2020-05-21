@@ -40,13 +40,13 @@
                 <b-spinner v-if="!draftSaved" small />
                 <b-icon-check v-else />
               </div>
-              <b-btn
+              <!-- <b-btn
                 :disabled="true"
                 variant="outline-secondary"
                 class="menubar__btn"
               >
                 <b-icon-trash />
-              </b-btn>
+              </b-btn> -->
             </div>
           </template>
           <b-form-group
@@ -55,26 +55,26 @@
             <template v-slot:label>
               <b-icon-briefcase />
               Client
-                <b-btn
-                  id="clear-clients"
-                  variant="outline-tertiary"
-                  @click="$store.dispatch('dropClients')"
-                  size="sm"
-                  pill
-                >
-                  <b-icon-trash2 />
-                </b-btn>
-                <b-btn
-                  id="refresh-client-list"
-                  variant="outline-secondary"
-                  @click="refreshClients"
-                  size="sm"
-                  pill
-                >
-                  <b-spinner v-if="isBusy" small />
-                  <b-icon-arrow-clockwise v-else />
-                  {{ clients.length }}
-                </b-btn>
+              <b-btn
+                id="clear-clients"
+                @click="$store.dispatch('dropClients')"
+                variant="light"
+                size="sm"
+                class="text-secondary"
+              >
+                <b-icon-trash />
+              </b-btn>
+              <b-btn
+                id="refresh-client-list"
+                @click="refreshClients"
+                variant="light"
+                size="sm"
+                class="text-secondary"
+              >
+                <b-spinner v-if="isBusy" small />
+                <b-icon-arrow-clockwise v-else />
+                {{ clients.length }}
+              </b-btn>
               <b-tooltip
                 target="refresh-client-list"
                 triggers="hover"
@@ -217,6 +217,8 @@ export default {
       theme: 'secondary',
       client: null,
       isBusy: false,
+      startDate: null,
+      endDate: null,
       locations: [],
       category: null,
       isInternal: true,
@@ -320,7 +322,7 @@ export default {
           'Shape Autopilot Paused'
         ],
         'General Note': [
-          { text: '-', value: null }
+          { text: '-', value: 'none' }
         ],
         'Customer Contact': [
           { text: 'Select Option', value: null },
@@ -380,7 +382,6 @@ export default {
     },
     isValid() {
       return this.category !== null &&
-        this.actionType !== null &&
         this.locations.length > 0 &&
         this.client !== null
     }

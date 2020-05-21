@@ -49,13 +49,13 @@
           <b-icon-list-ul />
         </b-btn>
         <div class="menubar__spacer bg-secondary" />
-        <b-btn
+        <!-- <b-btn
           :class="[{ 'is-active': isActive.link() }, 'menubar__btn']"
           @click="commands.link"
           variant="outline-secondary"
         >
           <b-icon-link45deg />
-        </b-btn>
+        </b-btn> -->
         <!-- <b-btn
           :class="[{ 'is-active': isActive.undo() }, 'menubar__btn']"
           @click="commands.undo"

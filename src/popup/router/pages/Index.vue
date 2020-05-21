@@ -228,14 +228,6 @@ export default {
       },
       macros: [
         {
-          text: 'Team Member Change',
-          data: {
-            category: 'Account Changes',
-            actionType: 'Team Member Change',
-            isInternal: true
-          }
-        },
-        {
           text: 'Location DA Start',
           data: {
             category: 'Account Changes',
@@ -250,47 +242,47 @@ export default {
             actionType: 'Location DA End',
             isInternal: false
           }
-        },
-        {
-          text: 'Budget Change',
-          data: {
-            category: 'Account Changes',
-            actionType: 'Budget Change',
-            isInternal: false
-          }
-        },
-        {
-          text: 'Shape Autopilot Paused',
-          data: {
-            category: 'Account Changes',
-            actionType: 'Shape Autopilot Paused',
-            isInternal: true
-          }
-        },
-        {
-          text: 'Shape Autopilot Activated',
-          data: {
-            category: 'Account Changes',
-            actionType: 'Shape Autopilot Activated',
-            isInternal: true
-          }
-        },
-        {
-          text: 'Dynamic Pricing Start',
-          data: {
-            category: 'Implementation Dates',
-            actionType: 'Dynamic Pricing Start',
-            isInternal: false
-          }
-        },
-        {
-          text: 'Dynamic Pricing End',
-          data: {
-            category: 'Implementation Dates',
-            actionType: 'Dynamic Pricing End',
-            isInternal: false
-          }
         }
+      //   {
+      //     text: 'Budget Change',
+      //     data: {
+      //       category: 'Account Changes',
+      //       actionType: 'Budget Change',
+      //       isInternal: false
+      //     }
+      //   },
+      //   {
+      //     text: 'Shape Autopilot Paused',
+      //     data: {
+      //       category: 'Account Changes',
+      //       actionType: 'Shape Autopilot Paused',
+      //       isInternal: true
+      //     }
+      //   },
+      //   {
+      //     text: 'Shape Autopilot Activated',
+      //     data: {
+      //       category: 'Account Changes',
+      //       actionType: 'Shape Autopilot Activated',
+      //       isInternal: true
+      //     }
+      //   },
+      //   {
+      //     text: 'Dynamic Pricing Start',
+      //     data: {
+      //       category: 'Implementation Dates',
+      //       actionType: 'Dynamic Pricing Start',
+      //       isInternal: false
+      //     }
+      //   },
+      //   {
+      //     text: 'Dynamic Pricing End',
+      //     data: {
+      //       category: 'Implementation Dates',
+      //       actionType: 'Dynamic Pricing End',
+      //       isInternal: false
+      //     }
+      //   }
       ],
       category: null,
       categories: [
@@ -374,9 +366,6 @@ export default {
     ...mapState({
       clients: state => state.clients
     }),
-    // clients() {
-    //   return this.$store.getters.clients
-    // },
     clientLocations() {
       return this.$store.getters.locations
     },
@@ -425,7 +414,6 @@ export default {
       this.isInternal = payload.isInternal
     },
     updateText(data) {
-      // console.log({ data })
       this.annotation = data
     },
     onClientSelect(payload) {

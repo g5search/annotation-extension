@@ -141,9 +141,10 @@ export default {
 .editor {
   &__content {
     font-size: 0.9em;
-    padding: 0.5em 0.5em 0em;
+    padding: 0.5em 0.5em 0.25em;
     border: 1px solid #7898ad;
     border-top: none;
+    color: #0b233f;
     & .is-empty {
       color: grey;
     }

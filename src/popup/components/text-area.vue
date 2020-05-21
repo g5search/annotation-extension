@@ -96,7 +96,19 @@ export default {
     EditorContent,
     EditorMenuBar
   },
-  props: ['theme', 'content'],
+  props: {
+    theme: {
+      type: String,
+      default: 'primary'
+    },
+    content: {
+      type: String,
+      default() {
+        return ''
+      }
+    }
+  },
+  // props: ['theme', 'content'],
   data() {
     return {
       editor: null

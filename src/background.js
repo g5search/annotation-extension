@@ -32,12 +32,12 @@ async function onMessage(req, sender, res) {
     res(200)
   } else if (req.msg === 'login') {
     const key = await getApiKey(req.email)
-    chrome.storage.sync.set({ apiKey: key }, () => {
+    chrome.storage.sync.set({ apiKey: key }, async () => {
+      await store.dispatch('hasToken')
       res(201)
     })
   } else if (req.msg === 'reload-clients') {
-    // const clients = await getClients()
-    // store.dispatch('setClients', clients)
+    // ALT XHR FOR CLIENTS keep for now
     getXHRClients(res)
   } else if (req.msg === 'createNote') {
     createNote(req.data)

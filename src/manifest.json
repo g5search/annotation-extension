@@ -25,7 +25,8 @@
   "web_accessible_resources": [],
   "permissions": [
     "storage",
-    "declarativeContent"
+    "declarativeContent",
+    "tabs"
   ],
   "background": {
     "scripts": [

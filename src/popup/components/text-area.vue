@@ -49,13 +49,13 @@
           <b-icon-list-ul />
         </b-btn>
         <div class="menubar__spacer bg-secondary" />
-        <b-btn
+        <!-- <b-btn
           :class="[{ 'is-active': isActive.link() }, 'menubar__btn']"
           @click="commands.link"
           variant="outline-secondary"
         >
           <b-icon-link45deg />
-        </b-btn>
+        </b-btn> -->
         <!-- <b-btn
           :class="[{ 'is-active': isActive.undo() }, 'menubar__btn']"
           @click="commands.undo"
@@ -96,7 +96,19 @@ export default {
     EditorContent,
     EditorMenuBar
   },
-  props: ['theme', 'content'],
+  props: {
+    theme: {
+      type: String,
+      default: 'primary'
+    },
+    content: {
+      type: String,
+      default() {
+        return ''
+      }
+    }
+  },
+  // props: ['theme', 'content'],
   data() {
     return {
       editor: null
@@ -141,9 +153,10 @@ export default {
 .editor {
   &__content {
     font-size: 0.9em;
-    padding: 0.5em 0.5em 0em;
+    padding: 0.5em 0.5em 0.25em;
     border: 1px solid #7898ad;
     border-top: none;
+    color: #0b233f;
     & .is-empty {
       color: grey;
     }

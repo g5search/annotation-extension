@@ -7,189 +7,99 @@
     footer-bg-variant="white"
   >
     <template v-slot:header>
-      <div class="d-flex w-100 justify-content-start menubar">
+      <note-toolbar :is-busy="isBusy" />
+    </template>
+    <b-form-group label-class="text-secondary" class="my-2">
+      <template v-slot:label>
+        <b-icon-briefcase />
+        Client
         <b-btn
-          :id="`hub-toggle-${tab.id}`"
-          v-b-toggle="`${tab.id}-collapse`"
-          :variant="`${clientComplete ? 'success' : 'outline-secondary'}`"
-          class="px-2"
+          id="clear-clients"
+          @click="$store.dispatch('dropClients')"
+          variant="light"
+          size="sm"
+          class="text-secondary"
         >
-          <b-icon-building />
-        </b-btn>
-        <b-dropdown variant="outline-secondary" right>
-          <template v-slot:button-content>
-            <b-icon-lightning-fill />
-          </template>
-          <b-dropdown-item
-            v-for="macro in macros"
-            :key="macro.text"
-            @click="onRun(macro.data)"
-          >
-            {{ macro.text }}
-          </b-dropdown-item>
-        </b-dropdown>
-        <div class="menubar__spacer bg-pale" />
-        <div class="bg-pale text-white d-flex align-items-center px-3">
-          <b-spinner v-show="!draftSaved" small />
-        </div>
-        <b-btn
-          @click="draftSaved = !draftSaved"
-          variant="outline-secondary"
-          class="menubar__btn draft-btn"
-        >
-          <b-icon-file-earmark-diff v-if="!draftSaved" />
-          <b-icon-file-earmark-check v-else />
-        </b-btn>
-        <b-btn @click="onSubmit" variant="quaternary" class="menubar__btn">
-          <b-icon-bookmark />
-        </b-btn>
-        <b-btn variant="outline-secondary" class="menubar__btn">
           <b-icon-trash />
         </b-btn>
-      </div>
-    </template>
-    <div class="pb-3 pt-1 px-0">
-      <b-collapse
-        :id="`${tab}-collapse`"
-        visible
-        class="pb-1 border-bottom"
-      >
-        <!-- <client-selector @hub-ready="clientComplete = !clientComplete" /> -->
-        <b-form-group
-          class="mb-2 text-secondary"
+        <b-btn
+          id="refresh-client-list"
+          @click="refreshClients"
+          variant="light"
+          size="sm"
+          class="text-secondary"
         >
-          <template v-slot:label>
-            <b-icon-briefcase />
-            Client
-          </template>
-          <vue-multiselect
-            v-model="client"
-            :options="clients"
-            :custom-label="getClientName"
-            @input="onClientSelect"
-            track-by="urn"
-            label="name"
-          />
-        </b-form-group>
-        <b-form-group
-          class="mb-1 text-secondary"
+          <b-spinner v-if="isClientsBusy" small />
+          <b-icon-arrow-clockwise v-else />
+          {{ clients.length }}
+        </b-btn>
+        <b-tooltip
+          target="refresh-client-list"
+          triggers="hover"
+          variant="secondary"
+          placement="right"
         >
-          <template v-slot:label>
-            <b-icon-building />
-            Location
-          </template>
-          <vue-multiselect
-            v-model="locations"
-            :options="clientLocations"
-            :custom-label="getLocationName"
-          />
-        </b-form-group>
-      </b-collapse>
-    </div>
-    <b-form-group
-      label-class="text-secondary"
-    >
+          Reload Clients
+        </b-tooltip>
+      </template>
+      <vue-multiselect
+        :value="client"
+        :options="clients"
+        :custom-label="getClientName"
+        @input="onClientSelect"
+        track-by="urn"
+        label="name"
+      />
+    </b-form-group>
+    <b-form-group label-class="text-secondary">
       <template v-slot:label>
         <b-icon-collection />
         Category
       </template>
       <b-form-select
-        v-model="category"
+        :value="category"
         :options="categories"
+        @input="onUpdate({ key: 'category', value: $event })"
+        required
       />
     </b-form-group>
-    <b-form-group
-      v-show="category !== null"
-      label-class="text-secondary"
-    >
+    <b-form-group label-class="text-secondary">
       <template v-slot:label>
         <b-icon-puzzle />
         Action Type
       </template>
       <b-form-select
+        id="action-type-select"
         :value="actionType"
         :options="actionTypes[category]"
-        @input="onUpdate({ prop: 'actionType', value: $event })"
+        @input="onUpdate({ key: 'actionType', value: $event })"
+        required
       />
     </b-form-group>
-    <b-card
-      :bg-variant="isInternal ? 'quaternary-lt4' : 'white'"
-      no-body
-      class="border-0 p-2"
-    >
-      <b-form-group
-        label-class="d-flex w-100 align-items-center justify-content-between"
-        class="text-secondary"
-      >
-        <template v-slot:label>
-          <span>
-            <b-icon-file-richtext />
-            Note
-          </span>
-          <b-form-checkbox
-            v-model="isInternal"
-            switch
-            size="sm"
-            class="text-secondary"
-          >
-            <b-icon-eye-fill v-if="!isInternal" />
-            <b-icon-eye-slash v-else />
-            {{ isInternal ? 'Internal-Only' : 'Ok to Share' }}
-          </b-form-checkbox>
-        </template>
-        <text-area
-          :theme="theme"
-          :content="content.html"
-          @text-update="onUpdate({ prop: 'annotation', value: $event })"
-        />
-      </b-form-group>
-    </b-card>
-    {{ content.html }}
   </b-card>
 </template>
 
 <script>
-// import ClientSelector from './client-selector'
+import { mapState, mapActions } from 'vuex'
 import VueMultiselect from 'vue-multiselect'
-import HubHelpers from '../router/hub-helpers'
+import HubHelpers from '../../popup/router/hub-helpers'
 import TextArea from './text-area'
+import NoteToolbar from './note-toolbar'
 export default {
   components: {
     VueMultiselect,
-    // ClientSelector,
-    TextArea
+    HubHelpers,
+    TextArea,
+    NoteToolbar
   },
   mixins: [HubHelpers],
-  props: ['tab', 'clients'],
   data() {
     return {
-      client: null,
-      clientLocations: [],
-      locations: [],
-      clientComplete: false,
-      content: {
-        html: '',
-        json: null
-      },
-      macros: [
-        {
-          text: 'Team Member Change',
-          data: {
-            category: 'Account Changes',
-            actionType: 'Team Member Change',
-            isInternal: true
-          }
-        },
-        {
-          text: 'Dynamic Pricing Start',
-          data: {
-            category: 'Implementation Dates',
-            actionType:'Dynamic Pricing Start',
-            isInternal: false
-          }
-        }
-      ],
-      category: null,
+      theme: 'secondary',
+      isBusy: false,
+      isClientsBusy: false,
+      canContentScript: true,
+      currentDomain: 'Shape',
       categories: [
         { text: 'Select Option', value: null },
         'Account Changes',
@@ -197,9 +107,9 @@ export default {
         'General Note',
         'Optmizations',
         'Other',
-        'Technical Issue'
+        'Technical Issue',
+        'Implementation Dates'
       ],
-      actionType: null,
       actionTypes: {
         'Account Changes': [
           { text: 'Select Option', value: null },
@@ -210,10 +120,15 @@ export default {
           'Spend Optimizer Version Change',
           'URL Change',
           'Whitelisting Events Change',
-          'Team Member Change'
+          'Team Member Change',
+          'Location DA Start',
+          'Location DA End',
+          'Budget Change',
+          'Shape Autopilot Activated',
+          'Shape Autopilot Paused'
         ],
         'General Note': [
-          { text: '-', value: null }
+          { text: '-', value: 'none' }
         ],
         'Customer Contact': [
           { text: 'Select Option', value: null },
@@ -242,97 +157,110 @@ export default {
           'Dynamic Pricing',
           'Dynamic Availability',
           'Reporting Issue'
+        ],
+        'Implementation Dates': [
+          { text: 'Select Option', value: null },
+          'Dynamic Pricing Start',
+          'Dynamic Pricing End',
+          'Dynamic Availability Start',
+          'Dynamic Availability End',
+          'Spend Optimizer Start',
+          'Spend Optimizer End',
+          'Call Scoring Start',
+          'Call Scoring End',
+          'First Impressions',
+          'First Spend'
         ]
-      },
-      isInternal: true,
-      draftSaved: true,
-      theme: 'secondary'
+      }
     }
   },
   computed: {
-    clients() {
-      return this.$store.getters.clients
-    }
+    ...mapState({
+      clients: state => state.clients,
+      selectedClient: state => state.client,
+      locations: state => state.locations,
+      category: state => state.category,
+      actionType: state => state.actionType,
+      selectedLocations: state => state.selectedLocations
+    })
   },
   methods: {
-    onUpdate({ prop, value }) {
-      this.$store.dispatch('updateDraft', {
-        id: this.tab,
-        prop,
-        value,
+     refreshClients() {
+      this.isClientBusy = true
+      chrome.runtime.sendMessage({
+        msg: 'reload-clients'
+      }, () => {
+        this.isClientBusy = false
       })
-      // this.content = payload
     },
     onClientSelect(payload) {
-      this.draftSaved = false
-      this.clientComplete = true
+      this.isBusy = true
+      this.setClient(payload)
       chrome.runtime.sendMessage({
         msg: 'locations',
         data: {
-          id: this.tab,
+          id: 1,
           prop: 'urn',
           value: this.client.urn
         }
-      }, (res) => {
-        this.draftSaved = true
+      }, () => {
+        this.isBusy = false
       })
     },
-    onRun(payload) {
-      this.category = payload.category
-      this.actionType = payload.actionType
-      this.isInternal = payload.isInternal
-    },
-    onSubmit() {
-      chrome.runtime.sendMessage({
-        msg: 'createNote',
-        data: {
-          category: this.category,
-          actionType: this.actionType,
-          urn: this.urn,
-          locations: this.locations,
-          internal: this.isInternal,
-          annotation: this.content
-        }
-      }, (res) => console.log(res))
-    }
+    ...mapActions({
+      setClient: 'setClient',
+      setSelectedLocations: 'setSelectedLocations',
+      onUpdate: 'updateField'
+    })
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.roman {
+  font-family: 'Times New Roman', Times, serif;
+  font-style: italic;
+  font-weight: 700;
+}
+// .better-badge {
+//   border-radius: 10px / 25%;
+//   box-shadow: 0 1px 2px rgba(206, 15, 105, 0.75),
+//               0 2px 5px rgba(232, 81, 63, 0.5),
+//               0 3px 8px rgba(255, 189, 0, 0.5);
+// }
 .note {
   &__content {
     font-size: 0.9em;
   }
-  & .menubar {
-    box-shadow: 0 2px 10px rgba(120, 152, 173, 0.2);
-    transition: 200ms ease-out;
-    display: flex;
-    &:hover {
-      box-shadow: 0 2px 15px rgba(120, 152, 173, 0.2);
-    }
-    &__spacer {
-      flex: 1 1 auto;
-    }
-    &__btn {
-      position: relative;
-      padding: 0.15em 0.25em;
-      margin: 0;
-      & .is-active {
-        background-color: #0b233f;
-        color: white;
-      }
-      &:hover {
-        &.draft-btn::after {
-          content: 'save';
-          position: absolute;
-          color: #0b233f;
-          left: 50%;
-          transform: translate(-50%, -80%);
-          height: 100%;
-        }
-      }
-    }
-  }
+  // & .menubar {
+  //   box-shadow: 0 2px 10px rgba(120, 152, 173, 0.2);
+  //   transition: 200ms ease-out;
+  //   display: flex;
+  //   &:hover {
+  //     box-shadow: 0 2px 15px rgba(120, 152, 173, 0.2);
+  //   }
+  //   &__spacer {
+  //     flex: 1 1 auto;
+  //   }
+  //   &__btn {
+  //     position: relative;
+  //     padding: 0.15em 0.25em;
+  //     margin: 0;
+  //     & .is-active {
+  //       background-color: #0b233f;
+  //       color: white;
+  //     }
+  //     &:hover {
+  //       &.draft-btn::after {
+  //         content: 'save';
+  //         position: absolute;
+  //         color: #0b233f;
+  //         left: 50%;
+  //         transform: translate(-50%, -80%);
+  //         height: 100%;
+  //       }
+  //     }
+  //   }
+  // }
 }
 </style>

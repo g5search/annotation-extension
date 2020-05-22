@@ -19,14 +19,32 @@
               type="email"
             />
           </b-form-group>
-          <b-btn
-            :disabled="!isEmail"
-            :variant="isSuccess ? 'success' : 'secondary'"
-            @click="fetchToken"
-            block
+          <b-btn-group class="w-100">
+            <b-btn
+              :disabled="!isEmail"
+              :variant="isSuccess ? 'success' : 'secondary'"
+              @click="fetchToken"
+            >
+              Fetch Token
+            </b-btn>
+            <!-- <b-btn
+              id="invalid-token"
+              :disabled="!isEmail"
+              @click="invalidateToken"
+              variant="outline-tertiary"
+            >
+              <b-icon-trash />
+              Remove All Tokens
+            </b-btn> -->
+          </b-btn-group>
+          <b-tooltip
+            target="invalid-token"
+            triggers="hover"
+            variant="tertiary"
+            placement="top"
           >
-            Fetch Token
-          </b-btn>
+            Use this option to clear all existing API tokens for your email address.
+          </b-tooltip>
           <template v-slot:footer>
             {{ hasToken ? 'Token Installed.' : 'Please fetch a new Token.' }}
           </template>

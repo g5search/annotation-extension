@@ -35,41 +35,18 @@
               >
                 Quick Notes
               </b-tooltip>
-              <!-- <b-btn
-                id="clear-clients"
-                variant="outline-tertiary"
-                @click="$store.dispatch('dropClients')"
-              >
-                <b-icon-egg-fried />
-              </b-btn>
-              <b-btn
-                id="refresh-client-list"
-                variant="outline-secondary"
-                @click="refreshClients"
-              >
-                <b-spinner v-if="isBusy" small />
-                <b-icon-arrow-clockwise v-else />
-              </b-btn> -->
-              <b-tooltip
-                target="refresh-client-list"
-                triggers="hover"
-                variant="secondary"
-                placement="right"
-              >
-                Reload Clients
-              </b-tooltip>
               <div class="menubar__spacer bg-pale" />
               <div class="bg-pale text-white d-flex align-items-center px-3">
                 <b-spinner v-if="!draftSaved" small />
                 <b-icon-check v-else />
               </div>
-              <b-btn
+              <!-- <b-btn
                 :disabled="true"
                 variant="outline-secondary"
                 class="menubar__btn"
               >
                 <b-icon-trash />
-              </b-btn>
+              </b-btn> -->
             </div>
           </template>
           <b-form-group
@@ -78,9 +55,36 @@
             <template v-slot:label>
               <b-icon-briefcase />
               Client
+              <b-btn
+                id="clear-clients"
+                @click="$store.dispatch('dropClients')"
+                variant="light"
+                size="sm"
+                class="text-secondary"
+              >
+                <b-icon-trash />
+              </b-btn>
+              <b-btn
+                id="refresh-client-list"
+                @click="refreshClients"
+                variant="light"
+                size="sm"
+                class="text-secondary"
+              >
+                <b-spinner v-if="isBusy" small />
+                <b-icon-arrow-clockwise v-else />
+                {{ clients.length }}
+              </b-btn>
+              <b-tooltip
+                target="refresh-client-list"
+                triggers="hover"
+                variant="secondary"
+                placement="right"
+              >
+                Reload Clients
+              </b-tooltip>
             </template>
             <vue-multiselect
-              v-if="!isBusy"
               v-model="client"
               :options="clients"
               :custom-label="getClientName"
@@ -198,6 +202,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import VueMultiselect from 'vue-multiselect'
 import HubHelpers from '../hub-helpers'
 import TextArea from '../../components/text-area'
@@ -212,6 +217,8 @@ export default {
       theme: 'secondary',
       client: null,
       isBusy: false,
+      startDate: null,
+      endDate: null,
       locations: [],
       category: null,
       isInternal: true,
@@ -220,14 +227,6 @@ export default {
         json: ''
       },
       macros: [
-        {
-          text: 'Team Member Change',
-          data: {
-            category: 'Account Changes',
-            actionType: 'Team Member Change',
-            isInternal: true
-          }
-        },
         {
           text: 'Location DA Start',
           data: {
@@ -243,47 +242,47 @@ export default {
             actionType: 'Location DA End',
             isInternal: false
           }
-        },
-        {
-          text: 'Budget Change',
-          data: {
-            category: 'Account Changes',
-            actionType: 'Budget Change',
-            isInternal: false
-          }
-        },
-        {
-          text: 'Shape Autopilot Paused',
-          data: {
-            category: 'Account Changes',
-            actionType: 'Shape Autopilot Paused',
-            isInternal: true
-          }
-        },
-        {
-          text: 'Shape Autopilot Activated',
-          data: {
-            category: 'Account Changes',
-            actionType: 'Shape Autopilot Activated',
-            isInternal: true
-          }
-        },
-        {
-          text: 'Dynamic Pricing Start',
-          data: {
-            category: 'Implementation Dates',
-            actionType: 'Dynamic Pricing Start',
-            isInternal: false
-          }
-        },
-        {
-          text: 'Dynamic Pricing End',
-          data: {
-            category: 'Implementation Dates',
-            actionType: 'Dynamic Pricing End',
-            isInternal: false
-          }
         }
+      //   {
+      //     text: 'Budget Change',
+      //     data: {
+      //       category: 'Account Changes',
+      //       actionType: 'Budget Change',
+      //       isInternal: false
+      //     }
+      //   },
+      //   {
+      //     text: 'Shape Autopilot Paused',
+      //     data: {
+      //       category: 'Account Changes',
+      //       actionType: 'Shape Autopilot Paused',
+      //       isInternal: true
+      //     }
+      //   },
+      //   {
+      //     text: 'Shape Autopilot Activated',
+      //     data: {
+      //       category: 'Account Changes',
+      //       actionType: 'Shape Autopilot Activated',
+      //       isInternal: true
+      //     }
+      //   },
+      //   {
+      //     text: 'Dynamic Pricing Start',
+      //     data: {
+      //       category: 'Implementation Dates',
+      //       actionType: 'Dynamic Pricing Start',
+      //       isInternal: false
+      //     }
+      //   },
+      //   {
+      //     text: 'Dynamic Pricing End',
+      //     data: {
+      //       category: 'Implementation Dates',
+      //       actionType: 'Dynamic Pricing End',
+      //       isInternal: false
+      //     }
+      //   }
       ],
       category: null,
       categories: [
@@ -315,7 +314,7 @@ export default {
           'Shape Autopilot Paused'
         ],
         'General Note': [
-          { text: '-', value: null }
+          { text: '-', value: 'none' }
         ],
         'Customer Contact': [
           { text: 'Select Option', value: null },
@@ -364,15 +363,14 @@ export default {
     }
   },
   computed: {
-    clients() {
-      return this.$store.getters.clients
-    },
+    ...mapState({
+      clients: state => state.clients
+    }),
     clientLocations() {
       return this.$store.getters.locations
     },
     isValid() {
       return this.category !== null &&
-        this.actionType !== null &&
         this.locations.length > 0 &&
         this.client !== null
     }
@@ -416,7 +414,6 @@ export default {
       this.isInternal = payload.isInternal
     },
     updateText(data) {
-      // console.log({ data })
       this.annotation = data
     },
     onClientSelect(payload) {

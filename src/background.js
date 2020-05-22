@@ -11,16 +11,16 @@ const headers = {
   'Access-Control-Allow-Origin': ''
 }
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener(async () => {
   autoDetectClientLocation()
-  chrome.storage.sync.get('apiKey', async (res) => {
+  const clients = await getClients()
+  store.dispatch('setClients', clients)
+  chrome.storage.sync.get('apiKey', (res) => {
     if (res.apiKey) {
       store.dispatch('hasToken')
     } else {
       console.log('%c No apiKey Found!', 'color: red;')
     }
-    const clients = await getClients()
-    store.dispatch('setClients', clients)
   })
 })
 
@@ -33,26 +33,40 @@ async function onMessage(req, sender, res) {
     res(200)
   } else if (req.msg === 'login') {
     const key = await getApiKey(req.email)
-    chrome.storage.sync.set({ apiKey: key }, () => {
+    chrome.storage.sync.set({ apiKey: key }, async () => {
+      await store.dispatch('hasToken')
       res(201)
     })
   } else if (req.msg === 'reload-clients') {
-    const clients = await getClients()
-    store.dispatch('setClients', clients)
-    res(200)
+    // ALT XHR FOR CLIENTS keep for now
+    getXHRClients(res)
   } else if (req.msg === 'createNote') {
     createNote(req.data)
     res(201)
   }
 }
 
-async function getClients(token) {
+async function getClients() {
   const clients = await axios({
     method: 'GET',
     url: `${host}/api/hub/clients?activeDa=true`,
     headers
   })
   return clients.data
+}
+
+function getXHRClients(cb) {
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET', `${host}/api/hub/clients?activeDa=true`, true)
+  xhr.setRequestHeader('Content-Type', 'application/json')
+  xhr.send()
+  xhr.onload = () => {
+    console.log('%c onload event fired.', 'color: red;')
+    const clients = JSON.parse(xhr.responseText)
+    console.log(clients.length)
+    store.dispatch('setClients', clients)
+    cb(200)
+  }
 }
 
 async function getLocations(urn) {

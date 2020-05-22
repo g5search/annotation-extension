@@ -10,8 +10,14 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   plugins: [new VuexWebExtensions({
     persistentStates: [
-      // 'clients',
-      'drafts',
+      'clients',
+      'selectedClient',
+      'locations',
+      'selectedLocations',
+      'isInternal',
+      'category',
+      'actionType',
+      'annotation',
       'lastUpdated',
       'user'
     ],
@@ -19,9 +25,19 @@ export default new Vuex.Store({
   })],
   state: {
     clients: [],
-    drafts: [],
+    selectedClient: null,
     locations: [],
+    selectedLocations: [],
     lastUpdated: '',
+    isInternal: true,
+    category: null,
+    actionType: null,
+    startDate: null,
+    endDate: null,
+    annotation: {
+      html: '',
+      json: null
+    },
     user: {
       hasToken: false
     }

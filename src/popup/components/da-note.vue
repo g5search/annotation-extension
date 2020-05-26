@@ -9,35 +9,39 @@
     <template v-slot:header>
       <note-toolbar :is-busy="isBusy" />
     </template>
-    <b-form-group label-class="text-secondary" class="my-2">
+    <b-form-group label-class="text-secondary py-0" class="mt-1">
       <template v-slot:label>
-        <b-icon-briefcase />
-        Client
-        <b-btn
-          id="clear-clients"
-          @click="$store.dispatch('dropClients')"
-          variant="light"
-          size="sm"
-          class="text-secondary"
-        >
-          <b-icon-trash />
-        </b-btn>
-        <b-btn
-          id="refresh-client-list"
-          @click="refreshClients"
-          variant="light"
-          size="sm"
-          class="text-secondary"
-        >
-          <b-spinner v-if="isClientsBusy" small />
-          <b-icon-arrow-clockwise v-else />
-          {{ clients.length }}
-        </b-btn>
+        <label class="mb-0 d-flex w-100 align-items-center justify-content-start">
+          <b-icon-briefcase />
+          <span class="ml-2 flex-grow-1">
+            Client
+          </span>
+          <b-btn
+            id="refresh-client-list"
+            @click="refreshClients"
+            variant="light"
+            size="sm"
+            class="text-secondary"
+          >
+            <b-spinner v-if="isClientsBusy" small />
+            <b-icon-arrow-clockwise v-else />
+            {{ clients.length }}
+          </b-btn>
+          <b-btn
+            id="clear-clients"
+            @click="$store.dispatch('dropClients')"
+            variant="light"
+            size="sm"
+            class="text-secondary"
+          >
+            <b-icon-trash />
+          </b-btn>
+        </label>
         <b-tooltip
           target="refresh-client-list"
           triggers="hover"
           variant="secondary"
-          placement="right"
+          placement="left"
         >
           Reload Clients
         </b-tooltip>
@@ -45,10 +49,7 @@
       <vue-multiselect
         :value="client"
         :options="clients"
-        :custom-label="getClientName"
         @input="onClientSelect"
-        track-by="urn"
-        label="name"
       />
     </b-form-group>
     <b-form-group label-class="text-secondary">
@@ -201,7 +202,7 @@ export default {
         data: {
           id: 1,
           prop: 'urn',
-          value: this.client.urn
+          value: payload.urn
         }
       }, () => {
         this.isBusy = false

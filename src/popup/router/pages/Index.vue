@@ -290,28 +290,19 @@ export default {
         'Account Changes',
         'Customer Contact',
         'General Note',
-        'Optmizations',
+        'Optimizations',
         'Other',
-        'Technical Issue',
-        'Implementation Dates'
+        'Technical Issue'
       ],
       actionType: null,
       actionTypes: {
         'Account Changes': [
           { text: 'Select Option', value: null },
-          'Dynamic Ads Updates',
-          'Branded Name Change',
           'Smart Bidding Strategy Change',
           'Specials/Promotions',
           'Spend Optimizer Version Change',
           'URL Change',
-          'Whitelisting Events Change',
-          'Team Member Change',
-          'Location DA Start',
-          'Location DA End',
-          'Budget Change',
-          'Shape Autopilot Activated',
-          'Shape Autopilot Paused'
+          'Whitelisting Events Change'
         ],
         'General Note': [
           { text: '-', value: 'none' }
@@ -321,9 +312,10 @@ export default {
           'Action Items',
           'Analysis/Notes'
         ],
-        'Optmizations': [
+        'Optimizations': [
           { text: 'Select Option', value: null },
           'Added Negative Keywords',
+          'Added Keywords',
           'Changed Location Strategy',
           'Paused Campaign',
           'Enabled Campaign',

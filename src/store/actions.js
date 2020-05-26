@@ -15,8 +15,8 @@ export const setClients = async ({ commit }, clients) => {
   }
 }
 
-export const setClient = async ({ commit }, { payload }) => {
-  await commit('SET_CLIENT', payload)
+export const setClient = ({ commit }, payload) => {
+  commit('SET_CLIENT', payload)
 }
 
 export const setLocations = async ({ commit }, payload) => {

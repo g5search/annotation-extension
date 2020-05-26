@@ -151,6 +151,18 @@ function autoDetectClientLocation () {
       const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/
       const [, clientUrn, locationUrn] = url.match(regex)
       // set client and location Urn
+    } else if (/https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/.test(url)) {
+      const regex = /https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/
+      const [, code_account] = url.match(regex)
+      console.log(`Code account found ${code_account}`)
+    } else if (/ https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*act=(\d*)\S*/.test(url)) {
+      const regex =  /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*act=(\d*)\S*/
+      const accountId = url.match(regex)
+      console.log('accountId', accountId)
+    } else if (/https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/.test(url)) {
+      const regex = /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/
+      const campaignId = url.match(regex)
+        console.log('campaignId', campaignId )
     }
   })
 }

@@ -132,17 +132,25 @@ function autoDetectClientLocation () {
     } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/.test(url)) {
       const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/
       const [, clientUrn, locationUrn] = url.match(regex)
+      const clients = store.getters.clients
+      const client = clients.filter(client => client.urn == clientId)
+      store.dispatch('setClient', client[0])
       console.log('we found a client and location', clientUrn, locationUrn)
       // set client and location Urn
     } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/.test(url)) {
       const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/
       const [, clientUrn] = url.match(regex)
+      const clients = store.getters.clients
+      const client = clients.filter(client => client.urn == clientId)
+      store.dispatch('setClient', client[0])
       console.log('we found a client in location view', clientUrn)
       // set client Urn
     } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)$/.test(url)) {
       const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)/
       const [, clientId] = url.match(regex)
-      console.log('we found a client', clientId)
+      const clients = store.getters.clients
+      const client = clients.filter(client => client.urn == clientId)
+      store.dispatch('setClient', client[0])
     } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/.test(url)) {
       const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/
       const [, clientUrn] = url.match(regex)

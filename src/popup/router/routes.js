@@ -5,11 +5,11 @@ import NewIndex from './pages/New-Index'
 export default [
   {
     path: '/',
-    component: PageIndex
+    component: NewIndex
   },
   {
     path: '/new-index',
-    component: NewIndex
+    component: PageIndex
   },
   {
     path: '/login',

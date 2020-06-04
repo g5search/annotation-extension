@@ -82,8 +82,6 @@ import {
   OrderedList,
   BulletList,
   ListItem,
-  Focus,
-  Placeholder,
   Bold,
   Italic,
   Link,
@@ -108,7 +106,6 @@ export default {
       }
     }
   },
-  // props: ['theme', 'content'],
   data() {
     return {
       editor: null
@@ -126,16 +123,6 @@ export default {
         new Strike(),
         new Underline(),
         new History(),
-        new Focus({
-          className: 'has-focus',
-          nested: true
-        }),
-        new Placeholder({
-          emptyEditorClass: 'is-editor-empty',
-          emptyNodeClass: 'is-empty',
-          emptyNodeText: 'Enter your note here...',
-          showOnlyWhenEditable: true
-        })
       ],
       content: this.content,
       onUpdate: ({ state, getHTML, getJSON, transaction }) => {

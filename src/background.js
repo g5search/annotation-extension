@@ -45,6 +45,7 @@ async function onMessage(req, sender, res) {
   } else if ('created') {
     console.log('created')
     autoDetectClientLocation()
+    res(200)
   }
 }
 
@@ -95,7 +96,8 @@ function createNote(annotation) {
     axios.post(`${host}/api/v1/note?key=${res.apiKey}`, annotation)
   })
 }
-function autoDetectClientLocation () {
+
+function autoDetectClientLocation() {
   chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
     const url = tabs[0].url
     if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
@@ -104,7 +106,7 @@ function autoDetectClientLocation () {
       const [, locationId] = url.match(regex)
       // const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
       console.log('locationId', locationId)
-  
+
     } else if (/https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/.test(url)) {
       // if the url constains g5search and includes the client and location id
       const regex = /https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/
@@ -113,12 +115,12 @@ function autoDetectClientLocation () {
       // const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
     }
     else if (/https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/.test(url)) {
-      // if in the service view pull the service id from url 
+      // if in the service view pull the service id from url
       const regex = /https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/
       const serviceId = url.match(regex)
       // const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
       console.log('serviceId', serviceId)
-    } 
+    }
     else if (/https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/.test(url)) {
       const regex = /https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/
       const [, clientId] = url.match(regex)
@@ -133,8 +135,10 @@ function autoDetectClientLocation () {
       const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/
       const [, clientUrn, locationUrn] = url.match(regex)
       const clients = store.getters.clients
-      const client = clients.filter(client => client.urn == clientId)
+      const client = clients.filter(client => client.urn == clientUrn)
       store.dispatch('setClient', client[0])
+      const locations = getLocations(client[0].urn)
+      store.dispatch('setLocations', locations)
       console.log('we found a client and location', clientUrn, locationUrn)
       // set client and location Urn
     } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/.test(url)) {
@@ -170,7 +174,7 @@ function autoDetectClientLocation () {
     } else if (/https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/.test(url)) {
       const regex = /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/
       const campaignId = url.match(regex)
-        console.log('campaignId', campaignId )
+      console.log('campaignId', campaignId )
     }
   })
 }

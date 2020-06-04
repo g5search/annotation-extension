@@ -16,7 +16,12 @@ export const setClients = async ({ commit }, clients) => {
 }
 
 export const setClient = ({ commit }, payload) => {
-  commit('SET_CLIENT', payload)
+  console.log({ payload })
+  if (payload.payload) {
+    commit('SET_CLIENT', payload.payload)
+  } else {
+    commit('SET_CLIENT', payload)
+  }
 }
 
 export const setLocations = async ({ commit }, payload) => {

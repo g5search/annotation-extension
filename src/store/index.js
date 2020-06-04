@@ -11,7 +11,7 @@ export default new Vuex.Store({
   plugins: [new VuexWebExtensions({
     persistentStates: [
       'clients',
-      'selectedClient',
+      // 'selectedClient',
       'locations',
       'selectedLocations',
       'isInternal',

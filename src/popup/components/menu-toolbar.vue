@@ -35,7 +35,7 @@
           >
             Notes
           </b-tooltip>
-          <!-- <b-btn
+          <b-btn
             id="new-home"
             to="/new-index"
             variant="outline-primary"
@@ -50,7 +50,7 @@
             placement="bottom"
           >
             New Index
-          </b-tooltip> -->
+          </b-tooltip>
           <div class="flex-grow-1 bg-primary" />
           <slot name="append" />
         </b-btn-group>

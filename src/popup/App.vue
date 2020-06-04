@@ -7,6 +7,16 @@
       shadow
     >
       <b-card class="p-1">
+        <b-btn
+          id="docs-link"
+          href="https://docs.google.com/document/d/1xWRWjlGZpy1x3RrzsChQrVEWhBkpDYIfBwSpD3EbjwM/edit?usp=sharing"
+          target="_blank"
+          variant="outline-tertiary"
+          block
+        >
+          <b-icon-file-richtext />
+          Documentation
+        </b-btn>
         <template v-slot:footer>
           <b-form-text class="text-right">
             Version {{ version }}
@@ -40,7 +50,7 @@ export default {
     return {
       version
     }
-  }, 
+  },
   created() {
     chrome.runtime.sendMessage({ msg: 'created' })
   }

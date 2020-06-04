@@ -47,8 +47,9 @@
         </b-tooltip>
       </template>
       <vue-multiselect
-        :value="client"
+        :value="selectedClient"
         :options="clients"
+        :custom-label="getClientName"
         @input="onClientSelect"
       />
     </b-form-group>

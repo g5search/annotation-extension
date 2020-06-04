@@ -1,6 +1,7 @@
 <template>
   <b-container fluid class="p-1 my-2">
     <b-row no-gutters>
+      {{ selectedClient }}
       <b-col>
         <b-card
           no-body
@@ -85,10 +86,10 @@
               </b-tooltip>
             </template>
             <vue-multiselect
-              v-model="client"
+              :value="selectedClient"
               :options="clients"
               :custom-label="getClientName"
-              @input="onClientSelect"
+              @change="onClientSelect"
               track-by="urn"
               label="name"
             />
@@ -356,7 +357,8 @@ export default {
   },
   computed: {
     ...mapState({
-      clients: state => state.clients
+      clients: state => state.clients,
+      selectedClient: state => state.selectedClient
     }),
     clientLocations() {
       return this.$store.getters.locations
@@ -364,7 +366,7 @@ export default {
     isValid() {
       return this.category !== null &&
         this.locations.length > 0 &&
-        this.client !== null
+        this.selectedClient !== null
     }
   },
   methods: {
@@ -415,7 +417,7 @@ export default {
         data: {
           id: 1,
           prop: 'urn',
-          value: this.client.urn
+          value: this.selectedClient.urn
         }
       }, () => {
         this.draftSaved = true

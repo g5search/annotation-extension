@@ -1,5 +1,6 @@
 import axios from 'axios'
 import store from './store'
+import { locations } from './store/getters'
 
 const host = 'https://notes.g5marketingcloud.com'
 // const host = 'http://localhost:4242'
@@ -13,7 +14,7 @@ const headers = {
 
 chrome.runtime.onInstalled.addListener(async () => {
   const clients = await getClients()
-  store.dispatch('setClients', clients)
+  await store.dispatch('setClients', clients)
   chrome.storage.sync.get('apiKey', (res) => {
     if (res.apiKey) {
       store.dispatch('hasToken')
@@ -39,13 +40,12 @@ async function onMessage(req, sender, res) {
   } else if (req.msg === 'reload-clients') {
     // ALT XHR FOR CLIENTS keep for now
     getXHRClients(res)
-  } else if (req.msg === 'createNote') {
+  } else if (req.msg === 'create-note') {
     createNote(req.data)
     res(201)
-  } else if ('created') {
-    console.log('created')
-    autoDetectClientLocation()
-    res(200)
+  } else if (req.msg === 'auto-detect') {
+    console.log({ req })
+    await autoDetectClientLocation(req.url, res)
   }
 }
 
@@ -97,84 +97,84 @@ function createNote(annotation) {
   })
 }
 
-function autoDetectClientLocation() {
-  chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-    const url = tabs[0].url
-    if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
-      // if the website is g5 search and it includes ?id for the client id
-      const regex = /https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/
-      const [, locationId] = url.match(regex)
-      // const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
-      console.log('locationId', locationId)
+async function autoDetectClientLocation(url, cb) {
+  if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
+    const regex = /https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/
+    const [, locationId] = url.match(regex)
+    const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
+    cb({ locationId })
 
-    } else if (/https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/.test(url)) {
-      // if the url constains g5search and includes the client and location id
-      const regex = /https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/
-      const [, clientId, locationId] = url.match(regex)
-      console.log('clientId', clientId, 'locationId', locationId)
-      // const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
-    }
-    else if (/https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/.test(url)) {
-      // if in the service view pull the service id from url
-      const regex = /https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/
-      const serviceId = url.match(regex)
-      // const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
-      console.log('serviceId', serviceId)
-    }
-    else if (/https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/.test(url)) {
-      const regex = /https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/
-      const [, clientId] = url.match(regex)
-      console.log('clientId', clientId)
-      const endpoint = `https://notes.g5marketingcloud.com/api/core/client/${clientId}`
-    } else if (/https:\/\/www.g5search.com\/admin\/clients\/edit_store\?id=(\d*)$/.test(url)) {
-      const regex = /https:\/\/www.g5search.com\/admin\/clients\/edit_store\?id=(\d*)$/
-      const [, locationId] = url.match(regex)
-      const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
-      console.log('locationId', locationId)
-    } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/.test(url)) {
-      const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/
-      const [, clientUrn, locationUrn] = url.match(regex)
-      const clients = store.getters.clients
-      const client = clients.filter(client => client.urn == clientUrn)
-      store.dispatch('setClient', client[0])
-      const locations = getLocations(client[0].urn)
-      store.dispatch('setLocations', locations)
-      console.log('we found a client and location', clientUrn, locationUrn)
-      // set client and location Urn
-    } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/.test(url)) {
-      const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/
-      const [, clientUrn] = url.match(regex)
-      const clients = store.getters.clients
-      const client = clients.filter(client => client.urn == clientId)
-      store.dispatch('setClient', client[0])
-      console.log('we found a client in location view', clientUrn)
-      // set client Urn
-    } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)$/.test(url)) {
-      const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)/
-      const [, clientId] = url.match(regex)
-      const clients = store.getters.clients
-      const client = clients.filter(client => client.urn == clientId)
-      store.dispatch('setClient', client[0])
-    } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/.test(url)) {
-      const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/
-      const [, clientUrn] = url.match(regex)
-      // set Client Urn
-    } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/.test(url)) {
-      const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/
-      const [, clientUrn, locationUrn] = url.match(regex)
-      // set client and location Urn
-    } else if (/https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/.test(url)) {
-      const regex = /https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/
-      const [, code_account] = url.match(regex)
-      console.log(`Code account found ${code_account}`)
-    } else if (/ https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*act=(\d*)\S*/.test(url)) {
-      const regex =  /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*act=(\d*)\S*/
-      const accountId = url.match(regex)
-      console.log('accountId', accountId)
-    } else if (/https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/.test(url)) {
-      const regex = /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/
-      const campaignId = url.match(regex)
-      console.log('campaignId', campaignId )
-    }
-  })
+  } else if (/https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/.test(url)) {
+    const regex = /https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/
+    const [, clientId, locationId] = url.match(regex)
+    const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
+    cb({ clientId, locationId })
+
+  } else if (/https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/.test(url)) {
+    const regex = /https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/
+    const serviceId = url.match(regex)
+    cb({ serviceId })
+
+  } else if (/https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/.test(url)) {
+    const regex = /https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/
+    const [, clientId] = url.match(regex)
+    const endpoint = `https://notes.g5marketingcloud.com/api/core/client/${clientId}`
+    cb({ clientId })
+
+  } else if (/https:\/\/www.g5search.com\/admin\/clients\/edit_store\?id=(\d*)$/.test(url)) {
+    const regex = /https:\/\/www.g5search.com\/admin\/clients\/edit_store\?id=(\d*)$/
+    const [, locationId] = url.match(regex)
+    const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
+    cb({ locationId })
+
+  } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/.test(url)) {
+    const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/
+    const [, clientUrn, locationUrn] = url.match(regex)
+    const clients = store.getters.clients
+    const client = clients.filter(client => client.urn == clientUrn)
+    const locations = await getLocations(client[0].urn)
+    await store.dispatch('setLocations', locations)
+    const selectedLocations = locations.filter(l => l.urn === locationUrn)
+    cb({ client: client[0], selectedLocations })
+
+  } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/.test(url)) {
+    const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/
+    const [, clientUrn] = url.match(regex)
+    const clients = store.getters.clients
+    const client = clients.filter(client => client.urn == clientId)
+    const locations = await getLocations(client[0].urn)
+    await store.dispatch('setLocations', locations)
+    cb({ client: client[0] })
+
+  } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)$/.test(url)) {
+    const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)/
+    const [, clientId] = url.match(regex)
+    const clients = store.getters.clients
+    const client = clients.filter(client => client.urn == clientId)
+    const locations = await getLocations(client[0].urn)
+    await store.dispatch('setLocations', locations)
+    cb({ client: client[0] })
+
+  } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/.test(url)) {
+    const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/
+    const [, clientUrn] = url.match(regex)
+    cb({ clientUrn })
+
+  } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/.test(url)) {
+    const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/
+    const [, clientUrn, locationUrn] = url.match(regex)
+    // set client and location Urn
+  } else if (/https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/.test(url)) {
+    const regex = /https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/
+    const [, code_account] = url.match(regex)
+    console.log(`Code account found ${code_account}`)
+  } else if (/ https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*act=(\d*)\S*/.test(url)) {
+    const regex =  /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*act=(\d*)\S*/
+    const accountId = url.match(regex)
+    console.log('accountId', accountId)
+  } else if (/https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/.test(url)) {
+    const regex = /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/
+    const campaignId = url.match(regex)
+    console.log('campaignId', campaignId )
+  }
 }

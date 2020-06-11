@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 import VuexWebExtensions from 'vuex-webextensions'
 import * as getters from './getters'
 import mutations from './mutations'
-import * as actions from './actions'
+import actions from './actions'
 
 Vue.use(Vuex)
 
@@ -11,9 +11,6 @@ export default new Vuex.Store({
   plugins: [new VuexWebExtensions({
     persistentStates: [
       'clients',
-      // 'selectedClient',
-      'locations',
-      'selectedLocations',
       'isInternal',
       'category',
       'actionType',
@@ -25,9 +22,7 @@ export default new Vuex.Store({
   })],
   state: {
     clients: [],
-    selectedClient: null,
     locations: [],
-    selectedLocations: [],
     lastUpdated: '',
     isInternal: true,
     category: null,

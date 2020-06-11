@@ -43,7 +43,7 @@
     </b-tooltip>
     <div class="menubar__spacer bg-pale" />
     <div
-      v-show="canContentScript"
+      v-if="canContentScript"
       class="bg-pale text-white d-flex align-items-center px-3"
     >
       <b-badge
@@ -72,8 +72,8 @@ export default {
   },
   data() {
     return {
-      canContentScript: true,
-      currentDomain: 'Shape',
+      canContentScript: false,
+      currentDomain: '',
       macros: [
         {
           text: 'Location DA Start',

@@ -1,7 +1,6 @@
 <template>
   <b-container fluid class="p-1 my-2">
     <b-row no-gutters>
-      {{ selectedClient }}
       <b-col>
         <b-card
           no-body
@@ -11,85 +10,62 @@
           footer-bg-variant="white"
         >
           <template v-slot:header>
-            <div class="d-flex w-100 justify-content-start menubar">
-              <b-dropdown
-                id="macro-dropdown"
-                variant="outline-secondary"
-                right
-              >
-                <template v-slot:button-content>
-                  <b-icon-lightning-fill />
-                </template>
-                <b-dropdown-item
-                  v-for="macro in macros"
-                  :key="macro.text"
-                  @click="onRun(macro.data)"
-                >
-                  {{ macro.text }}
-                </b-dropdown-item>
-              </b-dropdown>
-              <b-tooltip
-                target="macro-dropdown"
-                triggers="hover"
-                variant="secondary"
-                placement="right"
-              >
-                Quick Notes
-              </b-tooltip>
-              <div class="menubar__spacer bg-pale" />
-              <div class="bg-pale text-white d-flex align-items-center px-3">
-                <b-spinner v-if="!draftSaved" small />
-                <b-icon-check v-else />
-              </div>
-              <!-- <b-btn
-                :disabled="true"
-                variant="outline-secondary"
-                class="menubar__btn"
-              >
-                <b-icon-trash />
-              </b-btn> -->
-            </div>
+            <note-toolbar :is-busy="isBusy" />
           </template>
           <b-form-group
-            class="my-2 text-secondary"
+            label-class="py-0 text-secondary"
+            class="mt-1"
           >
             <template v-slot:label>
-              <b-icon-briefcase />
-              Client
-              <b-btn
-                id="clear-clients"
-                @click="$store.dispatch('dropClients')"
-                variant="light"
-                size="sm"
-                class="text-secondary"
-              >
-                <b-icon-trash />
-              </b-btn>
-              <b-btn
-                id="refresh-client-list"
-                @click="refreshClients"
-                variant="light"
-                size="sm"
-                class="text-secondary"
-              >
-                <b-spinner v-if="isBusy" small />
-                <b-icon-arrow-clockwise v-else />
-                {{ clients.length }}
-              </b-btn>
-              <b-tooltip
-                target="refresh-client-list"
-                triggers="hover"
-                variant="secondary"
-                placement="right"
-              >
-                Reload Clients
-              </b-tooltip>
+              <label class="mb-0 d-flex w-100 align-items-center justify-content-start">
+                <b-icon-briefcase />
+                <span class="ml-2 flex-grow-1">
+                  Client
+                </span>
+                <b-btn
+                  id="auto-detect-client"
+                  @click="autoDetect"
+                  variant="light"
+                  size="sm"
+                  class="text-secondary flex-grow-0"
+                >
+                  Auto
+                </b-btn>
+                <b-btn
+                  id="clear-clients"
+                  @click="$store.dispatch('dropClients')"
+                  variant="light"
+                  size="sm"
+                  class="text-secondary flex-grow-0"
+                >
+                  <b-icon-trash />
+                </b-btn>
+                <b-btn
+                  id="refresh-client-list"
+                  @click="refreshClients"
+                  variant="light"
+                  size="sm"
+                  class="text-secondary"
+                >
+                  <b-spinner v-if="isBusy" small />
+                  <b-icon-arrow-clockwise v-else />
+                  {{ clients.length }}
+                </b-btn>
+                <b-tooltip
+                  target="refresh-client-list"
+                  triggers="hover"
+                  variant="secondary"
+                  placement="right"
+                >
+                  Reload Clients
+                </b-tooltip>
+              </label>
             </template>
             <vue-multiselect
-              :value="selectedClient"
+              v-model="client"
               :options="clients"
               :custom-label="getClientName"
-              @change="onClientSelect"
+              @input="onClientSelect"
               track-by="urn"
               label="name"
             />
@@ -207,10 +183,12 @@ import { mapState } from 'vuex'
 import VueMultiselect from 'vue-multiselect'
 import HubHelpers from '../hub-helpers'
 import TextArea from '../../components/text-area'
+import NoteToolbar from '../../components/note-toolbar'
 export default {
   components: {
     VueMultiselect,
-    TextArea
+    TextArea,
+    NoteToolbar
   },
   mixins: [HubHelpers],
   data () {
@@ -244,46 +222,6 @@ export default {
             isInternal: false
           }
         }
-      //   {
-      //     text: 'Budget Change',
-      //     data: {
-      //       category: 'Account Changes',
-      //       actionType: 'Budget Change',
-      //       isInternal: false
-      //     }
-      //   },
-      //   {
-      //     text: 'Shape Autopilot Paused',
-      //     data: {
-      //       category: 'Account Changes',
-      //       actionType: 'Shape Autopilot Paused',
-      //       isInternal: true
-      //     }
-      //   },
-      //   {
-      //     text: 'Shape Autopilot Activated',
-      //     data: {
-      //       category: 'Account Changes',
-      //       actionType: 'Shape Autopilot Activated',
-      //       isInternal: true
-      //     }
-      //   },
-      //   {
-      //     text: 'Dynamic Pricing Start',
-      //     data: {
-      //       category: 'Implementation Dates',
-      //       actionType: 'Dynamic Pricing Start',
-      //       isInternal: false
-      //     }
-      //   },
-      //   {
-      //     text: 'Dynamic Pricing End',
-      //     data: {
-      //       category: 'Implementation Dates',
-      //       actionType: 'Dynamic Pricing End',
-      //       isInternal: false
-      //     }
-      //   }
       ],
       category: null,
       categories: [
@@ -358,18 +296,35 @@ export default {
   computed: {
     ...mapState({
       clients: state => state.clients,
-      selectedClient: state => state.selectedClient
+      selectedClient: state => state.selectedClient,
+      clientLocations: state => state.locations
     }),
-    clientLocations() {
-      return this.$store.getters.locations
-    },
     isValid() {
       return this.category !== null &&
         this.locations.length > 0 &&
         this.selectedClient !== null
     }
   },
+  created() {
+    this.autoDetect()
+  },
   methods: {
+    autoDetect() {
+      chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+        const url = tabs[0].url
+        console.log({ tabs })
+        chrome.runtime.sendMessage({
+          msg: 'auto-detect',
+          url
+        }, (res) => {
+          console.log({ res })
+          this.client = res.client
+          if (res.selectedLocations) {
+            this.locations = res.selectedLocations
+          }
+        })
+      })
+    },
     refreshClients() {
       this.isBusy = true
       chrome.runtime.sendMessage({
@@ -381,7 +336,7 @@ export default {
     onSubmit() {
       this.draftSaved = false
       chrome.runtime.sendMessage({
-        msg: 'createNote',
+        msg: 'create-note',
         data: {
           clientUrn: this.client.urn,
           internal: this.isInternal,
@@ -417,7 +372,7 @@ export default {
         data: {
           id: 1,
           prop: 'urn',
-          value: this.selectedClient.urn
+          value: this.client.urn
         }
       }, () => {
         this.draftSaved = true

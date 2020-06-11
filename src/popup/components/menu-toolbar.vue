@@ -35,22 +35,6 @@
           >
             Notes
           </b-tooltip>
-          <b-btn
-            id="new-home"
-            to="/new-index"
-            variant="outline-primary"
-            class="flex-grow-0"
-          >
-            <b-icon-book />
-          </b-btn>
-          <b-tooltip
-            target="new-home"
-            triggers="hover"
-            variant="primary"
-            placement="bottom"
-          >
-            New Index
-          </b-tooltip>
           <div class="flex-grow-1 bg-primary" />
           <slot name="append" />
         </b-btn-group>
@@ -64,7 +48,6 @@ export default {
   computed: {
     hasToken() {
       return this.$store.getters.hasToken
-      // return false
     }
   }
 }

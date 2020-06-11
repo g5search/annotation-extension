@@ -33,7 +33,6 @@
         >
           <b-icon-type-strikethrough />
         </b-btn>
-        <div class="menubar__spacer bg-secondary" />
         <b-btn
           :class="[{ 'is-active': isActive.ordered_list() }, 'menubar__btn']"
           @click="commands.ordered_list"
@@ -49,27 +48,6 @@
           <b-icon-list-ul />
         </b-btn>
         <div class="menubar__spacer bg-secondary" />
-        <!-- <b-btn
-          :class="[{ 'is-active': isActive.link() }, 'menubar__btn']"
-          @click="commands.link"
-          variant="outline-secondary"
-        >
-          <b-icon-link45deg />
-        </b-btn> -->
-        <!-- <b-btn
-          :class="[{ 'is-active': isActive.undo() }, 'menubar__btn']"
-          @click="commands.undo"
-          variant="outline-primary"
-        >
-          <b-icon-arrow-counterclockwise />
-        </b-btn>
-        <b-btn
-          :class="[{ 'is-active': isActive.redo() }, 'menubar__btn']"
-          @click="commands.redo"
-          variant="outline-primary"
-        >
-          <b-icon-arrow-clockwise />
-        </b-btn> -->
       </div>
     </editor-menu-bar>
     <editor-content :editor="editor" class="editor__content" />
@@ -98,6 +76,10 @@ export default {
     theme: {
       type: String,
       default: 'primary'
+    },
+    clear: {
+      type: Boolean,
+      default: false
     },
     content: {
       type: String,
@@ -132,6 +114,11 @@ export default {
   },
   beforeDestroy() {
     this.editor.destroy()
+  },
+  methods: {
+    onClear() {
+      this.editor.clearContent()
+    }
   }
 }
 </script>
@@ -157,7 +144,7 @@ export default {
     &__btn {
       padding: 0.15em 0.25em;
       margin: 0;
-      & .is-active {
+      &.is-active {
         background-color: #7898ad;
         color: white;
       }

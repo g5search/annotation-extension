@@ -83,7 +83,6 @@ h1,h2,h3 {
 .custom-select {
   background: none !important;
 }
-
 #app-root {
   min-width: 400px;
 }

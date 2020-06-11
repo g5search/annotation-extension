@@ -5,12 +5,22 @@
         <b-card
           no-body
           class="border-0 py-1 px-2 note"
-          header-class="p-0"
+          header-class="p-0 border-0"
           footer-class="p-0"
           footer-bg-variant="white"
         >
           <template v-slot:header>
-            <note-toolbar :is-busy="isBusy" />
+            <b-alert
+              :show="dismissCountDown"
+              @dismissed="dismissCountDown = 0"
+              @dismiss-count-down="countDownChanged"
+              id="submission-status"
+              variant="success"
+              dismissible
+            >
+              <b-icon-check />
+              Saved Successfully!
+            </b-alert>
           </template>
           <b-form-group
             label-class="py-0 text-secondary"
@@ -21,6 +31,9 @@
                 <b-icon-briefcase />
                 <span class="ml-2 flex-grow-1">
                   Client
+                  <span class="smaller roman text-tertiary">
+                    *
+                  </span>
                 </span>
                 <b-btn
                   id="auto-detect-client"
@@ -29,9 +42,19 @@
                   size="sm"
                   class="text-secondary flex-grow-0"
                 >
+                  <b-icon-bucket-fill v-if="detectedClient" />
+                  <b-icon-bucket v-else />
                   Auto
                 </b-btn>
-                <b-btn
+                <b-tooltip
+                  target="auto-detect-client"
+                  triggers="hover"
+                  variant="secondary"
+                  placement="top"
+                >
+                  Attempt to detect from current webpage.
+                </b-tooltip>
+                <!-- <b-btn
                   id="clear-clients"
                   @click="$store.dispatch('dropClients')"
                   variant="light"
@@ -39,7 +62,7 @@
                   class="text-secondary flex-grow-0"
                 >
                   <b-icon-trash />
-                </b-btn>
+                </b-btn> -->
                 <b-btn
                   id="refresh-client-list"
                   @click="refreshClients"
@@ -55,7 +78,7 @@
                   target="refresh-client-list"
                   triggers="hover"
                   variant="secondary"
-                  placement="right"
+                  placement="top"
                 >
                   Reload Clients
                 </b-tooltip>
@@ -107,11 +130,14 @@
             <template v-slot:label>
               <b-icon-collection />
               Category
+              <span class="smaller roman text-tertiary">
+                *
+              </span>
             </template>
             <b-form-select
               v-model="category"
               :options="categories"
-              required
+              :invalid-feedback="categoryInvalid"
             />
           </b-form-group>
           <b-form-group
@@ -142,7 +168,7 @@
                   <b-icon-file-richtext />
                   Note
                 </span>
-                <b-form-checkbox
+                <!-- <b-form-checkbox
                   v-model="isInternal"
                   switch
                   size="sm"
@@ -151,26 +177,94 @@
                   <b-icon-eye-fill v-if="!isInternal" />
                   <b-icon-eye-slash v-else />
                   {{ isInternal ? 'Internal-Only' : 'Ok to Share' }}
-                </b-form-checkbox>
+                </b-form-checkbox> -->
               </template>
-              <text-area
-                :theme="theme"
-                :content="annotation.html"
-                @text-update="updateText"
-              />
+              <div class="editor">
+                <editor-menu-bar
+                  :editor="editor"
+                  v-slot="{ commands, isActive }"
+                >
+                  <div class="d-flex justify-content-start menubar">
+                    <b-btn
+                      :class="[{ 'is-active': isActive.bold() }, 'menubar__btn']"
+                      @click="commands.bold"
+                      variant="outline-secondary"
+                    >
+                      <b-icon-type-bold />
+                    </b-btn>
+                    <b-btn
+                      :class="[{ 'is-active': isActive.italic() }, 'menubar__btn']"
+                      @click="commands.italic"
+                      variant="outline-secondary"
+                    >
+                      <b-icon-type-italic />
+                    </b-btn>
+                    <b-btn
+                      :class="[{ 'is-active': isActive.underline() }, 'menubar__btn']"
+                      @click="commands.underline"
+                      variant="outline-secondary"
+                    >
+                      <b-icon-type-underline />
+                    </b-btn>
+                    <b-btn
+                      :class="[{ 'is-active': isActive.strike() }, 'menubar__btn']"
+                      @click="commands.strike"
+                      variant="outline-secondary"
+                    >
+                      <b-icon-type-strikethrough />
+                    </b-btn>
+                    <b-btn
+                      :class="[{ 'is-active': isActive.ordered_list() }, 'menubar__btn']"
+                      @click="commands.ordered_list"
+                      variant="outline-secondary"
+                    >
+                      <b-icon-list-ol />
+                    </b-btn>
+                    <b-btn
+                      :class="[{ 'is-active': isActive.bullet_list() }, 'menubar__btn']"
+                      @click="commands.bullet_list"
+                      variant="outline-secondary"
+                    >
+                      <b-icon-list-ul />
+                    </b-btn>
+                    <div class="menubar__spacer bg-secondary d-flex justify-content-end">
+                      <b-form-checkbox
+                        v-model="isInternal"
+                        switch
+                        size="sm"
+                        class="text-light align-self-center pr-2"
+                      >
+                        <b-icon-eye-fill v-if="!isInternal" />
+                        <b-icon-eye-slash v-else />
+                        {{ isInternal ? 'Internal-Only' : 'Ok to Share' }}
+                      </b-form-checkbox>
+                    </div>
+                  </div>
+                </editor-menu-bar>
+                <editor-content :editor="editor" class="editor__content" />
+              </div>
             </b-form-group>
           </b-card>
           <template v-slot:footer>
-            <b-btn
-              @click="onSubmit"
-              :disabled="!isValid"
-              variant="secondary"
-              block
-              class="roman"
-            >
-              <b-icon-bookmark-plus />
-              Submit Note
-            </b-btn>
+            <b-btn-group class="w-100">
+              <b-btn
+                @click="onSubmit"
+                :disabled="!isValid"
+                :variant="isValid ? 'secondary' : 'outline-secondary'"
+                class="roman flex-grow-1"
+              >
+                <b-icon-bookmark-plus />
+                Save Note
+              </b-btn>
+              <b-btn
+                id="reset"
+                @click="onReset"
+                variant="outline-tertiary"
+                class="px-0 roman"
+              >
+                <b-icon-trash />
+              </b-btn>
+            </b-btn-group>
           </template>
         </b-card>
       </b-col>
@@ -181,20 +275,34 @@
 <script>
 import { mapState } from 'vuex'
 import VueMultiselect from 'vue-multiselect'
+import { Editor, EditorContent, EditorMenuBar } from 'tiptap'
+import {
+  OrderedList,
+  BulletList,
+  ListItem,
+  Bold,
+  Italic,
+  Link,
+  Strike,
+  Underline,
+  History
+} from 'tiptap-extensions'
 import HubHelpers from '../hub-helpers'
-import TextArea from '../../components/text-area'
-import NoteToolbar from '../../components/note-toolbar'
+// import TextArea from '../../components/text-area'
 export default {
   components: {
     VueMultiselect,
-    TextArea,
-    NoteToolbar
+    // TextArea,
+    EditorContent,
+    EditorMenuBar
   },
   mixins: [HubHelpers],
   data () {
     return {
+      editor: null,
       theme: 'secondary',
       client: null,
+      detectedClient: false,
       isBusy: false,
       startDate: null,
       endDate: null,
@@ -203,6 +311,7 @@ export default {
       isInternal: true,
       annotation: {
         html: '',
+        cleared: true,
         json: ''
       },
       macros: [
@@ -290,35 +399,77 @@ export default {
         ]
       },
       isInternal: true,
-      draftSaved: true
+      dismissSecs: 2,
+      dismissCountDown: 0,
     }
+  },
+  mounted() {
+    this.editor = new Editor({
+      extensions: [
+        new OrderedList(),
+        new BulletList(),
+        new ListItem(),
+        new Bold(),
+        new Italic(),
+        new Link(),
+        new Strike(),
+        new Underline(),
+        new History(),
+      ],
+      content: this.annotation,
+      onUpdate: ({ getHTML, getJSON }) => {
+        this.updateText({ html: getHTML(), json: getJSON() })
+      }
+    })
   },
   computed: {
     ...mapState({
       clients: state => state.clients,
-      selectedClient: state => state.selectedClient,
       clientLocations: state => state.locations
     }),
     isValid() {
-      return this.category !== null &&
-        this.locations.length > 0 &&
-        this.selectedClient !== null
+      return this.category !== null && this.client !== null
+    },
+    categoryInvalid() {
+      return (this.category !== null)
+        ? ''
+        : 'Category is required.'
     }
   },
   created() {
     this.autoDetect()
   },
+  beforeDestroy() {
+    this.editor.destroy()
+  },
   methods: {
+    onReset() {
+      this.client = null
+      this.locations = []
+      this.category = null
+      this.actionType = null
+      this.editor.clearContent()
+    },
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown
+    },
+    showAlert() {
+      this.dismissCountDown = this.dismissSecs
+    },
     autoDetect() {
-      chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+      chrome.tabs.query({
+        active: true,
+        lastFocusedWindow: true
+      }, (tabs) => {
         const url = tabs[0].url
-        console.log({ tabs })
         chrome.runtime.sendMessage({
           msg: 'auto-detect',
           url
         }, (res) => {
-          console.log({ res })
-          this.client = res.client
+          if (res.client) {
+            this.client = res.client
+            this.detectedClient = true
+          }
           if (res.selectedLocations) {
             this.locations = res.selectedLocations
           }
@@ -330,11 +481,12 @@ export default {
       chrome.runtime.sendMessage({
         msg: 'reload-clients'
       }, () => {
+        this.client = null,
+        this.detectedClient = false
         this.isBusy = false
       })
     },
     onSubmit() {
-      this.draftSaved = false
       chrome.runtime.sendMessage({
         msg: 'create-note',
         data: {
@@ -349,12 +501,13 @@ export default {
           endDate: null
         }
       }, () => {
-        this.draftSaved = true
         this.client = null
         this.locations = []
         this.category = null
         this.actionType = null
-        this.annotation.html = ''
+        this.detectedClient = false
+        this.editor.clearContent()
+        this.showAlert()
       })
     },
     onRun(payload) {
@@ -365,8 +518,8 @@ export default {
     updateText(data) {
       this.annotation = data
     },
-    onClientSelect(payload) {
-      this.draftSaved = false
+    onClientSelect() {
+      this.isBusy = true
       chrome.runtime.sendMessage({
         msg: 'locations',
         data: {
@@ -375,7 +528,7 @@ export default {
           value: this.client.urn
         }
       }, () => {
-        this.draftSaved = true
+        this.isBusy = false
       })
     }
   }
@@ -388,6 +541,36 @@ export default {
   font-family: 'Vollkorn', 'Times New Roman', Times, serif;
   font-style: italic;
   font-weight: 700;
+}
+.smaller {
+  font-size: 0.8em;
+}
+.editor {
+  &__content {
+    font-size: 0.9em;
+    padding: 0.5em 0.5em 0.25em;
+    border: 1px solid #7898ad;
+    border-top: none;
+    color: #0b233f;
+    & .is-empty {
+      color: grey;
+    }
+  }
+  & .menubar {
+    transition: 200ms ease-out;
+    display: flex;
+    &__spacer {
+      flex: 1 1 auto;
+    }
+    &__btn {
+      padding: 0.15em 0.25em;
+      margin: 0;
+      &.is-active {
+        background-color: #7898ad;
+        color: white;
+      }
+    }
+  }
 }
 .note {
   &__content {

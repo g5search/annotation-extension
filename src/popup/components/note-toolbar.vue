@@ -26,7 +26,7 @@
     </b-tooltip>
     <b-btn
       id="clear-note"
-      @click="$store.dispatch('resetNote')"
+      @click="$emit('reset')"
       variant="outline-tertiary"
       class="px-1"
     >
@@ -42,6 +42,7 @@
       Abandon current note
     </b-tooltip>
     <div class="menubar__spacer bg-pale" />
+    <slot name="append" />
     <div
       v-if="canContentScript"
       class="bg-pale text-white d-flex align-items-center px-3"

@@ -141,16 +141,16 @@ async function autoDetectClientLocation(url, cb) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/
     const [, clientUrn] = url.match(regex)
     const clients = store.getters.clients
-    const client = clients.filter(client => client.urn == clientId)
+    const client = clients.filter(client => client.urn == clientUrn)
     const locations = await getLocations(client[0].urn)
     await store.dispatch('setLocations', locations)
     cb({ client: client[0] })
 
   } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)$/.test(url)) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)/
-    const [, clientId] = url.match(regex)
+    const [, clientUrn] = url.match(regex)
     const clients = store.getters.clients
-    const client = clients.filter(client => client.urn == clientId)
+    const client = clients.filter(client => client.urn == clientUrn)
     const locations = await getLocations(client[0].urn)
     await store.dispatch('setLocations', locations)
     cb({ client: client[0] })

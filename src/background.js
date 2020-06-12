@@ -67,7 +67,11 @@ async function getClientFromUrn(urn) {
 function onAuthedReq(endpoint, cb, ...props) {
   // console.log({ endpoint, ...props })
   chrome.storage.sync.get('apiKey', async (res) => {
-    const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
+    const { data } = await axios({
+      method: 'GET',
+      url: `${endpoint}?key=${res.apiKey}`,
+      headers
+    })
     // console.log({ data })
     cb({ ...data, ...props })
   })

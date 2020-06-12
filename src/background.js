@@ -64,15 +64,19 @@ async function getClientFromUrn(urn) {
   return client[0]
 }
 
+/**
+ * Appends network request with user's apiKey, then blends response with props into callback
+ * @param {String} endpoint
+ * @param {Function} cb
+ * @param  {...any} props
+ */
 function onAuthedReq(endpoint, cb, ...props) {
-  // console.log({ endpoint, ...props })
   chrome.storage.sync.get('apiKey', async (res) => {
     const { data } = await axios({
       method: 'GET',
       url: `${endpoint}?key=${res.apiKey}`,
       headers
     })
-    // console.log({ data })
     cb({ ...data, ...props })
   })
 }
@@ -183,7 +187,11 @@ async function autoDetectClientLocation(url, cb) {
   } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/.test(url)) {
     const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/
     const [, clientUrn, locationUrn] = url.match(regex)
-    // set client and location Urn
+    const client = await getClientFromUrn(clientUrn)
+    const locations = await getLocations(client.urn)
+    await store.dispatch('setLocations', locations)
+    const selectedLocations = locations.filter(l => l.urn === locationUrn)
+    cb({ client, selectedLocations })
 
   } else if (/https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/.test(url)) {
     const regex = /https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/

@@ -1,9 +1,8 @@
 import axios from 'axios'
 import store from './store'
-import { locations } from './store/getters'
 
 const host = 'https://notes.g5marketingcloud.com'
-// const host = 'http://localhost:4242'
+// const host = 'http://localhost:3000'
 
 const headers = {
   'Accept': 'application/json',
@@ -58,6 +57,22 @@ async function getClients() {
   return clients.data
 }
 
+async function getClientFromUrn(urn) {
+  // console.log({ urn })
+  const clients = store.getters.clients
+  const client = clients.filter(client => client.urn == urn)
+  return client[0]
+}
+
+function onAuthedReq(endpoint, cb, ...props) {
+  // console.log({ endpoint, ...props })
+  chrome.storage.sync.get('apiKey', async (res) => {
+    const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
+    // console.log({ data })
+    cb({ ...data, ...props })
+  })
+}
+
 function getXHRClients(cb) {
   const xhr = new XMLHttpRequest()
   xhr.open('GET', `${host}/api/hub/clients?activeDa=true`, true)
@@ -101,81 +116,83 @@ async function autoDetectClientLocation(url, cb) {
   if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/
     const [, locationId] = url.match(regex)
-    const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
-    cb({ locationId })
+    const endpoint = `${host}/api/core/location/${locationId}`
+    onAuthedReq(endpoint, cb)
 
   } else if (/https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/
     const [, clientId, locationId] = url.match(regex)
-    const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
-    cb({ clientId, locationId })
+    const endpoint = `${host}/api/core/location/${locationId}`
+    onAuthedReq(endpoint, cb, clientId)
 
   } else if (/https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/
     const serviceId = url.match(regex)
-    cb({ serviceId })
+    const endpoint = `https://notes.g5marketingcloud.com/api/core/services/${serviceId}`
+    onAuthedReq(endpoint, cb)
 
   } else if (/https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/
     const [, clientId] = url.match(regex)
-    const endpoint = `https://notes.g5marketingcloud.com/api/core/client/${clientId}`
-    cb({ clientId })
+    const endpoint = `${host}/api/core/client/${clientId}`
+    onAuthedReq(endpoint, cb)
 
   } else if (/https:\/\/www.g5search.com\/admin\/clients\/edit_store\?id=(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/clients\/edit_store\?id=(\d*)$/
     const [, locationId] = url.match(regex)
-    const endpoint = `https://notes.g5marketingcloud.com/api/core/location/${locationId}`
-    cb({ locationId })
+    const endpoint = `${host}/api/core/location/${locationId}`
+    onAuthedReq(endpoint, cb)
 
   } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/.test(url)) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/
     const [, clientUrn, locationUrn] = url.match(regex)
-    const clients = store.getters.clients
-    const client = clients.filter(client => client.urn == clientUrn)
-    const locations = await getLocations(client[0].urn)
+    const client = await getClientFromUrn(clientUrn)
+    const locations = await getLocations(client.urn)
     await store.dispatch('setLocations', locations)
     const selectedLocations = locations.filter(l => l.urn === locationUrn)
-    cb({ client: client[0], selectedLocations })
+    cb({ client, selectedLocations })
 
   } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/.test(url)) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/
     const [, clientUrn] = url.match(regex)
-    const clients = store.getters.clients
-    const client = clients.filter(client => client.urn == clientUrn)
-    const locations = await getLocations(client[0].urn)
+    const client = await getClientFromUrn(clientUrn)
+    const locations = await getLocations(client.urn)
     await store.dispatch('setLocations', locations)
-    cb({ client: client[0] })
+    cb({ client })
 
   } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)$/.test(url)) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)/
     const [, clientUrn] = url.match(regex)
-    const clients = store.getters.clients
-    const client = clients.filter(client => client.urn == clientUrn)
-    const locations = await getLocations(client[0].urn)
+    const client = await getClientFromUrn(clientUrn)
+    const locations = await getLocations(client.urn)
     await store.dispatch('setLocations', locations)
-    cb({ client: client[0] })
+    cb({ client })
 
   } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/.test(url)) {
     const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/
     const [, clientUrn] = url.match(regex)
-    cb({ clientUrn })
+    const client = await getClientFromUrn(clientUrn)
+    const locations = await getLocations(client.urn)
+    await store.dispatch('setLocations', locations)
+    cb({ client })
 
   } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/.test(url)) {
     const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/
     const [, clientUrn, locationUrn] = url.match(regex)
     // set client and location Urn
+
   } else if (/https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/.test(url)) {
     const regex = /https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/
     const [, code_account] = url.match(regex)
-    console.log(`Code account found ${code_account}`)
+
   } else if (/ https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*act=(\d*)\S*/.test(url)) {
     const regex =  /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*act=(\d*)\S*/
     const accountId = url.match(regex)
-    console.log('accountId', accountId)
+
   } else if (/https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/.test(url)) {
     const regex = /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/
     const campaignId = url.match(regex)
-    console.log('campaignId', campaignId )
+
   } else {
     cb({ status: 200 })
   }

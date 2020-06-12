@@ -52,17 +52,8 @@
                   variant="secondary"
                   placement="top"
                 >
-                  Attempt to detect from current webpage.
+                  Attempt to detect from current webpage
                 </b-tooltip>
-                <!-- <b-btn
-                  id="clear-clients"
-                  @click="$store.dispatch('dropClients')"
-                  variant="light"
-                  size="sm"
-                  class="text-secondary flex-grow-0"
-                >
-                  <b-icon-trash />
-                </b-btn> -->
                 <b-btn
                   id="refresh-client-list"
                   @click="refreshClients"
@@ -97,10 +88,25 @@
             class="mb-2 text-secondary"
           >
             <template v-slot:label>
-              <b-icon-building />
-              Location
+              <label class="mb-0 d-flex w-100 align-items-center justify-content-start">
+                <b-icon-building />
+                <span class="ml-2 flex-grow-1">
+                  Location
+                </span>
+                <b-btn
+                  id="toggle-location-select"
+                  @click="showLocation = !showLocation"
+                  variant="light"
+                  size="sm"
+                  class="text-secondary flex-grow-0"
+                >
+                  <b-icon-eye-fill v-if="!showLocation" />
+                  <b-icon-eye-slash-fill v-else />
+                </b-btn>
+              </label>
             </template>
             <vue-multiselect
+              v-if="showLocation"
               v-model="locations"
               :options="clientLocations"
               :custom-label="getLocationName"
@@ -172,16 +178,6 @@
                   <b-icon-file-richtext />
                   Note
                 </span>
-                <!-- <b-form-checkbox
-                  v-model="isInternal"
-                  switch
-                  size="sm"
-                  class="text-secondary"
-                >
-                  <b-icon-eye-fill v-if="!isInternal" />
-                  <b-icon-eye-slash v-else />
-                  {{ isInternal ? 'Internal-Only' : 'Ok to Share' }}
-                </b-form-checkbox> -->
               </template>
               <div class="editor">
                 <editor-menu-bar
@@ -304,6 +300,7 @@ export default {
   data () {
     return {
       editor: null,
+      showLocation: false,
       theme: 'secondary',
       client: null,
       detectedClient: false,
@@ -450,6 +447,7 @@ export default {
     onReset() {
       this.client = null
       this.locations = []
+      this.showAlert = true
       this.category = null
       this.actionType = null
       this.editor.clearContent()

@@ -139,6 +139,10 @@
               :options="categories"
               :invalid-feedback="categoryInvalid"
             />
+            <!-- <vue-multiselect
+              v-model="category"
+              :options="categories"
+            /> -->
           </b-form-group>
           <b-form-group
             v-show="category !== null"
@@ -335,12 +339,12 @@ export default {
       category: null,
       categories: [
         { text: 'Select Option', value: null },
-        'Account Changes',
-        'Customer Contact',
-        'General Note',
-        'Optimizations',
-        'Other',
-        'Technical Issue'
+        { text: 'Account Changes', value: 'Account Changes' },
+        { text: 'Customer Contact', value: 'Customer Contact' },
+        { text: 'General Note', value: 'General Note' },
+        { text: 'Optimizations', value: 'Optimizations' },
+        { text: 'Other', value: 'Other' },
+        { text: 'Technical Issue', value: 'Technical Issue' }
       ],
       actionType: null,
       actionTypes: {

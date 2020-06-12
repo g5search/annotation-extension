@@ -176,5 +176,7 @@ async function autoDetectClientLocation(url, cb) {
     const regex = /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/
     const campaignId = url.match(regex)
     console.log('campaignId', campaignId )
+  } else {
+    cb({ status: 200 })
   }
 }

@@ -50,9 +50,6 @@ export default {
     return {
       version
     }
-  },
-  created() {
-    chrome.runtime.sendMessage({ msg: 'created' })
   }
 }
 </script>

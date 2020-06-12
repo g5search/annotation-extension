@@ -246,7 +246,7 @@
             </b-form-group>
           </b-card>
           <template v-slot:footer>
-            <b-btn-group class="w-100">
+            <b-btn-group class="w-100 d-flex">
               <b-btn
                 @click="onSubmit"
                 :disabled="!isValid"
@@ -260,7 +260,7 @@
                 id="reset"
                 @click="onReset"
                 variant="outline-tertiary"
-                class="px-0 roman"
+                class="ml-1 px-2 roman flex-grow-0"
               >
                 <b-icon-trash />
               </b-btn>

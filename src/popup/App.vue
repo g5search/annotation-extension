@@ -74,19 +74,19 @@ $enable-shadows: false;
 $enable-gradients: false;
 $font-family-base: 'Roboto', sans-serif;
 $headings-font-family: 'Roboto Slab', sans-serif;
-
 @import 'node_modules/bootstrap/scss/bootstrap';
 @import 'node_modules/bootstrap-vue/src/index.scss';
 h1,h2,h3 {
   font-weight: 700;
 }
 .custom-select {
-  background: none !important;
+  background: none;
+  border-radius: 5px;
+  border-color: #e8e8e8;
 }
 #app-root {
   min-width: 400px;
 }
-
 .multiselect__spinner:after,
 .multiselect__spinner:before {
   border-top-color: #0b233f;

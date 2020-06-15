@@ -18,7 +18,7 @@ export default new Vuex.Store({
       'lastUpdated',
       'user'
     ],
-    loggerLevel: 'debug'
+    // loggerLevel: 'debug'
   })],
   state: {
     clients: [],

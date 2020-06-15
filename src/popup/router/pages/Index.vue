@@ -23,8 +23,8 @@
             </b-alert>
           </template>
           <b-form-group
-            label-class="py-0 text-secondary"
-            class="mt-1"
+            label-class="py-1 text-secondary"
+            class="my-1"
           >
             <template v-slot:label>
               <label class="mb-0 d-flex w-100 align-items-center justify-content-start">
@@ -86,7 +86,8 @@
           </b-form-group>
           <b-form-group
             v-show="clientLocations"
-            class="mb-2 text-secondary"
+            label-class="pb-2 text-secondary"
+            class="my-1"
           >
             <template v-slot:label>
               <b-icon-building />
@@ -117,7 +118,8 @@
             </vue-multiselect>
           </b-form-group>
           <b-form-group
-            label-class="text-secondary"
+            label-class="text-secondary py-1"
+            class="my-1"
           >
             <template v-slot:label>
               <b-icon-collection />
@@ -132,7 +134,7 @@
               :invalid-feedback="categoryInvalid"
             />
           </b-form-group>
-          <b-form-group label-class="text-secondary">
+          <b-form-group label-class="text-secondary py-1" class="my-1">
             <template v-slot:label>
               <b-icon-puzzle />
               Action Type
@@ -150,7 +152,7 @@
           >
             <b-form-group
               label-class="d-flex w-100 align-items-center justify-content-between"
-              class="text-secondary"
+              class="my-1 text-secondary"
             >
               <template v-slot:label>
                 <span>
@@ -239,6 +241,7 @@
                 id="reset"
                 @click="onReset"
                 variant="outline-tertiary"
+                pill
                 class="ml-1 px-2 roman flex-grow-0"
               >
                 <b-icon-trash />
@@ -264,7 +267,7 @@ import {
   Link,
   Strike,
   Underline,
-  History
+  Placeholder
 } from 'tiptap-extensions'
 import HubHelpers from '../hub-helpers'
 export default {
@@ -312,7 +315,7 @@ export default {
       ],
       category: null,
       categories: [
-        { text: 'Select Option', value: null },
+        { text: 'Select option', value: null },
         { text: 'Account Changes', value: 'Account Changes' },
         { text: 'Customer Contact', value: 'Customer Contact' },
         { text: 'General Note', value: 'General Note' },
@@ -322,6 +325,9 @@ export default {
       ],
       actionType: null,
       actionTypes: {
+        null: [
+          { text: 'Select a category first' }
+        ],
         'Account Changes': [
           { text: 'Select Option', value: null },
           'Smart Bidding Strategy Change',
@@ -392,7 +398,12 @@ export default {
         new Link(),
         new Strike(),
         new Underline(),
-        new History(),
+        new Placeholder({
+          emptyEditorClass: 'is-editor-empty',
+          emptyNodeClass: 'is-empty',
+          emptyNodeText: 'Write something …',
+          showOnlyWhenEditable: true
+        }),
       ],
       content: this.annotation.html,
       onUpdate: ({ getHTML, getJSON }) => {
@@ -424,9 +435,11 @@ export default {
     onReset() {
       this.client = null
       this.locations = []
+      this.isInternal = true
       this.showAlert = true
       this.category = null
       this.actionType = null
+      this.autoDetect = false
       this.editor.clearContent()
     },
     countDownChanged(dismissCountDown) {
@@ -445,7 +458,6 @@ export default {
           msg: 'auto-detect',
           url
         }, async (res) => {
-          console.log({ res })
           if (res.client) {
             this.client = res.client
             this.detectedClient = true
@@ -455,8 +467,6 @@ export default {
           }
           if (res.selectedLocations) {
             this.locations = res.selectedLocations
-            // this.onClientSelect(res.selectedLocations)
-            // this.locations = res.selectedLocations
           }
         })
       })
@@ -535,8 +545,13 @@ export default {
     border: 1px solid #7898ad;
     border-top: none;
     color: #0b233f;
-    & .is-empty {
-      color: grey;
+    & .is-editor-empty:first-child::before {
+      content: attr(data-empty-text);
+      float: left;
+      color: #aaa;
+      pointer-events: none;
+      height: 0;
+      font-style: italic;
     }
   }
   & .menubar {

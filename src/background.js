@@ -28,7 +28,6 @@ chrome.runtime.onMessage.addListener(onMessage)
 async function onMessage(req, sender, res) {
   if (req.msg === 'locations') {
     const locations = await getLocations(req.data.value)
-    // store.dispatch('setLocations', locations)
     res({ locations })
   } else if (req.msg === 'login') {
     const key = await getApiKey(req.email)
@@ -37,7 +36,6 @@ async function onMessage(req, sender, res) {
       res(201)
     })
   } else if (req.msg === 'reload-clients') {
-    // ALT XHR FOR CLIENTS keep for now
     getXHRClients(res)
   } else if (req.msg === 'create-note') {
     createNote(req.data)
@@ -57,10 +55,21 @@ async function getClients() {
 }
 
 async function getClientFromUrn(urn) {
-  // console.log({ urn })
   const clients = store.getters.clients
   const client = clients.filter(client => client.urn == urn)
   return client[0]
+}
+
+function getXHRClients(cb) {
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET', `${host}/api/hub/clients?activeDa=true`, true)
+  xhr.setRequestHeader('Content-Type', 'application/json')
+  xhr.send()
+  xhr.onload = () => {
+    const clients = JSON.parse(xhr.responseText)
+    store.dispatch('setClients', clients)
+    cb(200)
+  }
 }
 
 /**
@@ -80,22 +89,7 @@ function onAuthedReq(endpoint, cb, ...props) {
   })
 }
 
-function getXHRClients(cb) {
-  const xhr = new XMLHttpRequest()
-  xhr.open('GET', `${host}/api/hub/clients?activeDa=true`, true)
-  xhr.setRequestHeader('Content-Type', 'application/json')
-  xhr.send()
-  xhr.onload = () => {
-    console.log('%c onload event fired.', 'color: red;')
-    const clients = JSON.parse(xhr.responseText)
-    console.log(clients.length)
-    store.dispatch('setClients', clients)
-    cb(200)
-  }
-}
-
 async function getLocations(urn) {
-  console.log({ urn })
   const locations = await axios({
     method: 'GET',
     url: `${host}/api/hub/clients/${urn}/locations`,

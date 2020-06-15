@@ -85,28 +85,14 @@
             />
           </b-form-group>
           <b-form-group
+            v-show="clientLocations"
             class="mb-2 text-secondary"
           >
             <template v-slot:label>
-              <label class="mb-0 d-flex w-100 align-items-center justify-content-start">
-                <b-icon-building />
-                <span class="ml-2 flex-grow-1">
-                  Location
-                </span>
-                <b-btn
-                  id="toggle-location-select"
-                  @click="showLocation = !showLocation"
-                  variant="light"
-                  size="sm"
-                  class="text-secondary flex-grow-0"
-                >
-                  <b-icon-eye-fill v-if="!showLocation" />
-                  <b-icon-eye-slash-fill v-else />
-                </b-btn>
-              </label>
+              <b-icon-building />
+              Location
             </template>
             <vue-multiselect
-              v-if="showLocation"
               v-model="locations"
               :options="clientLocations"
               :custom-label="getLocationName"
@@ -145,15 +131,8 @@
               :options="categories"
               :invalid-feedback="categoryInvalid"
             />
-            <!-- <vue-multiselect
-              v-model="category"
-              :options="categories"
-            /> -->
           </b-form-group>
-          <b-form-group
-            v-show="category !== null"
-            label-class="text-secondary"
-          >
+          <b-form-group label-class="text-secondary">
             <template v-slot:label>
               <b-icon-puzzle />
               Action Type
@@ -288,11 +267,9 @@ import {
   History
 } from 'tiptap-extensions'
 import HubHelpers from '../hub-helpers'
-// import TextArea from '../../components/text-area'
 export default {
   components: {
     VueMultiselect,
-    // TextArea,
     EditorContent,
     EditorMenuBar
   },
@@ -303,6 +280,7 @@ export default {
       showLocation: false,
       theme: 'secondary',
       client: null,
+      clientLocations: [],
       detectedClient: false,
       isBusy: false,
       startDate: null,
@@ -312,7 +290,6 @@ export default {
       isInternal: true,
       annotation: {
         html: '',
-        cleared: true,
         json: ''
       },
       macros: [
@@ -417,7 +394,7 @@ export default {
         new Underline(),
         new History(),
       ],
-      content: this.annotation,
+      content: this.annotation.html,
       onUpdate: ({ getHTML, getJSON }) => {
         this.updateText({ html: getHTML(), json: getJSON() })
       }
@@ -426,7 +403,7 @@ export default {
   computed: {
     ...mapState({
       clients: state => state.clients,
-      clientLocations: state => state.locations
+      storeLocations: state => state.locations
     }),
     isValid() {
       return this.category !== null && this.client !== null
@@ -467,13 +444,19 @@ export default {
         chrome.runtime.sendMessage({
           msg: 'auto-detect',
           url
-        }, (res) => {
+        }, async (res) => {
+          console.log({ res })
           if (res.client) {
             this.client = res.client
             this.detectedClient = true
           }
+          if (res.locations) {
+            this.clientLocations = res.locations
+          }
           if (res.selectedLocations) {
             this.locations = res.selectedLocations
+            // this.onClientSelect(res.selectedLocations)
+            // this.locations = res.selectedLocations
           }
         })
       })
@@ -512,11 +495,6 @@ export default {
         this.showAlert()
       })
     },
-    onRun(payload) {
-      this.category = payload.category
-      this.actionType = payload.actionType
-      this.isInternal = payload.isInternal
-    },
     updateText(data) {
       this.annotation = data
     },
@@ -529,7 +507,10 @@ export default {
           prop: 'urn',
           value: this.client.urn
         }
-      }, () => {
+      }, (res) => {
+        if (res.locations) {
+          this.clientLocations = res.locations
+        }
         this.isBusy = false
       })
     }

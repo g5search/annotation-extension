@@ -28,8 +28,8 @@ chrome.runtime.onMessage.addListener(onMessage)
 async function onMessage(req, sender, res) {
   if (req.msg === 'locations') {
     const locations = await getLocations(req.data.value)
-    store.dispatch('setLocations', locations)
-    res(200)
+    // store.dispatch('setLocations', locations)
+    res({ locations })
   } else if (req.msg === 'login') {
     const key = await getApiKey(req.email)
     chrome.storage.sync.set({ apiKey: key }, async () => {
@@ -43,7 +43,6 @@ async function onMessage(req, sender, res) {
     createNote(req.data)
     res(201)
   } else if (req.msg === 'auto-detect') {
-    console.log({ req })
     await autoDetectClientLocation(req.url, res)
   }
 }
@@ -96,6 +95,7 @@ function getXHRClients(cb) {
 }
 
 async function getLocations(urn) {
+  console.log({ urn })
   const locations = await axios({
     method: 'GET',
     url: `${host}/api/hub/clients/${urn}/locations`,
@@ -155,43 +155,40 @@ async function autoDetectClientLocation(url, cb) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/
     const [, clientUrn, locationUrn] = url.match(regex)
     const client = await getClientFromUrn(clientUrn)
-    const locations = await getLocations(client.urn)
-    await store.dispatch('setLocations', locations)
+    const locations = await getLocations(clientUrn)
     const selectedLocations = locations.filter(l => l.urn === locationUrn)
-    cb({ client, selectedLocations })
+    cb({ client, locations, selectedLocations })
 
   } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/.test(url)) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/
     const [, clientUrn] = url.match(regex)
     const client = await getClientFromUrn(clientUrn)
     const locations = await getLocations(client.urn)
-    await store.dispatch('setLocations', locations)
-    cb({ client })
+    const selectedLocations = locations.filter(l => l.urn === locationUrn)
+    cb({ client, locations, selectedLocations })
 
   } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)$/.test(url)) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)/
     const [, clientUrn] = url.match(regex)
     const client = await getClientFromUrn(clientUrn)
     const locations = await getLocations(client.urn)
-    await store.dispatch('setLocations', locations)
-    cb({ client })
+    cb({ client, locations })
 
   } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/.test(url)) {
     const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/
     const [, clientUrn] = url.match(regex)
     const client = await getClientFromUrn(clientUrn)
     const locations = await getLocations(client.urn)
-    await store.dispatch('setLocations', locations)
-    cb({ client })
+    const selectedLocations = locations.filter(l => l.urn === locationUrn)
+    cb({ client, locations, selectedLocations })
 
   } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/.test(url)) {
     const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/
     const [, clientUrn, locationUrn] = url.match(regex)
     const client = await getClientFromUrn(clientUrn)
     const locations = await getLocations(client.urn)
-    await store.dispatch('setLocations', locations)
     const selectedLocations = locations.filter(l => l.urn === locationUrn)
-    cb({ client, selectedLocations })
+    cb({ client, selectedLocations, locations })
 
   } else if (/https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/.test(url)) {
     const regex = /https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/

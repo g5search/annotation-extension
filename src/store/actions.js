@@ -12,19 +12,9 @@ export default {
       commit('SET_CLIENTS', clients)
     }
   },
-  // setClient({ commit }, client) {
-  //   if (client.payload) {
-  //     commit('SET_CLIENT', client.payload)
-  //   } else {
-  //     commit('SET_CLIENT', client)
-  //   }
-  // },
-  async setLocations({ commit }, payload) {
-    await commit('SET_LOCATIONS', payload)
+  setLocations({ commit }, payload) {
+    commit('SET_LOCATIONS', payload)
   },
-  // async setSelectedLocations({ commit }, locations) {
-  //   await commit('SET_SELECTED_LOCATIONS', locations)
-  // },
   async updateField({ commit }, keyVal) {
     await commit('UPDATE_FIELD', keyVal)
   },

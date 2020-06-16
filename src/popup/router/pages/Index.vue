@@ -585,8 +585,8 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    box-shadow: 0px 5px 15px rgba(12, 35, 63, 0.5),
-                0px 10px 20px rgba(12, 35, 63, 0.5);
+    box-shadow: 0px 5px 15px rgba(12, 35, 63, 0.2),
+                0px 10px 20px rgba(12, 35, 63, 0.2);
   }
 }
 .editor {

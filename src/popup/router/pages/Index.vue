@@ -4,9 +4,9 @@
       <b-col>
         <b-card
           no-body
-          class="border-0 py-1 px-2 note"
+          class="border-0 pb-1 px-2 note"
           header-class="p-0 border-0"
-          footer-class="p-0"
+          footer-class="p-0 border-0"
           footer-bg-variant="white"
         >
           <template v-slot:header>

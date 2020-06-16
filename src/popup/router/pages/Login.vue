@@ -3,6 +3,14 @@
     <b-row>
       <b-col>
         <b-card class="my-2">
+          <template v-slot:header>
+            <h1>
+              We need your getg5.com email
+            </h1>
+            <p>
+              We use an API token to link your email to your G5 and Salesforce accounts, and saves us a significant hassle. You should only have to do this once.
+            </p>
+          </template>
           <b-form-group
             label-class="text-secondary"
             description="first.last@getg5.com"

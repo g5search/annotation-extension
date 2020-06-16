@@ -42,6 +42,9 @@ async function onMessage(req, sender, res) {
     res(201)
   } else if (req.msg === 'auto-detect') {
     await autoDetectClientLocation(req.url, res)
+  } else if (req.msg === 'google-ads') {
+    console.log(req.data)
+    res('got it')
   }
 }
 
@@ -117,7 +120,7 @@ function createNote(annotation) {
 }
 
 async function autoDetectClientLocation(url, cb) {
-  if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
+if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/
     const [, locationId] = url.match(regex)
     const endpoint = `${host}/api/core/location/${locationId}`
@@ -206,6 +209,11 @@ async function autoDetectClientLocation(url, cb) {
     const endpoint = `${host}//api/v1/facebook/campaign/${campaignId}`
     onAuthedReq(endpoint, cb)
 
+  } else if (/https:\/\/ads.google.com\/.*$/.test(url)) {
+    chrome.tabs.executeScript({
+      file: './content-scripts/google-ads.js'
+    })
+    cb(200)
   } else {
     cb({ status: 200 })
   }

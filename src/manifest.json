@@ -21,12 +21,12 @@
       "description": "Open Annotations"
     }
   },
-  "content_scripts": [],
   "web_accessible_resources": [],
   "permissions": [
     "storage",
     "declarativeContent",
-    "tabs"
+    "tabs",
+    "activeTab"
   ],
   "background": {
     "scripts": [

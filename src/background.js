@@ -1,8 +1,8 @@
 import axios from 'axios'
 import store from './store'
 
-const host = 'https://notes.g5marketingcloud.com'
-// const host = 'http://localhost:3000'
+// const host = 'https://notes.g5marketingcloud.com'
+const host = 'http://localhost:3000'
 
 const headers = {
   'Accept': 'application/json',
@@ -132,48 +132,24 @@ async function autoDetectClientLocation(url, cb) {
     const [, clientId, locationId] = url.match(regex)
     const endpoint = `${host}/api/core/location/${locationId}`
     onAuthedReq(endpoint, cb, true)
-    // chrome.storage.sync.get('apiKey', async (res) => {
-    //   const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
-    //   const client = await getClientFromUrn(data.clientUrn)
-    //   const locations = await getLocations(data.clientUrn)
-    //   const selectedLocations = locations.filter(l => l.urn === data.locationUrn)
-    //   cb({ client, locations, selectedLocations })
-    // })
 
   } else if (/https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/
     const [, serviceId] = url.match(regex)
     const endpoint = `https://notes.g5marketingcloud.com/api/core/services/${serviceId}`
     onAuthedReq(endpoint, cb)
-    // chrome.storage.sync.get('apiKey', async (res) => {
-    //   const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
-    //   console.log({ data })
-    //   cb({ data })
-    // })
 
   } else if (/https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/
     const [, clientId] = url.match(regex)
     const endpoint = `${host}/api/core/client/${clientId}`
     onAuthedReq(endpoint, cb)
-    // chrome.storage.sync.get('apiKey', async (res) => {
-    //   const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
-    //   const client = await getClientFromUrn(data.clientUrn)
-    //   cb({ client })
-    // })
 
   } else if (/https:\/\/www.g5search.com\/admin\/clients\/edit_store\?id=(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/clients\/edit_store\?id=(\d*)$/
     const [, locationId] = url.match(regex)
     const endpoint = `${host}/api/core/location/${locationId}`
     onAuthedReq(endpoint, cb, true)
-    // chrome.storage.sync.get('apiKey', async (res) => {
-    //   const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
-    //   const client = await getClientFromUrn(data.clientUrn)
-    //   const locations = await getLocations(data.clientUrn)
-    //   const selectedLocations = locations.filter(l => l.urn === data.locationUrn)
-    //   cb({ client, locations, selectedLocations })
-    // })
 
   } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/.test(url)) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/
@@ -220,11 +196,15 @@ async function autoDetectClientLocation(url, cb) {
 
   } else if (/ https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*act=(\d*)\S*/.test(url)) {
     const regex =  /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*act=(\d*)\S*/
-    const accountId = url.match(regex)
+    const [, accountId] = url.match(regex)
+    const endpoint = `${host}/api/v1/facebook/account/${accountId}`
+    onAuthedReq(endpoint, cb)
 
   } else if (/https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/.test(url)) {
     const regex = /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/
-    const campaignId = url.match(regex)
+    const [, campaignId] = url.match(regex)
+    const endpoint = `${host}//api/v1/facebook/campaign/${campaignId}`
+    onAuthedReq(endpoint, cb)
 
   } else {
     cb({ status: 200 })

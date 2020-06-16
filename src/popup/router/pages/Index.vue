@@ -1,92 +1,78 @@
 <template>
-  <b-container fluid class="p-1 my-2">
+  <b-container fluid class="px-2 py-1 my-1">
     <b-row no-gutters>
       <b-col>
         <b-card
           no-body
-          class="border-0 pb-1 px-2 note"
+          class="border-0 p-2 note alert-anchor"
           header-class="p-0 border-0"
           footer-class="p-0 border-0"
           footer-bg-variant="white"
         >
-          <template v-slot:header>
-            <b-alert
-              :show="dismissCountDown"
-              @dismissed="dismissCountDown = 0"
-              @dismiss-count-down="countDownChanged"
-              id="submission-status"
-              variant="success"
-              dismissible
-            >
-              <b-icon-check />
-              Saved Successfully!
-            </b-alert>
-          </template>
           <b-form-group
-            label-class="py-1 text-secondary"
-            class="my-1"
+            label-class="pt-1 pb-0 text-secondary d-flex w-100 align-items-center justify-content-start"
+            class="mb-1 mt-0"
           >
             <template v-slot:label>
-              <label class="mb-0 d-flex w-100 align-items-center justify-content-start">
-                <b-icon-briefcase />
-                <span class="ml-2 flex-grow-1">
-                  Client
-                  <span class="smaller roman text-tertiary">
-                    *
-                  </span>
+              <b-icon-briefcase />
+              <span class="ml-2 flex-grow-1">
+                Client
+                <span class="smaller roman text-tertiary">
+                  *
                 </span>
-                <b-btn
-                  id="auto-detect-client"
-                  @click="autoDetect"
-                  variant="light"
-                  size="sm"
-                  class="text-secondary flex-grow-0"
-                >
-                  <b-icon-bucket-fill v-if="detectedClient" />
-                  <b-icon-bucket v-else />
-                  Auto
-                </b-btn>
-                <b-tooltip
-                  target="auto-detect-client"
-                  triggers="hover"
-                  variant="secondary"
-                  placement="top"
-                >
-                  Attempt to detect from current webpage
-                </b-tooltip>
-                <b-btn
-                  id="refresh-client-list"
-                  @click="refreshClients"
-                  variant="light"
-                  size="sm"
-                  class="text-secondary"
-                >
-                  <b-spinner v-if="isBusy" small />
-                  <b-icon-arrow-clockwise v-else />
-                  {{ clients.length }}
-                </b-btn>
-                <b-tooltip
-                  target="refresh-client-list"
-                  triggers="hover"
-                  variant="secondary"
-                  placement="top"
-                >
-                  Reload Clients
-                </b-tooltip>
-              </label>
+              </span>
+              <b-btn
+                id="auto-detect-client"
+                @click="autoDetect"
+                variant="light"
+                size="sm"
+                class="text-secondary flex-grow-0 btn-rad"
+              >
+                <b-icon-bucket-fill v-if="detectedClient" />
+                <b-icon-bucket v-else />
+                Auto
+              </b-btn>
+              <b-tooltip
+                target="auto-detect-client"
+                triggers="hover"
+                variant="secondary"
+                placement="top"
+              >
+                Attempt to detect from current webpage
+              </b-tooltip>
+              <b-btn
+                id="refresh-client-list"
+                @click="refreshClients"
+                variant="light"
+                size="sm"
+                class="text-secondary btn-rad"
+              >
+                <b-spinner v-if="isBusy" small />
+                <b-icon-arrow-clockwise v-else />
+                {{ clients.length }}
+              </b-btn>
+              <b-tooltip
+                target="refresh-client-list"
+                triggers="hover"
+                variant="secondary"
+                placement="top"
+              >
+                Reload Clients
+              </b-tooltip>
             </template>
             <vue-multiselect
               v-model="client"
               :options="clients"
               :custom-label="getClientName"
               @input="onClientSelect"
+              placeholder="Search"
               track-by="urn"
               label="name"
             />
           </b-form-group>
           <b-form-group
             v-show="clientLocations"
-            label-class="pb-2 text-secondary"
+            label-class="pb-0 pt-1 text-secondary"
             class="my-1"
           >
             <template v-slot:label>
@@ -117,34 +103,71 @@
               </template>
             </vue-multiselect>
           </b-form-group>
-          <b-form-group
-            label-class="text-secondary py-1"
-            class="my-1"
-          >
-            <template v-slot:label>
-              <b-icon-collection />
-              Category
-              <span class="smaller roman text-tertiary">
-                *
-              </span>
-            </template>
-            <b-form-select
-              v-model="category"
-              :options="categories"
-              :invalid-feedback="categoryInvalid"
-            />
-          </b-form-group>
-          <b-form-group label-class="text-secondary py-1" class="my-1">
-            <template v-slot:label>
-              <b-icon-puzzle />
-              Action Type
-            </template>
-            <b-form-select
-              v-model="actionType"
-              :options="actionTypes[category]"
-              required
-            />
-          </b-form-group>
+          <b-card no-body class="my-2 py-1 px-2">
+            <b-form-group
+              label-cols="4"
+              label-class="text-secondary py-1"
+              class="my-1"
+            >
+              <template v-slot:label>
+                <b-icon-collection />
+                Category
+                <span class="smaller roman text-tertiary">
+                  *
+                </span>
+              </template>
+              <b-form-select
+                v-model="category"
+                :options="categories"
+                :invalid-feedback="categoryInvalid"
+              />
+            </b-form-group>
+            <b-form-group
+              label-cols="4"
+              label-class="text-secondary py-1"
+              class="my-1"
+            >
+              <template v-slot:label>
+                <b-icon-puzzle />
+                Action Type
+              </template>
+              <b-form-select
+                v-model="actionType"
+                :options="actionTypes[category]"
+                required
+              />
+            </b-form-group>
+            <b-form-group
+              label-cols="3"
+              label-class="text-secondary"
+              class="mb-0 mt-1"
+            >
+              <template v-slot:label>
+                Start Date
+              </template>
+              <b-form-datepicker
+                v-show="showDates"
+                v-model="startDate"
+                size="sm"
+              />
+            </b-form-group>
+            <b-form-group
+              label-cols="3"
+              label-class="text-secondary"
+              class="my-0"
+            >
+              <template v-slot:label>
+                End Date
+              </template>
+              <b-form-datepicker
+                v-show="showDates"
+                v-model="endDate"
+                reset-button
+                reset-button-variant="outline-secondary"
+                size="sm"
+              />
+            </b-form-group>
+          </b-card>
           <b-card
             :bg-variant="isInternal ? 'quaternary-lt4' : 'white'"
             no-body
@@ -232,7 +255,7 @@
                 @click="onSubmit"
                 :disabled="!isValid"
                 :variant="isValid ? 'secondary' : 'outline-secondary'"
-                class="roman flex-grow-1"
+                class="roman flex-grow-1 btn-rad"
               >
                 <b-icon-bookmark-plus />
                 Save Note
@@ -241,13 +264,23 @@
                 id="reset"
                 @click="onReset"
                 variant="outline-tertiary"
-                pill
-                class="ml-1 px-2 roman flex-grow-0"
+                class="ml-1 btn-rad px-2 roman flex-grow-0"
               >
                 <b-icon-trash />
               </b-btn>
             </b-btn-group>
           </template>
+          <b-alert
+            :show="dismissCountDown"
+            @dismissed="dismissCountDown = 0"
+            @dismiss-count-down="countDownChanged"
+            id="submission-status"
+            variant="success"
+            dismissible
+          >
+            <b-icon-check-circle />
+            Note Saved!
+          </b-alert>
         </b-card>
       </b-col>
     </b-row>
@@ -285,6 +318,7 @@ export default {
       client: null,
       clientLocations: [],
       detectedClient: false,
+      showDates: true,
       isBusy: false,
       startDate: null,
       endDate: null,
@@ -492,8 +526,8 @@ export default {
           actionType: this.actionType,
           html: this.annotation.html,
           annotation: this.annotation.json,
-          startDate: null,
-          endDate: null
+          startDate: this.startDate,
+          endDate: this.endDate
         }
       }, () => {
         this.client = null
@@ -501,6 +535,8 @@ export default {
         this.category = null
         this.actionType = null
         this.detectedClient = false
+        this.startDate = null
+        this.endDate = null
         this.editor.clearContent()
         this.showAlert()
       })
@@ -537,6 +573,21 @@ export default {
 }
 .smaller {
   font-size: 0.8em;
+}
+.btn-rad {
+  border-radius: 5px;
+}
+.alert-anchor {
+  position: relative;
+  & #submission-status {
+    position: absolute;
+    width: 75%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0px 5px 15px rgba(12, 35, 63, 0.5),
+                0px 10px 20px rgba(12, 35, 63, 0.5);
+  }
 }
 .editor {
   &__content {

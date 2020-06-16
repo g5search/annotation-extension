@@ -63,9 +63,9 @@ $theme-colors: (
   'quaternary': #eee23e,
   'pale': #dee2e6,
   'quaternary-lt4': rgba(236, 233, 178, 0.5),
-  'success': #52be99
+  'success': #62bc60
 );
-// $body-bg: #e1e5e9;
+$body-bg: #e1e5e9;
 $enable-rounded: false;
 $enable-shadows: false;
 $enable-gradients: false;

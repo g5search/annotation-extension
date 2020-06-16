@@ -2,7 +2,7 @@
   <b-container fluid class="px-0 menu-toolbar">
     <b-row no-gutters>
       <b-col>
-        <b-btn-group size="sm" class="d-flex w-100">
+        <b-btn-group size="sm" class="d-flex w-100 bg-white">
           <b-btn
             id="login"
             :variant="hasToken ? 'primary' : 'outline-primary'"

@@ -73,19 +73,21 @@ function getXHRClients(cb) {
 }
 
 /**
- * Appends network request with user's apiKey, then blends response with props into callback
  * @param {String} endpoint
  * @param {Function} cb
- * @param  {...any} props
+ * @param {Boolean} includeLocations
  */
-function onAuthedReq(endpoint, cb, ...props) {
+function onAuthedReq(endpoint, cb, includeLocations = false) {
   chrome.storage.sync.get('apiKey', async (res) => {
-    const { data } = await axios({
-      method: 'GET',
-      url: `${endpoint}?key=${res.apiKey}`,
-      headers
-    })
-    cb({ ...data, ...props })
+    const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
+    const client = await getClientFromUrn(data.clientUrn)
+    const locations = await getLocations(data.clientUrn)
+    if (includeLocations) {
+      const selectedLocations = locations.filter(l => l.urn === data.locationUrn)
+      cb({ client, locations, selectedLocations })
+    } else {
+      cb({ client, locations })
+    }
   })
 }
 
@@ -119,31 +121,59 @@ async function autoDetectClientLocation(url, cb) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/
     const [, locationId] = url.match(regex)
     const endpoint = `${host}/api/core/location/${locationId}`
-    onAuthedReq(endpoint, cb)
+    chrome.storage.sync.get('apiKey', async (res) => {
+      const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
+      console.log({ data })
+      cb({ data })
+    })
 
   } else if (/https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/
     const [, clientId, locationId] = url.match(regex)
     const endpoint = `${host}/api/core/location/${locationId}`
-    onAuthedReq(endpoint, cb, clientId)
+    onAuthedReq(endpoint, cb, true)
+    // chrome.storage.sync.get('apiKey', async (res) => {
+    //   const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
+    //   const client = await getClientFromUrn(data.clientUrn)
+    //   const locations = await getLocations(data.clientUrn)
+    //   const selectedLocations = locations.filter(l => l.urn === data.locationUrn)
+    //   cb({ client, locations, selectedLocations })
+    // })
 
   } else if (/https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/
-    const serviceId = url.match(regex)
+    const [, serviceId] = url.match(regex)
     const endpoint = `https://notes.g5marketingcloud.com/api/core/services/${serviceId}`
     onAuthedReq(endpoint, cb)
+    // chrome.storage.sync.get('apiKey', async (res) => {
+    //   const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
+    //   console.log({ data })
+    //   cb({ data })
+    // })
 
   } else if (/https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/
     const [, clientId] = url.match(regex)
     const endpoint = `${host}/api/core/client/${clientId}`
     onAuthedReq(endpoint, cb)
+    // chrome.storage.sync.get('apiKey', async (res) => {
+    //   const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
+    //   const client = await getClientFromUrn(data.clientUrn)
+    //   cb({ client })
+    // })
 
   } else if (/https:\/\/www.g5search.com\/admin\/clients\/edit_store\?id=(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/clients\/edit_store\?id=(\d*)$/
     const [, locationId] = url.match(regex)
     const endpoint = `${host}/api/core/location/${locationId}`
-    onAuthedReq(endpoint, cb)
+    onAuthedReq(endpoint, cb, true)
+    // chrome.storage.sync.get('apiKey', async (res) => {
+    //   const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
+    //   const client = await getClientFromUrn(data.clientUrn)
+    //   const locations = await getLocations(data.clientUrn)
+    //   const selectedLocations = locations.filter(l => l.urn === data.locationUrn)
+    //   cb({ client, locations, selectedLocations })
+    // })
 
   } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/.test(url)) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/edit$/

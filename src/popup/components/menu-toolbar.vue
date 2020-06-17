@@ -55,6 +55,7 @@ export default {
 
 <style lang="scss">
 .menu-toolbar {
+  position: sticky;
   box-shadow: 0 2px 15px rgba(12, 35, 63, 0.5);
   transition: 200ms ease-out;
   &:hover {

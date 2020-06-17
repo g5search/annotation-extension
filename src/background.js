@@ -1,8 +1,8 @@
 import axios from 'axios'
 import store from './store'
 
-const host = 'https://notes.g5marketingcloud.com'
-// const host = 'http://localhost:3000'
+// const host = 'https://notes.g5marketingcloud.com'
+const host = 'http://localhost:3000'
 
 const headers = {
   'Accept': 'application/json',
@@ -45,11 +45,26 @@ async function onMessage(req, sender, res) {
   } else if (req.msg === 'google-ads') {
     const endpoint = `${host}/api/v1/google-ads/${req.data.codeAccount}`
     const { data } = await axios.get(endpoint)
-    console.log(data.clientUrn)
+    // console.log(data.clientUrn)
     res(201)
   } else if (req.msg === 'shape-urn') {
     console.log(req.data)
-    res(201)
+    const { urn } = req.data
+    if (urn.startsWith('g5-cl')) {
+      // const { location, client } = await getClientLocationFromUrn(urn)
+      const endpoint = `${host}/api/hub/location/${urn}`
+      onAuthedReq(endpoint, res, true)
+      // res({ client, selectedLocations: [location] })
+    } else {
+      const client = await getClientFromUrn(urn)
+      chrome.runtime.sendMessage({
+        msg: 'shape-data',
+        client
+      }, (res) => {
+        console.log({ res })
+      })
+    }
+    res()
   }
 }
 
@@ -60,6 +75,14 @@ async function getClients() {
     headers
   })
   return clients.data
+}
+
+async function getClientLocationFromUrn(urn) {
+  chrome.storage.sync.get('apiKey', async (res) => {
+    if (!res.apiKey) return
+    const { data } = await axios.get(`${host}/api/hub/location/${urn}?key=${res.apiKey}`)
+    return data
+  })
 }
 
 async function getClientFromUrn(urn) {
@@ -106,7 +129,15 @@ async function getApiKey(email) {
  */
 function onAuthedReq(endpoint, cb, includeLocations = false) {
   chrome.storage.sync.get('apiKey', async (res) => {
-    const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
+    if (!res.apiKey) {
+      cb(404)
+      return
+    }
+    const { data } = await axios({
+      method: 'GET',
+      url: `${endpoint}?key=${res.apiKey}`,
+      headers
+    })
     const client = await getClientFromUrn(data.clientUrn)
     const locations = await getLocations(data.clientUrn)
     if (includeLocations) {
@@ -219,10 +250,11 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
       file: './content-scripts/google-ads.js'
     })
     cb(200)
-  } else if (/https:\/\/shape.io\/.*$/) {
+  } else if (/https:\/\/shape.io\/(.*)/.test(url)) {
     chrome.tabs.executeScript({
       file: './content-scripts/shape.js'
     })
+    cb({ status: 203 })
   } else {
     cb({ status: 200 })
   }

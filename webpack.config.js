@@ -13,7 +13,8 @@ const config = {
     'popup/popup': './popup/popup.js',
     'options/options': './options/options.js',
     'content-scripts/google-ads': './content-scripts/google-ads.js',
-    'content-scripts/shape': './content-scripts/shape.js'
+    'content-scripts/shape': './content-scripts/shape.js',
+    'content-scripts/clw': './content-scripts/clw.js'
   },
   output: {
     path: __dirname + '/dist',
@@ -87,19 +88,19 @@ const config = {
           }
 
           return JSON.stringify(jsonContent, null, 2)
-        },
-      },
-    ]),
-  ],
-};
+        }
+      }
+    ])
+  ]
+}
 
 if (config.mode === 'production') {
   config.plugins = (config.plugins || []).concat([
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"production"',
-      },
-    }),
+      }
+    })
   ])
 }
 
@@ -107,7 +108,7 @@ if (process.env.HMR === 'true') {
   config.plugins = (config.plugins || []).concat([
     new ExtensionReloader({
       manifest: __dirname + '/src/manifest.json',
-    }),
+    })
   ])
 }
 

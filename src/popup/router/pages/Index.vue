@@ -134,39 +134,40 @@
               <b-form-select
                 v-model="actionType"
                 :options="actionTypes[category]"
+                @change="toggleDates"
                 required
               />
             </b-form-group>
-            <b-form-group
-              label-cols="3"
-              label-class="text-secondary"
-              class="mb-0 mt-1"
-            >
-              <template v-slot:label>
-                Start Date
-              </template>
-              <b-form-datepicker
-                v-show="showDates"
-                v-model="startDate"
-                size="sm"
-              />
-            </b-form-group>
-            <b-form-group
-              label-cols="3"
-              label-class="text-secondary"
-              class="my-0"
-            >
-              <template v-slot:label>
-                End Date
-              </template>
-              <b-form-datepicker
-                v-show="showDates"
-                v-model="endDate"
-                reset-button
-                reset-button-variant="outline-secondary"
-                size="sm"
-              />
-            </b-form-group>
+            <div v-show="showDates">
+              <b-form-group
+                label-cols="3"
+                label-class="text-secondary"
+                class="mb-0 mt-1"
+              >
+                <template v-slot:label>
+                  Start Date
+                </template>
+                <b-form-datepicker
+                  v-model="startDate"
+                  size="sm"
+                />
+              </b-form-group>
+              <b-form-group
+                label-cols="3"
+                label-class="text-secondary"
+                class="my-0"
+              >
+                <template v-slot:label>
+                  End Date
+                </template>
+                <b-form-datepicker
+                  v-model="endDate"
+                  reset-button
+                  reset-button-variant="outline-secondary"
+                  size="sm"
+                />
+              </b-form-group>
+            </div>
           </b-card>
           <b-card
             :bg-variant="isInternal ? 'quaternary-lt4' : 'white'"
@@ -182,6 +183,16 @@
                   <b-icon-file-richtext />
                   Note
                 </span>
+                <b-form-checkbox
+                  v-model="isInternal"
+                  switch
+                  size="sm"
+                  class="align-self-center pr-2"
+                >
+                  <b-icon-eye-fill v-if="!isInternal" />
+                  <b-icon-eye-slash v-else />
+                  {{ isInternal ? 'Internal-Only' : 'Ok to Share' }}
+                </b-form-checkbox>
               </template>
               <div class="editor">
                 <editor-menu-bar
@@ -231,23 +242,40 @@
                     >
                       <b-icon-list-ul />
                     </b-btn>
-                    <div class="menubar__spacer bg-secondary d-flex justify-content-end">
-                      <b-form-checkbox
-                        v-model="isInternal"
-                        switch
-                        size="sm"
-                        class="text-light align-self-center pr-2"
-                      >
-                        <b-icon-eye-fill v-if="!isInternal" />
-                        <b-icon-eye-slash v-else />
-                        {{ isInternal ? 'Internal-Only' : 'Ok to Share' }}
-                      </b-form-checkbox>
-                    </div>
+                    <div class="menubar__spacer bg-secondary" />
                   </div>
                 </editor-menu-bar>
                 <editor-content :editor="editor" class="editor__content" />
               </div>
             </b-form-group>
+          </b-card>
+          <b-card no-body class="mb-1 p-1">
+           <b-form-checkbox
+              v-model="backdate"
+              switch
+              size="sm"
+              class="text-secondary"
+            >
+              <b-icon-calendar />
+              Manual Note Date
+            </b-form-checkbox>
+            <div v-show="backdate">
+              <b-form-group
+                label-cols="3"
+                label-class="text-secondary"
+                class="my-0"
+              >
+                <template v-slot:label>
+                  Note Date
+                </template>
+                <b-form-datepicker
+                  v-model="noteDate"
+                  reset-button
+                  reset-button-variant="outline-secondary"
+                  size="sm"
+                />
+              </b-form-group>
+            </div>
           </b-card>
           <template v-slot:footer>
             <b-btn-group class="w-100 d-flex">
@@ -314,12 +342,14 @@ export default {
     return {
       editor: null,
       showLocation: false,
+      showDates: false,
+      backdate: false,
       theme: 'secondary',
       client: null,
       clientLocations: [],
       detectedClient: false,
-      showDates: true,
       isBusy: false,
+      noteDate: new Date(),
       startDate: null,
       endDate: null,
       locations: [],
@@ -466,6 +496,18 @@ export default {
     this.editor.destroy()
   },
   methods: {
+    toggleDates(evt) {
+      const matches = [
+        'Specials/Promotions',
+        'Testing',
+        'Uncontrollable Circumstance',
+        'DA WoW',
+        'Other',
+        'Dynamic Pricing',
+        'Dynamic Availability'
+      ]
+      this.showDates = matches.includes(evt)
+    },
     onReset() {
       this.client = null
       this.locations = []
@@ -483,6 +525,12 @@ export default {
       this.dismissCountDown = this.dismissSecs
     },
     autoDetect() {
+      chrome.runtime.onMessage.addListener((req) => {
+        if (req.msg === 'shape-data') {
+          this.client = req.data.client
+          console.log({ req })
+        }
+      })
       chrome.tabs.query({
         active: true,
         lastFocusedWindow: true
@@ -585,6 +633,7 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    border-radius: 5px;
     box-shadow: 0px 5px 15px rgba(12, 35, 63, 0.2),
                 0px 10px 20px rgba(12, 35, 63, 0.2);
   }

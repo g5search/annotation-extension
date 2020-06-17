@@ -57,9 +57,10 @@ async function onMessage(req, sender, res) {
       // res({ client, selectedLocations: [location] })
     } else {
       const client = await getClientFromUrn(urn)
+      console.log('sending shape data')
       chrome.runtime.sendMessage({
         msg: 'shape-data',
-        client
+        data: { client }
       }, (res) => {
         console.log({ res })
       })

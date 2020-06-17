@@ -4,4 +4,5 @@
     msg: 'google-ads',
     data: { codeAccount }
   })
+  return codeAccount
 })()

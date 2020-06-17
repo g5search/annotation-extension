@@ -77,13 +77,13 @@ async function getClients() {
   return clients.data
 }
 
-async function getClientLocationFromUrn(urn) {
-  chrome.storage.sync.get('apiKey', async (res) => {
-    if (!res.apiKey) return
-    const { data } = await axios.get(`${host}/api/hub/location/${urn}?key=${res.apiKey}`)
-    return data
-  })
-}
+// async function getClientLocationFromUrn(urn) {
+//   chrome.storage.sync.get('apiKey', async (res) => {
+//     if (!res.apiKey) return
+//     const { data } = await axios.get(`${host}/api/hub/location/${urn}?key=${res.apiKey}`)
+//     return data
+//   })
+// }
 
 async function getClientFromUrn(urn) {
   const clients = store.getters.clients
@@ -242,7 +242,7 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
   } else if (/https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/.test(url)) {
     const regex = /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*selected_campaign_ids=(\d*)&root_level=ad_set/
     const [, campaignId] = url.match(regex)
-    const endpoint = `${host}//api/v1/facebook/campaign/${campaignId}`
+    const endpoint = `${host}/api/v1/facebook/campaign/${campaignId}`
     onAuthedReq(endpoint, cb)
 
   } else if (/https:\/\/ads.google.com\/.*$/.test(url)) {

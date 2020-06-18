@@ -53,7 +53,8 @@ async function onMessage(req, sender, res) {
     if (urn.startsWith('g5-cl')) {
       // const { location, client } = await getClientLocationFromUrn(urn)
       const endpoint = `${host}/api/hub/location/${urn}`
-      onAuthedReq(endpoint, res, true)
+      
+      onAuthedReq(endpoint, sendClientLocations, true)
       // res({ client, selectedLocations: [location] })
     } else {
       const client = await getClientFromUrn(urn)
@@ -68,7 +69,14 @@ async function onMessage(req, sender, res) {
     res()
   }
 }
-
+function sendClientLocations(data) {
+  chrome.runtime.sendMessage({
+    msg: 'shape-data',
+    data
+  }, (res) => {
+    console.log(res)
+  })
+}
 async function getClients() {
   const clients = await axios({
     method: 'GET',
@@ -141,8 +149,10 @@ function onAuthedReq(endpoint, cb, includeLocations = false) {
     })
     const client = await getClientFromUrn(data.clientUrn)
     const locations = await getLocations(data.clientUrn)
+    console.log({data})
+    const { locationUrn } = data
     if (includeLocations) {
-      const selectedLocations = locations.filter(l => l.urn === data.locationUrn)
+      const selectedLocations = locations.filter(l => l.urn === locationUrn)
       cb({ client, locations, selectedLocations })
     } else {
       cb({ client, locations })
@@ -260,3 +270,4 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     cb({ status: 200 })
   }
 }
+

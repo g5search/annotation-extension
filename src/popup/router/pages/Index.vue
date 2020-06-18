@@ -528,7 +528,6 @@ export default {
       chrome.runtime.onMessage.addListener((req) => {
         if (req.msg === 'shape-data') {
           this.client = req.data.client
-          console.log({ req })
         }
       })
       chrome.tabs.query({

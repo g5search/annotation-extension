@@ -44,7 +44,7 @@ async function onMessage(req, sender, res) {
     await autoDetectClientLocation(req.url, res)
   } else if (req.msg === 'google-ads') {
     const endpoint = `${host}/api/v1/google-ads/${req.data.codeAccount}`
-    const { data } = await axios.get(endpoint)
+    onAuthedReq(endpoint, sendClientLocations, true)
     // console.log(data.clientUrn)
     res(201)
   } else if (req.msg === 'shape-urn') {
@@ -58,10 +58,10 @@ async function onMessage(req, sender, res) {
       // res({ client, selectedLocations: [location] })
     } else {
       const client = await getClientFromUrn(urn)
-      console.log('sending shape data')
+      const locations = await getLocations(urn)
       chrome.runtime.sendMessage({
         msg: 'shape-data',
-        data: { client }
+        data: { client, locations }
       }, (res) => {
         console.log({ res })
       })
@@ -147,6 +147,7 @@ function onAuthedReq(endpoint, cb, includeLocations = false) {
       url: `${endpoint}?key=${res.apiKey}`,
       headers
     })
+    console.log('data', data)
     const client = await getClientFromUrn(data.clientUrn)
     const locations = await getLocations(data.clientUrn)
     console.log({data})

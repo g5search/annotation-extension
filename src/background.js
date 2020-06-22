@@ -244,7 +244,8 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
   } else if (/https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/.test(url)) {
     const regex = /https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/
     const [, code_account] = url.match(regex)
-
+    const endpoint = `${host}/api/v1/microsoft/account/${accountId}`
+    onAuthedReq(endpoint, cb)
   } else if (/ https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*act=(\d*)\S*/.test(url)) {
     const regex =  /https:\/\/business\.facebook\.com\/adsmanager\/manage\/all\?\S*act=(\d*)\S*/
     const [, accountId] = url.match(regex)

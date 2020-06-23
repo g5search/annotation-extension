@@ -534,6 +534,8 @@ export default {
           this.locations = (req.data.selectedLocations.length > 0)
             ? req.data.selectedLocations
             : []
+        } else if (req.msg === 'google-ads-data') {
+          console.log({ req })
         }
       })
       chrome.tabs.query({

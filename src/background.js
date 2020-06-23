@@ -1,8 +1,8 @@
 import axios from 'axios'
 import store from './store'
 
-// const host = 'https://notes.g5marketingcloud.com'
-const host = 'http://localhost:3000'
+const host = 'https://notes.g5marketingcloud.com'
+// const host = 'http://localhost:3000'
 
 const headers = {
   'Accept': 'application/json',
@@ -44,6 +44,7 @@ async function onMessage(req, sender, res) {
     const { manual } = req
     await autoDetectClientLocation(req.url, res, manual)
   } else if (req.msg === 'google-ads') {
+    console.log({ req })
     const endpoint = `${host}/api/v1/google-ads/${req.data.codeAccount}`
     onAuthedReq(endpoint, sendClientLocations, true)
     res(201)

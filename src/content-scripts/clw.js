@@ -1,4 +1,4 @@
 (function() {
-  const dataLayer = window.dataLayer
-  console.log(JSON.stringify(dataLayer))
+  // const dataLayer = window.dataLayer
+  console.log(window.dataLayer)
 })()

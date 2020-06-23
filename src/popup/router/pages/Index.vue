@@ -23,7 +23,7 @@
               </span>
               <b-btn
                 id="auto-detect-client"
-                @click="autoDetect"
+                @click="autoDetect(manual = true)"
                 variant="light"
                 size="sm"
                 class="text-secondary flex-grow-0 btn-rad"
@@ -524,7 +524,7 @@ export default {
     showAlert() {
       this.dismissCountDown = this.dismissSecs
     },
-    autoDetect() {
+    autoDetect(manual = false) {
       chrome.runtime.onMessage.addListener((req) => {
         if (req.msg === 'shape-data') {
           this.client = req.data.client
@@ -543,7 +543,8 @@ export default {
         const url = tabs[0].url
         chrome.runtime.sendMessage({
           msg: 'auto-detect',
-          url
+          url,
+          manual
         }, async (res) => {
           if (res.client) {
             this.client = res.client

@@ -41,21 +41,18 @@ async function onMessage(req, sender, res) {
     createNote(req.data)
     res(201)
   } else if (req.msg === 'auto-detect') {
-    await autoDetectClientLocation(req.url, res)
+    const { manual } = req
+    await autoDetectClientLocation(req.url, res, manual)
   } else if (req.msg === 'google-ads') {
     const endpoint = `${host}/api/v1/google-ads/${req.data.codeAccount}`
     onAuthedReq(endpoint, sendClientLocations, true)
-    // console.log(data.clientUrn)
     res(201)
   } else if (req.msg === 'shape-urn') {
     console.log(req.data)
     const { urn } = req.data
     if (urn.startsWith('g5-cl')) {
-      // const { location, client } = await getClientLocationFromUrn(urn)
       const endpoint = `${host}/api/hub/location/${urn}`
-
       onAuthedReq(endpoint, sendClientLocations, true)
-      // res({ client, selectedLocations: [location] })
     } else {
       const client = await getClientFromUrn(urn)
       const locations = await getLocations(urn)
@@ -66,7 +63,7 @@ async function onMessage(req, sender, res) {
         console.log({ res })
       })
     }
-    res()
+    res(200)
   }
 }
 
@@ -161,7 +158,7 @@ function createNote(annotation) {
   })
 }
 
-async function autoDetectClientLocation(url, cb) {
+async function autoDetectClientLocation(url, cb, manual = false) {
 if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/
     const [, clientId] = url.match(regex)
@@ -214,14 +211,6 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const locations = await getLocations(client.urn)
     cb({ client, locations })
 
-  } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/.test(url)) {
-    const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/
-    const [, clientUrn] = url.match(regex)
-    const client = await getClientFromUrn(clientUrn)
-    const locations = await getLocations(client.urn)
-    const selectedLocations = locations.filter(l => l.urn === locationUrn)
-    cb({ client, locations, selectedLocations })
-
   } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/.test(url)) {
     const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/
     const [, clientUrn, locationUrn] = url.match(regex)
@@ -229,6 +218,13 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const locations = await getLocations(client.urn)
     const selectedLocations = locations.filter(l => l.urn === locationUrn)
     cb({ client, selectedLocations, locations })
+
+  } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/.test(url)) {
+    const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/
+    const [, clientUrn] = url.match(regex)
+    const client = await getClientFromUrn(clientUrn)
+    const locations = await getLocations(client.urn)
+    cb({ client, locations })
 
   } else if (/https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/.test(url)) {
     const regex = /https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/
@@ -257,6 +253,10 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
       file: './content-scripts/shape.js'
     })
     cb({ status: 203 })
+  } else if (manual) {
+    chrome.tabs.executeScript({
+      file: './content-scripts/clw.js'
+    })
   } else {
     cb({ status: 200 })
   }

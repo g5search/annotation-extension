@@ -530,7 +530,6 @@ export default {
       chrome.runtime.onMessage.addListener((req, sender, res) => {
         if (req.msg === 'shape-data') {
           this.detectedClient = true
-          this.autoIsBusy = false
           this.client = req.data.client
           this.clientLocations = (req.data.locations.length > 0)
             ? req.data.locations
@@ -545,13 +544,14 @@ export default {
         } else {
           res(204)
         }
+        this.autoIsBusy = false
       })
       chrome.tabs.query({
         active: true,
         lastFocusedWindow: true
       }, (tabs) => {
-        const url = tabs[0].url
         this.autoIsBusy = true
+        const { url } = tabs[0]
         chrome.runtime.sendMessage({
           msg: 'auto-detect',
           url,
@@ -560,7 +560,6 @@ export default {
           if (res.client) {
             this.client = res.client
             this.detectedClient = true
-            this.autoIsBusy = false
           }
           if (res.locations) {
             this.clientLocations = res.locations
@@ -568,6 +567,7 @@ export default {
           if (res.selectedLocations) {
             this.locations = res.selectedLocations
           }
+          this.autoIsBusy = false
         })
       })
     },

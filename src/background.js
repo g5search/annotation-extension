@@ -46,7 +46,11 @@ async function onMessage(req, sender, res) {
   } else if (req.msg === 'google-ads') {
     const accountId = req.data.codeAccount.replace(/-/g, '')
     const endpoint = `${host}/api/v1/google-ads/${accountId}`
-    onAuthedReq(endpoint, sendClientLocations, true)
+    if (req.data.customerId) {
+      onAuthedReq(endpoint, sendClientLocations)
+    } else {
+      onAuthedReq(endpoint, sendClientLocations, true)
+    }
     res(201)
   } else if (req.msg === 'shape-urn') {
     console.log(req.data)

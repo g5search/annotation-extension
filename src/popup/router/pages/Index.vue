@@ -593,7 +593,8 @@ export default {
           html: this.annotation.html,
           annotation: this.annotation.json,
           startDate: this.startDate,
-          endDate: this.endDate
+          endDate: this.endDate,
+          createdAt: this.noteDate
         }
       }, () => {
         this.client = null

@@ -29,6 +29,7 @@
                 class="text-secondary flex-grow-0 btn-rad"
               >
                 <b-icon-bucket-fill v-if="detectedClient" />
+                <b-spinner v-else-if="autoIsBusy" small />
                 <b-icon-bucket v-else />
                 Auto
               </b-btn>
@@ -349,6 +350,7 @@ export default {
       clientLocations: [],
       detectedClient: false,
       isBusy: false,
+      autoIsBusy: false,
       noteDate: new Date(),
       startDate: null,
       endDate: null,
@@ -525,8 +527,10 @@ export default {
       this.dismissCountDown = this.dismissSecs
     },
     autoDetect(manual = false) {
-      chrome.runtime.onMessage.addListener((req) => {
+      chrome.runtime.onMessage.addListener((req, sender, res) => {
         if (req.msg === 'shape-data') {
+          this.detectedClient = true
+          this.autoIsBusy = false
           this.client = req.data.client
           this.clientLocations = (req.data.locations.length > 0)
             ? req.data.locations
@@ -534,8 +538,12 @@ export default {
           this.locations = (req.data.selectedLocations.length > 0)
             ? req.data.selectedLocations
             : []
+          res(200)
         } else if (req.msg === 'google-ads-data') {
           console.log({ req })
+          res(200)
+        } else {
+          res(204)
         }
       })
       chrome.tabs.query({
@@ -543,6 +551,7 @@ export default {
         lastFocusedWindow: true
       }, (tabs) => {
         const url = tabs[0].url
+        this.autoIsBusy = true
         chrome.runtime.sendMessage({
           msg: 'auto-detect',
           url,
@@ -551,6 +560,7 @@ export default {
           if (res.client) {
             this.client = res.client
             this.detectedClient = true
+            this.autoIsBusy = false
           }
           if (res.locations) {
             this.clientLocations = res.locations

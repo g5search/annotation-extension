@@ -1,8 +1,8 @@
 import axios from 'axios'
 import store from './store'
 
-const host = 'https://notes.g5marketingcloud.com'
-// const host = 'http://localhost:3000'
+// const host = 'https://notes.g5marketingcloud.com'
+const host = 'http://localhost:3000'
 
 const headers = {
   'Accept': 'application/json',
@@ -53,7 +53,7 @@ async function onMessage(req, sender, res) {
     if (urn.startsWith('g5-cl')) {
       // const { location, client } = await getClientLocationFromUrn(urn)
       const endpoint = `${host}/api/hub/location/${urn}`
-      
+
       onAuthedReq(endpoint, sendClientLocations, true)
       // res({ client, selectedLocations: [location] })
     } else {
@@ -69,6 +69,7 @@ async function onMessage(req, sender, res) {
     res()
   }
 }
+
 function sendClientLocations(data) {
   chrome.runtime.sendMessage({
     msg: 'shape-data',
@@ -77,6 +78,7 @@ function sendClientLocations(data) {
     console.log(res)
   })
 }
+
 async function getClients() {
   const clients = await axios({
     method: 'GET',
@@ -85,14 +87,6 @@ async function getClients() {
   })
   return clients.data
 }
-
-// async function getClientLocationFromUrn(urn) {
-//   chrome.storage.sync.get('apiKey', async (res) => {
-//     if (!res.apiKey) return
-//     const { data } = await axios.get(`${host}/api/hub/location/${urn}?key=${res.apiKey}`)
-//     return data
-//   })
-// }
 
 async function getClientFromUrn(urn) {
   const clients = store.getters.clients
@@ -147,10 +141,10 @@ function onAuthedReq(endpoint, cb, includeLocations = false) {
       url: `${endpoint}?key=${res.apiKey}`,
       headers
     })
-    console.log('data', data)
+
     const client = await getClientFromUrn(data.clientUrn)
     const locations = await getLocations(data.clientUrn)
-    console.log({data})
+
     const { locationUrn } = data
     if (includeLocations) {
       const selectedLocations = locations.filter(l => l.urn === locationUrn)
@@ -170,13 +164,9 @@ function createNote(annotation) {
 async function autoDetectClientLocation(url, cb) {
 if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/
-    const [, locationId] = url.match(regex)
-    const endpoint = `${host}/api/core/location/${locationId}`
-    chrome.storage.sync.get('apiKey', async (res) => {
-      const { data } = await axios.get(`${endpoint}?key=${res.apiKey}`)
-      console.log({ data })
-      cb({ data })
-    })
+    const [, clientId] = url.match(regex)
+    const endpoint = `${host}/api/core/client/${clientId}`
+    onAuthedReq(endpoint, cb)
 
   } else if (/https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/
@@ -188,7 +178,7 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\/edit\/(\d*)$/
     const [, serviceId] = url.match(regex)
     const endpoint = `https://notes.g5marketingcloud.com/api/core/services/${serviceId}`
-    onAuthedReq(endpoint, cb)
+    onAuthedReq(endpoint, cb, true)
 
   } else if (/https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/
@@ -215,8 +205,7 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const [, clientUrn] = url.match(regex)
     const client = await getClientFromUrn(clientUrn)
     const locations = await getLocations(client.urn)
-    const selectedLocations = locations.filter(l => l.urn === locationUrn)
-    cb({ client, locations, selectedLocations })
+    cb({ client, locations })
 
   } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)$/.test(url)) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)/

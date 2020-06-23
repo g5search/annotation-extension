@@ -528,8 +528,12 @@ export default {
       chrome.runtime.onMessage.addListener((req) => {
         if (req.msg === 'shape-data') {
           this.client = req.data.client
-          this.clientLocations = (req.data.locations.length > 0) ? req.data.locations : []
-          this.locations = (req.data.selectedLocations.length > 0) ? req.data.selectedLocations : []
+          this.clientLocations = (req.data.locations.length > 0)
+            ? req.data.locations
+            : []
+          this.locations = (req.data.selectedLocations.length > 0)
+            ? req.data.selectedLocations
+            : []
         }
       })
       chrome.tabs.query({

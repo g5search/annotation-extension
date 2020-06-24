@@ -482,6 +482,9 @@ export default {
       clients: state => state.clients,
       storeLocations: state => state.locations
     }),
+    hasToken() {
+      return this.$store.getters.hasToken
+    },
     isValid() {
       return this.category !== null && this.client !== null
     },
@@ -492,7 +495,8 @@ export default {
     }
   },
   created() {
-    this.autoDetect()
+      // this.$router.push('/Login')
+      this.autoDetect()
   },
   beforeDestroy() {
     this.editor.destroy()
@@ -518,6 +522,8 @@ export default {
       this.category = null
       this.actionType = null
       this.autoDetect = false
+      this.isBusy = false
+      this.autoIsBusy = false
       this.editor.clearContent()
     },
     countDownChanged(dismissCountDown) {
@@ -528,6 +534,7 @@ export default {
     },
     autoDetect(manual = false) {
       chrome.runtime.onMessage.addListener((req, sender, res) => {
+        console.log({ req })
         if (req.msg === 'shape-data') {
           this.detectedClient = true
           this.client = req.data.client
@@ -541,8 +548,6 @@ export default {
         } else if (req.msg === 'google-ads-data') {
           console.log({ req })
           res(200)
-        } else {
-          res(204)
         }
         this.autoIsBusy = false
       })

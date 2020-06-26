@@ -522,7 +522,7 @@ export default {
       this.category = null
       this.actionType = null
       this.autoDetect = false
-      this.isBusy = false
+      
       this.autoIsBusy = false
       this.editor.clearContent()
     },
@@ -535,7 +535,18 @@ export default {
     autoDetect(manual = false) {
       chrome.runtime.onMessage.addListener((req, sender, res) => {
         console.log({ req })
-        if (req.msg === 'shape-data') {
+        if (req.msg === 'update-ui') {
+          this.detectedClient = (req.data.detectedClient) ? req.data.detectedClient : false
+          this.client = req.data.client ? req.data.client : this.client
+          this.clientLocations = (req.data.locations.length > 0)
+            ? req.data.locations
+            : []
+          this.locations = (req.data.selectedLocations)
+            ? req.data.selectedLocations
+            : []
+          this.autoIsBusy = false
+        }
+        else if (req.msg === 'shape-data') {
           this.detectedClient = true
           this.client = req.data.client
           this.clientLocations = (req.data.locations.length > 0)
@@ -550,6 +561,7 @@ export default {
           res(200)
         }
         this.autoIsBusy = false
+        this.isBusy = false
       })
       chrome.tabs.query({
         active: true,
@@ -625,11 +637,6 @@ export default {
           prop: 'urn',
           value: this.client.urn
         }
-      }, (res) => {
-        if (res.locations) {
-          this.clientLocations = res.locations
-        }
-        this.isBusy = false
       })
     }
   }

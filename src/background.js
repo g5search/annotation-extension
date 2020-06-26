@@ -28,7 +28,8 @@ chrome.runtime.onMessage.addListener(onMessage)
 async function onMessage(req, sender, res) {
   if (req.msg === 'locations') {
     const locations = await getLocations(req.data.value)
-    res({ locations })
+    console.log({ locations })
+    updateUi({ locations })
   } else if (req.msg === 'login') {
     const key = await getApiKey(req.email)
     chrome.storage.sync.set({ apiKey: key }, async () => {
@@ -47,9 +48,9 @@ async function onMessage(req, sender, res) {
     const accountId = req.data.codeAccount.replace(/-/g, '')
     const endpoint = `${host}/api/v1/google-ads/${accountId}`
     if (req.data.customerId) {
-      onAuthedReq(endpoint, sendClientLocations)
+      onAuthedReq(endpoint, updateUi)
     } else {
-      onAuthedReq(endpoint, sendClientLocations, true)
+      onAuthedReq(endpoint, updateUi, true)
     }
     res(201)
   } else if (req.msg === 'shape-urn') {
@@ -57,27 +58,20 @@ async function onMessage(req, sender, res) {
     const { urn } = req.data
     if (urn.startsWith('g5-cl')) {
       const endpoint = `${host}/api/hub/location/${urn}`
-      onAuthedReq(endpoint, sendClientLocations, true)
+      onAuthedReq(endpoint, updateUi, true)
     } else {
       const client = await getClientFromUrn(urn)
       const locations = await getLocations(urn)
-      chrome.runtime.sendMessage({
-        msg: 'shape-data',
-        data: { client, locations }
-      }, (res) => {
-        console.log({ res })
-      })
+      updateUi({ client, locations })
     }
     res(200)
   }
 }
-
-function sendClientLocations(data) {
+function updateUi (data) {
+  console.log("updatingUi")
   chrome.runtime.sendMessage({
-    msg: 'shape-data',
+    msg: 'update-ui',
     data
-  }, (res) => {
-    console.log(res)
   })
 }
 

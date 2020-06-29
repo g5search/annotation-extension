@@ -530,12 +530,10 @@ export default {
     showAlert() {
       this.dismissCountDown = this.dismissSecs
     },
-    autoDetect(manual = false) {
+    onMessage() {
       chrome.runtime.onMessage.addListener((req, sender, res) => {
         if (req.msg === 'update-ui') {
-          this.detectedClient = (req.data.detectedClient)
-            ? req.data.detectedClient
-            : false
+          this.detectedClient = req.data.hasOwnProperty('client')
           this.client = (req.data.client)
             ? req.data.client
             : this.client
@@ -546,22 +544,16 @@ export default {
             ? req.data.selectedLocations
             : []
           this.autoIsBusy = false
-        } else if (req.msg === 'shape-data') {
-          this.detectedClient = true
-          this.client = req.data.client
-          this.clientLocations = (req.data.locations.length > 0)
-            ? req.data.locations
-            : []
-          this.locations = (req.data.selectedLocations.length > 0)
-            ? req.data.selectedLocations
-            : []
-          res(200)
-        } else if (req.msg === 'google-ads-data') {
-          res(200)
+          this.isBusy = false
+        } else if (req.msg === 'not-found') {
+          this.autoIsBusy = false
+          this.detectedClient = false
+          this.isBusy = false
         }
-        this.autoIsBusy = false
-        this.isBusy = false
       })
+    },
+    autoDetect(manual = false) {
+      this.onMessage()
       chrome.tabs.query({
         active: true,
         lastFocusedWindow: true
@@ -572,7 +564,7 @@ export default {
           msg: 'auto-detect',
           url,
           manual
-        }, async (res) => {
+        }, (res) => {
           if (res.client) {
             this.client = res.client
             this.detectedClient = true
@@ -584,6 +576,7 @@ export default {
             this.locations = res.selectedLocations
           }
           this.autoIsBusy = false
+          this.isBusy = false
         })
       })
     },
@@ -592,7 +585,9 @@ export default {
       chrome.runtime.sendMessage({
         msg: 'reload-clients'
       }, () => {
-        this.client = null,
+        this.client = null
+        this.clientLocations = []
+        this.locations = []
         this.detectedClient = false
         this.isBusy = false
       })
@@ -636,6 +631,11 @@ export default {
           prop: 'urn',
           value: this.client.urn
         }
+      }, (res) => {
+        if (res.locations) {
+          this.clientLocations = locations
+        }
+        this.isBusy = false
       })
     }
   }

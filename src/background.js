@@ -28,8 +28,7 @@ chrome.runtime.onMessage.addListener(onMessage)
 async function onMessage(req, sender, res) {
   if (req.msg === 'locations') {
     const locations = await getLocations(req.data.value)
-    console.log({ locations })
-    updateUi({ locations })
+    res({ locations })
   } else if (req.msg === 'login') {
     const key = await getApiKey(req.email)
     chrome.storage.sync.set({ apiKey: key }, async () => {
@@ -53,8 +52,7 @@ async function onMessage(req, sender, res) {
       onAuthedReq(endpoint, updateUi, true)
     }
     res(201)
-  } else if (req.msg === 'shape-urn') {
-    console.log(req.data)
+  } else if (req.msg === 'shape') {
     const { urn } = req.data
     if (urn.startsWith('g5-cl')) {
       const endpoint = `${host}/api/hub/location/${urn}`
@@ -67,7 +65,8 @@ async function onMessage(req, sender, res) {
     res(200)
   }
 }
-function updateUi (data) {
+
+function updateUi(data) {
   chrome.runtime.sendMessage({
     msg: 'update-ui',
     data
@@ -245,12 +244,12 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     chrome.tabs.executeScript({
       file: './content-scripts/google-ads.js'
     })
-    cb(200)
+    cb({ status: 200 })
   } else if (/https:\/\/shape.io\/(.*)/.test(url)) {
     chrome.tabs.executeScript({
       file: './content-scripts/shape.js'
     })
-    cb({ status: 203 })
+    cb({ status: 200 })
   } else if (manual) {
     chrome.tabs.executeScript({
       file: './content-scripts/clw.js'

@@ -479,8 +479,7 @@ export default {
   },
   computed: {
     ...mapState({
-      clients: state => state.clients,
-      storeLocations: state => state.locations
+      clients: state => state.clients
     }),
     hasToken() {
       return this.$store.getters.hasToken
@@ -495,8 +494,7 @@ export default {
     }
   },
   created() {
-      // this.$router.push('/Login')
-      this.autoDetect()
+    this.autoDetect()
   },
   beforeDestroy() {
     this.editor.destroy()
@@ -522,7 +520,7 @@ export default {
       this.category = null
       this.actionType = null
       this.autoDetect = false
-      
+
       this.autoIsBusy = false
       this.editor.clearContent()
     },
@@ -534,10 +532,13 @@ export default {
     },
     autoDetect(manual = false) {
       chrome.runtime.onMessage.addListener((req, sender, res) => {
-        console.log({ req })
         if (req.msg === 'update-ui') {
-          this.detectedClient = (req.data.detectedClient) ? req.data.detectedClient : false
-          this.client = req.data.client ? req.data.client : this.client
+          this.detectedClient = (req.data.detectedClient)
+            ? req.data.detectedClient
+            : false
+          this.client = (req.data.client)
+            ? req.data.client
+            : this.client
           this.clientLocations = (req.data.locations.length > 0)
             ? req.data.locations
             : []
@@ -545,8 +546,7 @@ export default {
             ? req.data.selectedLocations
             : []
           this.autoIsBusy = false
-        }
-        else if (req.msg === 'shape-data') {
+        } else if (req.msg === 'shape-data') {
           this.detectedClient = true
           this.client = req.data.client
           this.clientLocations = (req.data.locations.length > 0)
@@ -557,7 +557,6 @@ export default {
             : []
           res(200)
         } else if (req.msg === 'google-ads-data') {
-          console.log({ req })
           res(200)
         }
         this.autoIsBusy = false
@@ -568,7 +567,7 @@ export default {
         lastFocusedWindow: true
       }, (tabs) => {
         this.autoIsBusy = true
-        const { url } = tabs[0]
+        const url = tabs[0].url
         chrome.runtime.sendMessage({
           msg: 'auto-detect',
           url,

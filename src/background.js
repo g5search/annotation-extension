@@ -68,7 +68,6 @@ async function onMessage(req, sender, res) {
   }
 }
 function updateUi (data) {
-  console.log("updatingUi")
   chrome.runtime.sendMessage({
     msg: 'update-ui',
     data

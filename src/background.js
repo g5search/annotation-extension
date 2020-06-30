@@ -27,8 +27,10 @@ chrome.runtime.onMessage.addListener(onMessage)
 
 async function onMessage(req, sender, res) {
   if (req.msg === 'locations') {
-    const locations = await getLocations(req.data.value)
-    res({ locations })
+    getXHRLocations(req.data.value, res)
+    // const locations = await getLocations(req.data.value)
+    // console.log({ locations })
+    // res({ locations })
   } else if (req.msg === 'login') {
     const key = await getApiKey(req.email)
     chrome.storage.sync.set({ apiKey: key }, async () => {
@@ -100,6 +102,19 @@ function getXHRClients(cb) {
   }
 }
 
+function getXHRLocations(urn, cb) {
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET', `${host}/api/hub/clients/${urn}/locations`, true)
+  xhr.setRequestHeader('Content-Type', 'application/json')
+  xhr.send()
+  xhr.onload = () => {
+    const locations = JSON.parse(xhr.responseText)
+    const filtered = locations.filter(l => l.status !== 'Deleted')
+    cb({ locations: filtered })
+    updateUi({ locations: filtered })
+  }
+}
+
 async function getLocations(urn) {
   const locations = await axios({
     method: 'GET',
@@ -143,8 +158,10 @@ function onAuthedReq(endpoint, cb, includeLocations = false) {
     if (includeLocations) {
       const selectedLocations = locations.filter(l => l.urn === locationUrn)
       cb({ client, locations, selectedLocations })
+      updateUi({ client, locations, selectedLocations })
     } else {
       cb({ client, locations })
+      updateUi({ client, locations })
     }
   })
 }
@@ -193,6 +210,7 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const locations = await getLocations(clientUrn)
     const selectedLocations = locations.filter(l => l.urn === locationUrn)
     cb({ client, locations, selectedLocations })
+    updateUi({ client, locations, selectedLocations })
 
   } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/.test(url)) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations$/
@@ -200,6 +218,7 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const client = await getClientFromUrn(clientUrn)
     const locations = await getLocations(client.urn)
     cb({ client, locations })
+    updateUi({ client, locations })
 
   } else if (/https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)$/.test(url)) {
     const regex = /https:\/\/hub\.g5marketingcloud\.com\/admin\/clients\/(\S*)/
@@ -207,6 +226,7 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const client = await getClientFromUrn(clientUrn)
     const locations = await getLocations(client.urn)
     cb({ client, locations })
+    updateUi({ client, locations })
 
   } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/.test(url)) {
     const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations\/(\S*)\/pooling_location_phone_numbers/
@@ -215,6 +235,7 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const locations = await getLocations(client.urn)
     const selectedLocations = locations.filter(l => l.urn === locationUrn)
     cb({ client, selectedLocations, locations })
+    updateUi({ client, selectedLocations, locations })
 
   } else if (/https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/.test(url)) {
     const regex = /https:\/\/call-tracking\.g5marketingcloud\.com\/admin\/clients\/(\S*)\/locations/
@@ -222,6 +243,7 @@ if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const client = await getClientFromUrn(clientUrn)
     const locations = await getLocations(client.urn)
     cb({ client, locations })
+    updateUi({ client, locations })
 
   } else if (/https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/.test(url)) {
     const regex = /https\:\/\/ui\.ads\.microsoft\.com\/campaign\/Campaigns\?\S*#customer\/\S*\/account\/(\d*)\/overview/

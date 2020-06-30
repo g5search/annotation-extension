@@ -21,7 +21,6 @@
       "description": "Open Annotations"
     }
   },
-  "web_accessible_resources": [],
   "permissions": [
     "storage",
     "declarativeContent",

@@ -413,6 +413,7 @@ export default {
         'Optimizations': [
           { text: 'Select Option', value: null },
           'Added Negative Keywords',
+          'Updated Audiences',
           'Added Keywords',
           'Changed Location Strategy',
           'Paused Campaign',
@@ -476,6 +477,7 @@ export default {
         this.updateText({ html: getHTML(), json: getJSON() })
       }
     })
+    this.autoDetect()
   },
   computed: {
     ...mapState({
@@ -493,9 +495,9 @@ export default {
         : 'Category is required.'
     }
   },
-  created() {
-    this.autoDetect()
-  },
+  // created() {
+  //   this.autoDetect()
+  // },
   beforeDestroy() {
     this.editor.destroy()
   },
@@ -520,7 +522,7 @@ export default {
       this.category = null
       this.actionType = null
       this.autoDetect = false
-
+      this.isBusy = false
       this.autoIsBusy = false
       this.editor.clearContent()
     },
@@ -532,6 +534,7 @@ export default {
     },
     onMessage() {
       chrome.runtime.onMessage.addListener((req, sender, res) => {
+        console.log({ req })
         if (req.msg === 'update-ui') {
           this.detectedClient = req.data.hasOwnProperty('client')
           this.client = (req.data.client)
@@ -545,10 +548,14 @@ export default {
             : []
           this.autoIsBusy = false
           this.isBusy = false
+          res(200)
+          return
         } else if (req.msg === 'not-found') {
           this.autoIsBusy = false
           this.detectedClient = false
           this.isBusy = false
+          res(400)
+          return
         }
       })
     },
@@ -613,6 +620,7 @@ export default {
         this.category = null
         this.actionType = null
         this.detectedClient = false
+        this.isBusy = false
         this.startDate = null
         this.endDate = null
         this.editor.clearContent()
@@ -632,8 +640,9 @@ export default {
           value: this.client.urn
         }
       }, (res) => {
+        console.log({ res })
         if (res.locations) {
-          this.clientLocations = locations
+          this.clientLocations = res.locations
         }
         this.isBusy = false
       })

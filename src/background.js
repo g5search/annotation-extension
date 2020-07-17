@@ -46,7 +46,9 @@ async function onMessage(req, sender, res) {
     const { manual } = req
     await autoDetectClientLocation(req.url, res, manual)
   } else if (req.msg === 'google-ads') {
-    const accountId = req.data.codeAccount.replace(/-/g, '')
+    const accountId = req.data.customerId
+      ? req.data.customerId.replace(/-/g, '')
+      : req.data.codeAccount.replace(/-/g, '')
     const endpoint = `${host}/api/v1/google-ads/${accountId}`
     if (req.data.customerId) {
       onAuthedReq(endpoint, updateUi)
@@ -150,11 +152,10 @@ function onAuthedReq(endpoint, cb, includeLocations = false) {
       url: `${endpoint}?key=${res.apiKey}`,
       headers
     })
-
     const client = await getClientFromUrn(data.clientUrn)
     const locations = await getLocations(client.urn)
-
     const { locationUrn } = data
+    console.log(includeLocations)
     if (includeLocations) {
       const selectedLocations = locations.filter(l => l.urn === locationUrn)
       cb({ client, locations, selectedLocations })
@@ -173,7 +174,7 @@ function createNote(annotation) {
 }
 
 async function autoDetectClientLocation(url, cb, manual = false) {
-if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
+  if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/
     const [, clientId] = url.match(regex)
     const endpoint = `${host}/api/core/client/${clientId}`

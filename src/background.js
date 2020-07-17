@@ -155,7 +155,6 @@ function onAuthedReq(endpoint, cb, includeLocations = false) {
     const client = await getClientFromUrn(data.clientUrn)
     const locations = await getLocations(client.urn)
     const { locationUrn } = data
-    console.log(includeLocations)
     if (includeLocations) {
       const selectedLocations = locations.filter(l => l.urn === locationUrn)
       cb({ client, locations, selectedLocations })

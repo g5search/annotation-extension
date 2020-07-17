@@ -8,7 +8,6 @@
     }
     codeAccount = opId.innerText;
   }
-  console.log({ codeAccount, customerId });
   chrome.runtime.sendMessage({
     msg: 'google-ads',
     data: { codeAccount, customerId }

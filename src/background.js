@@ -28,9 +28,6 @@ chrome.runtime.onMessage.addListener(onMessage)
 async function onMessage(req, sender, res) {
   if (req.msg === 'locations') {
     getXHRLocations(req.data.value, res)
-    // const locations = await getLocations(req.data.value)
-    // console.log({ locations })
-    // res({ locations })
   } else if (req.msg === 'login') {
     const key = await getApiKey(req.email)
     chrome.storage.sync.set({ apiKey: key }, async () => {
@@ -45,6 +42,12 @@ async function onMessage(req, sender, res) {
   } else if (req.msg === 'auto-detect') {
     const { manual } = req
     await autoDetectClientLocation(req.url, res, manual)
+  } else if (req.msg === 'core') {
+    const clientId = req.data.clientId
+    if (clientId) {
+      const endpoint = `${host}/api/core/client/${clientId}`
+      onAuthedReq(endpoint, updateUi)
+    }
   } else if (req.msg === 'google-ads') {
     const accountId = req.data.customerId
       ? req.data.customerId.replace(/-/g, '')
@@ -172,12 +175,30 @@ function createNote(annotation) {
   })
 }
 
+// class autoDetectClientLoc {
+//   constructor(url, cb, manual = false) {
+//     this.url = url
+//     this.cb = cb
+//     this.manual = manual
+//     this.map = {
+//     }
+//   }
+//   run() {}
+// }
+
 async function autoDetectClientLocation(url, cb, manual = false) {
   if (/https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\?id=(\d*)$/
     const [, clientId] = url.match(regex)
     const endpoint = `${host}/api/core/client/${clientId}`
     onAuthedReq(endpoint, cb)
+
+  } else if (/https:\/\/www.g5search.com\/admin\/services$/.test(url) ||
+    /https:\/\/www.g5search.com\/admin\/clients\/list_stores/.test(url)) {
+    chrome.tabs.executeScript({
+      file: './content-scripts/core.js'
+    })
+    cb({ status: 200 })
 
   } else if (/https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/.test(url)) {
     const regex = /https:\/\/www.g5search.com\/admin\/services\/details\/(\d*)\/(\d*)$/
@@ -191,8 +212,8 @@ async function autoDetectClientLocation(url, cb, manual = false) {
     const endpoint = `https://notes.g5marketingcloud.com/api/core/services/${serviceId}`
     onAuthedReq(endpoint, cb, true)
 
-  } else if (/https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/.test(url)) {
-    const regex = /https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit\?class=admin/
+  } else if (/https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit/.test(url)) {
+    const regex = /https:\/\/www.g5search.com\/admin\/clients\/(\d*)\/edit/
     const [, clientId] = url.match(regex)
     const endpoint = `${host}/api/core/client/${clientId}`
     onAuthedReq(endpoint, cb)

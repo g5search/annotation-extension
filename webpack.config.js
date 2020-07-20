@@ -12,6 +12,7 @@ const config = {
     'background': './background.js',
     'popup/popup': './popup/popup.js',
     'options/options': './options/options.js',
+    'content-scripts/core': './content-scripts/core.js',
     'content-scripts/google-ads': './content-scripts/google-ads.js',
     'content-scripts/shape': './content-scripts/shape.js',
     'content-scripts/clw': './content-scripts/clw.js'

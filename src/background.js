@@ -183,4 +183,3 @@ export {
   getLocations,
   getClientFromUrn
 }
-

@@ -11,7 +11,7 @@
         >
           <b-form-group
             label-class="pt-1 pb-0 text-secondary d-flex w-100 align-items-center justify-content-start"
-            class="mb-1 mt-0"
+            class="mb-1 mt-0 px-2"
           >
             <template v-slot:label>
               <b-icon-briefcase />
@@ -74,7 +74,7 @@
           <b-form-group
             v-show="clientLocations"
             label-class="pb-0 pt-1 text-secondary"
-            class="my-1"
+            class="my-1 px-2"
           >
             <template v-slot:label>
               <b-icon-building />
@@ -86,14 +86,14 @@
               :custom-label="getLocationName"
               :multiple="true"
               :close-on-select="false"
-              :clear-on-select="false"
+              :clear-on-select="true"
               placeholder="Search"
               track-by="urn"
               label="name"
             >
               <template
                 slot="selection"
-                slot-scope="{ values, search, isOpen }"
+                slot-scope="{ values, isOpen }"
               >
                 <span
                   v-if="values.length && !isOpen"
@@ -249,6 +249,19 @@
                 <editor-content :editor="editor" class="editor__content" />
               </div>
             </b-form-group>
+            <div v-if="!isInternal" class="px-2">
+              <b-form-checkbox
+                id="toggle-promoted"
+                v-model="promoted"
+                :class="promoted ? 'text-success' : 'text-secondary'"
+                switch
+                size="sm"
+              >
+                <b-icon-star-fill v-if="promoted" />
+                <b-icon-star v-else />
+                {{ promoted ? 'Promoted!' : 'Promote' }}
+              </b-form-checkbox>
+            </div>
           </b-card>
           <b-card no-body class="mb-1 p-1">
            <b-form-checkbox
@@ -357,6 +370,7 @@ export default {
       locations: [],
       category: null,
       isInternal: true,
+      promoted: false,
       annotation: {
         html: '',
         json: ''
@@ -403,7 +417,7 @@ export default {
           'Whitelisting Events Change'
         ],
         'General Note': [
-          { text: '-', value: 'none' }
+          { text: '-', value: 'None' }
         ],
         'Customer Contact': [
           { text: 'Select Option', value: null },
@@ -420,7 +434,7 @@ export default {
           'Enabled Campaign',
           'Refreshed Ad Copy',
           'Testing',
-          'T & O Added',
+          'T&O Added',
           'Manual Spend Adjustments',
           'Manual Bid Adjustments'
         ],
@@ -518,6 +532,7 @@ export default {
       this.client = null
       this.locations = []
       this.isInternal = true
+      this.promoted = false
       this.showAlert = true
       this.category = null
       this.actionType = null
@@ -605,6 +620,7 @@ export default {
         data: {
           clientUrn: this.client.urn,
           internal: this.isInternal,
+          promoted: this.promoted,
           locationUrns: this.locations.map(l => l.urn),
           category: this.category,
           actionType: this.actionType,
@@ -620,6 +636,8 @@ export default {
         this.category = null
         this.actionType = null
         this.detectedClient = false
+        this.isInternal = true
+        this.promoted = false
         this.isBusy = false
         this.startDate = null
         this.endDate = null

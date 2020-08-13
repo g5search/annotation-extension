@@ -130,7 +130,7 @@ export default {
           'Shape Autopilot Paused'
         ],
         'General Note': [
-          { text: '-', value: 'none' }
+          { text: '-', value: 'None' }
         ],
         'Customer Contact': [
           { text: 'Select Option', value: null },
@@ -145,7 +145,7 @@ export default {
           'Enabled Campaign',
           'Refreshed Ad Copy',
           'Testing',
-          'T & O Added',
+          'T&O Added',
           'Manual Spend Adjustments',
           'Manual Bid Adjustments'
         ],

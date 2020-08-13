@@ -2,8 +2,8 @@ import axios from 'axios'
 import store from './store'
 import { AutoDetecter } from './controllers/AutoDetectClass'
 
-const host = 'https://notes.g5marketingcloud.com'
-// const host = 'http://localhost:3000'
+// const host = 'https://notes.g5marketingcloud.com'
+const host = 'http://localhost:3000'
 
 const headers = {
   'Accept': 'application/json',

@@ -368,7 +368,7 @@ export default {
       startDate: null,
       endDate: null,
       locations: [],
-      category: null,
+      category: 'None',
       isInternal: true,
       promoted: false,
       annotation: {
@@ -393,9 +393,8 @@ export default {
           }
         }
       ],
-      category: null,
       categories: [
-        { text: 'Select option', value: null },
+        { text: 'Select option', value: 'None' },
         { text: 'Account Changes', value: 'Account Changes' },
         { text: 'Customer Contact', value: 'Customer Contact' },
         { text: 'General Note', value: 'General Note' },
@@ -403,13 +402,13 @@ export default {
         { text: 'Other', value: 'Other' },
         { text: 'Technical Issue', value: 'Technical Issue' }
       ],
-      actionType: null,
+      actionType: 'None',
       actionTypes: {
-        null: [
-          { text: 'Select a category first' }
+        'None': [
+          { text: 'Select a category first', value: 'None' }
         ],
         'Account Changes': [
-          { text: 'Select Option', value: null },
+          { text: 'Select Option', value: 'None' },
           'Smart Bidding Strategy Change',
           'Specials/Promotions',
           'Spend Optimizer Version Change',
@@ -420,16 +419,17 @@ export default {
           { text: '-', value: 'None' }
         ],
         'Customer Contact': [
-          { text: 'Select Option', value: null },
+          { text: 'Select Option', value: 'None' },
           'Action Items',
           'Analysis/Notes'
         ],
         'Optimizations': [
-          { text: 'Select Option', value: null },
+          { text: 'Select Option', value: 'None' },
           'Added Negative Keywords',
           'Updated Audiences',
           'Added Keywords',
           'Changed Location Strategy',
+          'Updated Geographic Targeting',
           'Paused Campaign',
           'Enabled Campaign',
           'Refreshed Ad Copy',
@@ -439,18 +439,18 @@ export default {
           'Manual Bid Adjustments'
         ],
         'Other': [
-          { text: 'Select Option', value: null },
+          { text: 'Select Option', value: 'None' },
           'Uncontrollable Circumstances'
         ],
         'Technical Issue': [
-          { text: 'Select Option', value: null },
+          { text: 'Select Option', value: 'None' },
           'DA WoW',
           'Dynamic Pricing',
           'Dynamic Availability',
           'Reporting Issue'
         ],
         'Implementation Dates': [
-          { text: 'Select Option', value: null },
+          { text: 'Select Option', value: 'None' },
           'Dynamic Pricing Start',
           'Dynamic Pricing End',
           'Dynamic Availability Start',

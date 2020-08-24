@@ -1,6 +1,6 @@
 {
   "name": "annotation-extension",
-  "version": "1.3.17",
+  "version": "1.3.18",
   "description": "A Vue-based Chrome Extension for G5 COPS annotation service.",
   "author": "David Miller, Tyler Hasenoehrl, Colin McCullough",
   "engines": {

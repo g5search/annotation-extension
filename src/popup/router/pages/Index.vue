@@ -111,6 +111,23 @@
               class="my-1"
             >
               <template v-slot:label>
+                <b-icon-people-fill />
+                Team
+                <span class="smaller text-tertiary">
+                  *
+                </span>
+              </template>
+              <b-form-select
+                v-model="team"
+                :options="teams"
+              />
+            </b-form-group>
+            <b-form-group
+              label-cols="4"
+              label-class="text-secondary py-1"
+              class="my-1"
+            >
+              <template v-slot:label>
                 <b-icon-collection />
                 Category
                 <span class="smaller roman text-tertiary">
@@ -119,7 +136,7 @@
               </template>
               <b-form-select
                 v-model="category"
-                :options="categories"
+                :options="categories[team]"
                 :invalid-feedback="categoryInvalid"
               />
             </b-form-group>
@@ -134,7 +151,7 @@
               </template>
               <b-form-select
                 v-model="actionType"
-                :options="actionTypes[category]"
+                :options="actionTypes[category][team]"
                 @change="toggleDates"
                 required
               />
@@ -368,7 +385,6 @@ export default {
       startDate: null,
       endDate: null,
       locations: [],
-      category: 'None',
       isInternal: true,
       promoted: false,
       annotation: {
@@ -393,8 +409,19 @@ export default {
           }
         }
       ],
-      categories: [
-        { text: 'Select option', value: 'None' },
+      team: 'da',
+      teams: [
+        { text: 'Digital Advertising', value: 'da' },
+        { text: 'SEO', value: 'seo' },
+        { text: 'Customer Care', value: 'cc', disabled: true }
+      ],
+      category: 'None',
+      categories: {
+      null: [
+        { text: 'Select a Team First', value: null }
+      ],
+      da: [
+        { text: 'Select Option', value: null },
         { text: 'Account Changes', value: 'Account Changes' },
         { text: 'Customer Contact', value: 'Customer Contact' },
         { text: 'General Note', value: 'General Note' },
@@ -402,12 +429,55 @@ export default {
         { text: 'Other', value: 'Other' },
         { text: 'Technical Issue', value: 'Technical Issue' }
       ],
-      actionType: 'None',
-      actionTypes: {
-        'None': [
-          { text: 'Select a category first', value: 'None' }
+      seo: [
+        { text: 'Select Option', value: null },
+        { text: 'Account Changes', value: 'Account Changes' },
+        { text: 'Account Audit', value: 'Account Audit' },
+        { text: 'Customer Contact', value: 'Customer Contact' },
+        { text: 'General Note', value: 'General Note' },
+        { text: 'Optimizations', value: 'Optimizations' },
+        { text: 'Other', value: 'Other' },
+        { text: 'Technical Issue', value: 'Technical Issue' }
+      ],
+      cc: []
+    },
+    actionType: null,
+    actionTypes: {
+      null: {
+        da: [
+          { text: 'Select a Category First', value: null }
         ],
-        'Account Changes': [
+        seo: [
+          { text: 'Select a Category First', value: null }
+        ],
+        cc: [
+          { text: 'Select a Category First', value: null }
+        ]
+      },
+      None: {
+        da: [
+          { text: 'Select a Category First', value: null }
+        ],
+        seo: [
+          { text: 'Select a Category First', value: null }
+        ],
+        cc: [
+          { text: 'Select a Category First', value: null }
+        ]
+      },
+      'Account Audit': {
+        da: [],
+        seo: [
+          { text: 'Select Option', value: 'None' },
+          'Site Health Check',
+          'SEO Audit',
+          'Performance Analysis',
+          'Client Recommendation'
+        ],
+        cc: []
+      },
+      'Account Changes': {
+        da: [
           { text: 'Select Option', value: 'None' },
           'Smart Bidding Strategy Change',
           'Specials/Promotions',
@@ -415,18 +485,41 @@ export default {
           'URL Change',
           'Whitelisting Events Change'
         ],
-        'General Note': [
-          { text: '-', value: 'None' }
+        seo: [
+          { text: 'Select Option', value: 'None' },
+          'Service Upgrade',
+          'Service Downgrade',
+          'Business Information'
         ],
-        'Customer Contact': [
+        cc: [
+          { text: 'Select Option', value: 'None' }
+        ]
+      },
+      'General Note': {
+        da: [{ text: 'None', value: 'None' }],
+        seo: [{ text: 'None', value: 'None' }],
+        cc: [{ text: 'None', value: 'None' }]
+      },
+      'Customer Contact': {
+        da: [
           { text: 'Select Option', value: 'None' },
           'Action Items',
           'Analysis/Notes'
         ],
-        'Optimizations': [
+        seo: [
+          { text: 'Select Option', value: 'None' },
+          'Action Items',
+          'Analysis/Notes',
+          'User Access'
+        ],
+        cc: [
+          { text: 'Select Option', value: 'None' }
+        ]
+      },
+      Optimizations: {
+        da: [
           { text: 'Select Option', value: 'None' },
           'Added Negative Keywords',
-          'Updated Audiences',
           'Added Keywords',
           'Changed Location Strategy',
           'Updated Geographic Targeting',
@@ -438,31 +531,111 @@ export default {
           'Manual Spend Adjustments',
           'Manual Bid Adjustments'
         ],
-        'Other': [
+        seo: [
+          { text: 'Select Option', value: 'None' },
+          'Keyword Strategy Update',
+          'Website - Content',
+          'Website - Technical',
+          'GMB'
+        ],
+        cc: [{ text: 'Select Option', value: 'None' }]
+      },
+      Other: {
+        da: [
           { text: 'Select Option', value: 'None' },
           'Uncontrollable Circumstances'
         ],
-        'Technical Issue': [
+        seo: [{ text: '-', value: 'None' }],
+        cc: [{ text: '-', value: 'None' }]
+      },
+      'Technical Issue': {
+        da: [
           { text: 'Select Option', value: 'None' },
           'DA WoW',
           'Dynamic Pricing',
           'Dynamic Availability',
           'Reporting Issue'
         ],
-        'Implementation Dates': [
+        seo: [
           { text: 'Select Option', value: 'None' },
-          'Dynamic Pricing Start',
-          'Dynamic Pricing End',
-          'Dynamic Availability Start',
-          'Dynamic Availability End',
-          'Spend Optimizer Start',
-          'Spend Optimizer End',
-          'Call Scoring Start',
-          'Call Scoring End',
-          'First Impressions',
-          'First Spend'
-        ]
-      },
+          'Website',
+          'GMB',
+          'Business Listings',
+          'Reporting Issue'
+        ],
+        cc: [{ text: 'Select Option', value: 'None' }]
+      }
+    },
+      // categories: [
+      //   { text: 'Select option', value: 'None' },
+      //   { text: 'Account Changes', value: 'Account Changes' },
+      //   { text: 'Customer Contact', value: 'Customer Contact' },
+      //   { text: 'General Note', value: 'General Note' },
+      //   { text: 'Optimizations', value: 'Optimizations' },
+      //   { text: 'Other', value: 'Other' },
+      //   { text: 'Technical Issue', value: 'Technical Issue' }
+      // ],
+      // actionType: 'None',
+      // actionTypes: {
+      //   'None': [
+      //     { text: 'Select a category first', value: 'None' }
+      //   ],
+      //   'Account Changes': [
+      //     { text: 'Select Option', value: 'None' },
+      //     'Smart Bidding Strategy Change',
+      //     'Specials/Promotions',
+      //     'Spend Optimizer Version Change',
+      //     'URL Change',
+      //     'Whitelisting Events Change'
+      //   ],
+      //   'General Note': [
+      //     { text: '-', value: 'None' }
+      //   ],
+      //   'Customer Contact': [
+      //     { text: 'Select Option', value: 'None' },
+      //     'Action Items',
+      //     'Analysis/Notes'
+      //   ],
+      //   'Optimizations': [
+      //     { text: 'Select Option', value: 'None' },
+      //     'Added Negative Keywords',
+      //     'Updated Audiences',
+      //     'Added Keywords',
+      //     'Changed Location Strategy',
+      //     'Updated Geographic Targeting',
+      //     'Paused Campaign',
+      //     'Enabled Campaign',
+      //     'Refreshed Ad Copy',
+      //     'Testing',
+      //     'T&O Added',
+      //     'Manual Spend Adjustments',
+      //     'Manual Bid Adjustments'
+      //   ],
+      //   'Other': [
+      //     { text: 'Select Option', value: 'None' },
+      //     'Uncontrollable Circumstances'
+      //   ],
+      //   'Technical Issue': [
+      //     { text: 'Select Option', value: 'None' },
+      //     'DA WoW',
+      //     'Dynamic Pricing',
+      //     'Dynamic Availability',
+      //     'Reporting Issue'
+      //   ],
+      //   'Implementation Dates': [
+      //     { text: 'Select Option', value: 'None' },
+      //     'Dynamic Pricing Start',
+      //     'Dynamic Pricing End',
+      //     'Dynamic Availability Start',
+      //     'Dynamic Availability End',
+      //     'Spend Optimizer Start',
+      //     'Spend Optimizer End',
+      //     'Call Scoring Start',
+      //     'Call Scoring End',
+      //     'First Impressions',
+      //     'First Spend'
+      //   ]
+      // },
       isInternal: true,
       dismissSecs: 2,
       dismissCountDown: 0,

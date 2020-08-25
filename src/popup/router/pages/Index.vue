@@ -69,7 +69,19 @@
               placeholder="Search"
               track-by="urn"
               label="name"
-            />
+            >
+              <template v-slot:option="{ option }">
+                 <b>
+                  {{ option.name }}
+                </b>
+                <p class="text-muted small mb-0">
+                  {{ option.brandedName }}
+                </p>
+                <p class="text-muted small mb-0">
+                  {{ option.urn }}
+                </p>
+              </template>
+            </vue-multiselect>
           </b-form-group>
           <b-form-group
             v-show="clientLocations"
@@ -91,16 +103,36 @@
               track-by="urn"
               label="name"
             >
-              <template
-                slot="selection"
-                slot-scope="{ values, isOpen }"
-              >
+              <template v-slot:selection="{ values, isOpen }">
                 <span
-                  v-if="values.length && !isOpen"
+                  v-if="values.length > 1 && !isOpen"
                   class="multiselect__single"
                 >
                   {{ values.length }} location(s) selected
                 </span>
+              </template>
+              <template v-slot:option="{ option }">
+                <div class="d-flex">
+                  <div class="mr-2">
+                    <p class="mb-0 text-muted small">
+                      {{ option.offPlatform !== 'false' ? 'Self-Hosted' : '' }}
+                    </p>
+                    <b :class="option.status === 'Live' ? 'text-success' : 'text-warning'">
+                      {{ option.status }}
+                    </b>
+                  </div>
+                  <div>
+                    <b>
+                      {{ option.name }}
+                    </b>
+                    <p class="text-muted small mb-0">
+                      {{ option.displayName }}
+                    </p>
+                    <i class="text-muted small mb-0">
+                      {{ option.urn }}
+                    </i>
+                  </div>
+                </div>
               </template>
             </vue-multiselect>
           </b-form-group>
@@ -418,10 +450,10 @@ export default {
       category: 'None',
       categories: {
       null: [
-        { text: 'Select a Team First', value: null }
+        { text: 'Select a Team First', value: 'None' }
       ],
       da: [
-        { text: 'Select Option', value: null },
+        { text: 'Select Option', value: 'None' },
         { text: 'Account Changes', value: 'Account Changes' },
         { text: 'Customer Contact', value: 'Customer Contact' },
         { text: 'General Note', value: 'General Note' },
@@ -430,7 +462,7 @@ export default {
         { text: 'Technical Issue', value: 'Technical Issue' }
       ],
       seo: [
-        { text: 'Select Option', value: null },
+        { text: 'Select Option', value: 'None' },
         { text: 'Account Changes', value: 'Account Changes' },
         { text: 'Account Audit', value: 'Account Audit' },
         { text: 'Customer Contact', value: 'Customer Contact' },
@@ -441,28 +473,28 @@ export default {
       ],
       cc: []
     },
-    actionType: null,
+    actionType: 'None',
     actionTypes: {
       null: {
         da: [
-          { text: 'Select a Category First', value: null }
+          { text: 'Select a Category First', value: 'None' }
         ],
         seo: [
-          { text: 'Select a Category First', value: null }
+          { text: 'Select a Category First', value: 'None' }
         ],
         cc: [
-          { text: 'Select a Category First', value: null }
+          { text: 'Select a Category First', value: 'None' }
         ]
       },
       None: {
         da: [
-          { text: 'Select a Category First', value: null }
+          { text: 'Select a Category First', value: 'None' }
         ],
         seo: [
-          { text: 'Select a Category First', value: null }
+          { text: 'Select a Category First', value: 'None' }
         ],
         cc: [
-          { text: 'Select a Category First', value: null }
+          { text: 'Select a Category First', value: 'None' }
         ]
       },
       'Account Audit': {
@@ -566,76 +598,6 @@ export default {
         cc: [{ text: 'Select Option', value: 'None' }]
       }
     },
-      // categories: [
-      //   { text: 'Select option', value: 'None' },
-      //   { text: 'Account Changes', value: 'Account Changes' },
-      //   { text: 'Customer Contact', value: 'Customer Contact' },
-      //   { text: 'General Note', value: 'General Note' },
-      //   { text: 'Optimizations', value: 'Optimizations' },
-      //   { text: 'Other', value: 'Other' },
-      //   { text: 'Technical Issue', value: 'Technical Issue' }
-      // ],
-      // actionType: 'None',
-      // actionTypes: {
-      //   'None': [
-      //     { text: 'Select a category first', value: 'None' }
-      //   ],
-      //   'Account Changes': [
-      //     { text: 'Select Option', value: 'None' },
-      //     'Smart Bidding Strategy Change',
-      //     'Specials/Promotions',
-      //     'Spend Optimizer Version Change',
-      //     'URL Change',
-      //     'Whitelisting Events Change'
-      //   ],
-      //   'General Note': [
-      //     { text: '-', value: 'None' }
-      //   ],
-      //   'Customer Contact': [
-      //     { text: 'Select Option', value: 'None' },
-      //     'Action Items',
-      //     'Analysis/Notes'
-      //   ],
-      //   'Optimizations': [
-      //     { text: 'Select Option', value: 'None' },
-      //     'Added Negative Keywords',
-      //     'Updated Audiences',
-      //     'Added Keywords',
-      //     'Changed Location Strategy',
-      //     'Updated Geographic Targeting',
-      //     'Paused Campaign',
-      //     'Enabled Campaign',
-      //     'Refreshed Ad Copy',
-      //     'Testing',
-      //     'T&O Added',
-      //     'Manual Spend Adjustments',
-      //     'Manual Bid Adjustments'
-      //   ],
-      //   'Other': [
-      //     { text: 'Select Option', value: 'None' },
-      //     'Uncontrollable Circumstances'
-      //   ],
-      //   'Technical Issue': [
-      //     { text: 'Select Option', value: 'None' },
-      //     'DA WoW',
-      //     'Dynamic Pricing',
-      //     'Dynamic Availability',
-      //     'Reporting Issue'
-      //   ],
-      //   'Implementation Dates': [
-      //     { text: 'Select Option', value: 'None' },
-      //     'Dynamic Pricing Start',
-      //     'Dynamic Pricing End',
-      //     'Dynamic Availability Start',
-      //     'Dynamic Availability End',
-      //     'Spend Optimizer Start',
-      //     'Spend Optimizer End',
-      //     'Call Scoring Start',
-      //     'Call Scoring End',
-      //     'First Impressions',
-      //     'First Spend'
-      //   ]
-      // },
       isInternal: true,
       dismissSecs: 2,
       dismissCountDown: 0,
@@ -682,9 +644,6 @@ export default {
         : 'Category is required.'
     }
   },
-  // created() {
-  //   this.autoDetect()
-  // },
   beforeDestroy() {
     this.editor.destroy()
   },
@@ -707,8 +666,9 @@ export default {
       this.isInternal = true
       this.promoted = false
       this.showAlert = true
-      this.category = null
-      this.actionType = null
+      this.team = 'da'
+      this.category = 'None'
+      this.actionType = 'None'
       this.autoDetect = false
       this.isBusy = false
       this.autoIsBusy = false
@@ -806,8 +766,9 @@ export default {
       }, () => {
         this.client = null
         this.locations = []
-        this.category = null
-        this.actionType = null
+        this.team = 'da'
+        this.category = 'None'
+        this.actionType = 'None'
         this.detectedClient = false
         this.isInternal = true
         this.promoted = false

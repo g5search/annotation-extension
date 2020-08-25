@@ -85,7 +85,7 @@ function updateUi(data) {
 async function getClients() {
   const clients = await axios({
     method: 'GET',
-    url: `${host}/api/hub/clients?activeDa=true`,
+    url: `${host}/api/hub/clients?activeDa=false&internal=false`,
     headers
   })
   return clients.data
@@ -99,7 +99,7 @@ async function getClientFromUrn(urn) {
 
 function getXHRClients(cb) {
   const xhr = new XMLHttpRequest()
-  xhr.open('GET', `${host}/api/hub/clients?activeDa=true`, true)
+  xhr.open('GET', `${host}/api/hub/clients?activeDa=false&internal=false`, true)
   xhr.setRequestHeader('Content-Type', 'application/json')
   xhr.send()
   xhr.onload = () => {

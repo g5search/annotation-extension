@@ -605,6 +605,13 @@ export default {
     }
   },
   mounted() {
+    chrome.storage.sync.get('team', (res) => {
+      if (res.team) {
+        this.team = res.team
+      } else {
+        this.team = 'da'
+      }
+    })
     this.editor = new Editor({
       extensions: [
         new OrderedList(),

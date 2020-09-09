@@ -35,6 +35,11 @@ async function onMessage(req, sender, res) {
       await store.dispatch('hasToken')
       res(201)
     })
+  } else if (req.msg === 'set-team') {
+    chrome.storage.sync.set({ team: req.data }, async () => {
+      await store.dispatch('setTeam', req.data)
+      res(201)
+    })
   } else if (req.msg === 'reload-clients') {
     getXHRClients(res)
   } else if (req.msg === 'create-note') {

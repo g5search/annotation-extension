@@ -8,7 +8,7 @@
               We need your getg5.com email
             </h1>
             <p>
-              We use an API token to link your email to your G5 and Salesforce accounts, and saves us a significant hassle. You should only have to do this once.
+              You should only have to do this once.
             </p>
           </template>
           <b-form-group
@@ -59,6 +59,25 @@
         </b-card>
       </b-col>
     </b-row>
+    <b-row>
+      <b-col>
+        <b-card class="my-2">
+          <template v-slot:header>
+            <h2>
+              Also, you can toggle your default team.
+            </h2>
+          </template>
+          <b-form-checkbox
+            v-model="isDa"
+            switch
+            @change="updateTeam"
+            class="text-secondary"
+          >
+            {{ isTeam }}
+          </b-form-checkbox>
+        </b-card>
+      </b-col>
+    </b-row>
   </b-container>
 </template>
 
@@ -67,10 +86,14 @@ export default {
   data() {
     return {
       email: null,
-      isSuccess: false
+      isSuccess: false,
+      isDa: true
     }
   },
   computed: {
+    isTeam() {
+      return this.isDa ? 'Digital Advertising' : 'SEO'
+    },
     isEmail() {
       return this.email === null
         ? null
@@ -88,6 +111,17 @@ export default {
         this.$store.dispatch('hasToken')
       }
     })
+    chrome.storage.sync.get('team', (res) => {
+      const { team } = res
+      if (team) {
+        this.$store.dispatch('setTeam', team)
+        if (team === 'da') {
+          this.isDa = true
+        } else {
+          this.isDa = false
+        }
+      }
+    })
   },
   methods: {
     updateEmail(val) {
@@ -95,6 +129,12 @@ export default {
     },
     onClear() {
       this.email = null
+    },
+    updateTeam(val) {
+      chrome.runtime.sendMessage({
+        msg: 'set-team',
+        data: val ? 'da' : 'seo'
+      })
     },
     fetchToken() {
       chrome.runtime.sendMessage({

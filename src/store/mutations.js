@@ -5,6 +5,9 @@ export default {
   SET_CLIENTS(state, payload) {
     state.clients = payload
   },
+  SET_TEAM(state, payload) {
+    state.team = payload
+  },
   DROP_CLIENTS(state) {
     state.clients = []
   },

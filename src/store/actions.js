@@ -2,6 +2,9 @@ export default {
   async resetNote({ commit }) {
     await commit('ON_RESET')
   },
+  async setTeam({ commit }, team) {
+    await commit('SET_TEAM', team)
+  },
   async dropClients({ commit }) {
     await commit('DROP_CLIENTS')
   },

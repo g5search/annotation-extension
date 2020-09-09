@@ -16,7 +16,8 @@ export default new Vuex.Store({
       'actionType',
       'annotation',
       'lastUpdated',
-      'user'
+      'user',
+      'team'
     ],
     // loggerLevel: 'debug'
   })],
@@ -33,6 +34,7 @@ export default new Vuex.Store({
       html: '',
       json: null
     },
+    team: 'da',
     user: {
       hasToken: false
     }

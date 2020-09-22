@@ -342,15 +342,25 @@
           </b-card>
           <template v-slot:footer>
             <b-btn-group class="w-100 d-flex">
-              <b-btn
-                @click="onSubmit"
-                :disabled="!isValid"
-                :variant="isValid ? 'secondary' : 'outline-secondary'"
-                class="roman flex-grow-1 btn-rad"
-              >
-                <b-icon-bookmark-plus />
-                Save Note
-              </b-btn>
+              <span :id="!isValid ? 'incomplete-fields' : 'save-btn'" class="w-100 d-flex">
+                <b-btn
+                  @click="onSubmit"
+                  :disabled="!isValid"
+                  :variant="isValid ? 'secondary' : 'outline-secondary'"
+                  class="roman flex-grow-1 btn-rad"
+                >
+                  <b-icon-bookmark-plus />
+                  Save Note
+                </b-btn>
+                <b-tooltip
+                  target="incomplete-fields"
+                  triggers="hover"
+                  placement="bottom"
+                  variant="secondary"
+                >
+                  Complete Required Fields
+                </b-tooltip>
+              </span>
               <b-btn
                 id="reset"
                 @click="onReset"
@@ -587,7 +597,10 @@ export default {
           'DA WoW',
           'Dynamic Pricing',
           'Dynamic Availability',
-          'Reporting Issue'
+          'Reporting Issue',
+          'DAM - Account Selection',
+          'DAM - Sitelink Selection',
+          'DAM - Campaign/Ad Group Selection'
         ],
         seo: [
           { text: 'Select Option', value: 'None' },
@@ -644,7 +657,7 @@ export default {
       return this.$store.getters.hasToken
     },
     isValid() {
-      return this.category !== null && this.client !== null
+      return this.category !== 'None' && this.client !== null
     },
     categoryInvalid() {
       return (this.category !== null)
@@ -769,7 +782,8 @@ export default {
           annotation: this.annotation.json,
           startDate: this.startDate,
           endDate: this.endDate,
-          createdAt: this.noteDate
+          createdAt: this.noteDate,
+          teamId: this.team === 'da' ? 1 : 2
         }
       }, () => {
         this.client = null

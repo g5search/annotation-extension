@@ -295,9 +295,15 @@
                     <div class="menubar__spacer bg-secondary" />
                   </div>
                 </editor-menu-bar>
-                <editor-content :editor="editor" class="editor__content" />
+                <editor-content
+                  :editor="editor"
+                  v-model="message"
+                  @input="remaincharCount()"
+                  class="editor__content"
+                />
               </div>
             </b-form-group>
+            <span>{{ remaincharactersText }}</span>
             <div v-if="!isInternal" class="px-2">
               <b-form-checkbox
                 id="toggle-promoted"
@@ -429,6 +435,9 @@ export default {
       locations: [],
       isInternal: true,
       promoted: false,
+      maxcharacter: 1000,
+      remaincharactersText: "1000/1000 characters remaining",
+      message: '',
       annotation: {
         html: '',
         json: ''
@@ -669,6 +678,15 @@ export default {
     this.editor.destroy()
   },
   methods: {
+    remaincharCount() {
+      console.log('working')
+      if (this.message.length > this.maxcharacter){
+        this.remaincharactersText = `Exceeded ${this.maxcharacter} characters limit.`
+      }else{
+        const remainCharacters = this.maxcharacter - this.message.length;
+        this.remaincharactersText = `${remainCharacters}/1000 characters remaining`
+      }
+  },
     toggleDates(evt) {
       const matches = [
         'Specials/Promotions',

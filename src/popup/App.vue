@@ -82,7 +82,7 @@ h1,h2,h3 {
   border-color: #e8e8e8;
 }
 #app-root {
-  min-width: 400px;
+  min-width: 500px;
 }
 .multiselect__spinner:after,
 .multiselect__spinner:before {

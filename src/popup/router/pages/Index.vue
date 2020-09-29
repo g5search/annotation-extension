@@ -295,9 +295,17 @@
                     <div class="menubar__spacer bg-secondary" />
                   </div>
                 </editor-menu-bar>
-                <editor-content :editor="editor" class="editor__content" />
+                <editor-content
+                  :editor="editor"
+                  v-model="message"
+                  class="editor__content"
+                />
               </div>
             </b-form-group>
+            <b-form-text v-if="charLength > 1000" class="text-right">
+              <b-icon-exclamation-triangle-fill variant="tertiary" />
+              <span class="text-tertiary">{{ maxCharLimitTxt }}</span>
+            </b-form-text>
             <div v-if="!isInternal" class="px-2">
               <b-form-checkbox
                 id="toggle-promoted"
@@ -429,6 +437,7 @@ export default {
       locations: [],
       isInternal: true,
       promoted: false,
+      maxCharLimitTxt: 'Exceeded max(1000) character count',
       annotation: {
         html: '',
         json: ''
@@ -657,7 +666,12 @@ export default {
       return this.$store.getters.hasToken
     },
     isValid() {
-      return this.category !== 'None' && this.client !== null
+      return this.category !== 'None' &&
+        this.client !== null &&
+        this.charLength <= 1000
+    },
+    charLength() {
+      return this.annotation.html.length
     },
     categoryInvalid() {
       return (this.category !== null)

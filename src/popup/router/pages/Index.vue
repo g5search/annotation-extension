@@ -298,12 +298,16 @@
                 <editor-content
                   :editor="editor"
                   v-model="message"
-                  @input="remaincharCount()"
                   class="editor__content"
                 />
               </div>
             </b-form-group>
-            <span>{{ remaincharactersText }}</span>
+            <b-form-text class="text-right">
+              <b-icon-exclamation-triangle-fill v-if="charLength > 1000" variant="tertiary" />
+              <span :class="[{ 'text-tertiary': charLength > 1000 }]">
+                {{ charLength }} {{ remaincharactersText }}
+              </span>
+            </b-form-text>
             <div v-if="!isInternal" class="px-2">
               <b-form-checkbox
                 id="toggle-promoted"
@@ -435,9 +439,7 @@ export default {
       locations: [],
       isInternal: true,
       promoted: false,
-      maxcharacter: 1000,
-      remaincharactersText: "1000/1000 characters remaining",
-      message: '',
+      remaincharactersText: ' /1000 characters remaining',
       annotation: {
         html: '',
         json: ''
@@ -666,7 +668,12 @@ export default {
       return this.$store.getters.hasToken
     },
     isValid() {
-      return this.category !== 'None' && this.client !== null
+      return this.category !== 'None' &&
+        this.client !== null &&
+        this.charLength <= 1000
+    },
+    charLength() {
+      return this.annotation.html.length
     },
     categoryInvalid() {
       return (this.category !== null)
@@ -678,15 +685,6 @@ export default {
     this.editor.destroy()
   },
   methods: {
-    remaincharCount() {
-      console.log('working')
-      if (this.message.length > this.maxcharacter){
-        this.remaincharactersText = `Exceeded ${this.maxcharacter} characters limit.`
-      }else{
-        const remainCharacters = this.maxcharacter - this.message.length;
-        this.remaincharactersText = `${remainCharacters}/1000 characters remaining`
-      }
-  },
     toggleDates(evt) {
       const matches = [
         'Specials/Promotions',

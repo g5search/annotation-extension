@@ -302,11 +302,9 @@
                 />
               </div>
             </b-form-group>
-            <b-form-text class="text-right">
-              <b-icon-exclamation-triangle-fill v-if="charLength > 1000" variant="tertiary" />
-              <span :class="[{ 'text-tertiary': charLength > 1000 }]">
-                {{ charLength }} {{ remaincharactersText }}
-              </span>
+            <b-form-text v-if="charLength > 1000" class="text-right">
+              <b-icon-exclamation-triangle-fill variant="tertiary" />
+              <span class="text-tertiary">{{ maxCharLimitTxt }}</span>
             </b-form-text>
             <div v-if="!isInternal" class="px-2">
               <b-form-checkbox
@@ -439,7 +437,7 @@ export default {
       locations: [],
       isInternal: true,
       promoted: false,
-      remaincharactersText: ' /1000 characters remaining',
+      maxCharLimitTxt: 'Exceeded max(1000) character count',
       annotation: {
         html: '',
         json: ''

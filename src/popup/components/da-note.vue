@@ -105,6 +105,7 @@ export default {
       categories: [
         { text: 'Select Option', value: null },
         'Account Changes',
+        'Content Pilot',
         'Customer Contact',
         'General Note',
         'Optmizations',
@@ -131,6 +132,14 @@ export default {
         ],
         'General Note': [
           { text: '-', value: 'None' }
+        ],
+        'Content Pilot': [
+          { text: 'Select Option', value: null },
+          'Ad Copy',
+          'Descriptions',
+          'H1',
+          'Onpage Content',
+          'Title Tags'
         ],
         'Customer Contact': [
           { text: 'Select Option', value: null },

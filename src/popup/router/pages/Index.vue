@@ -297,7 +297,6 @@
                 </editor-menu-bar>
                 <editor-content
                   :editor="editor"
-                  v-model="message"
                   class="editor__content"
                 />
               </div>
@@ -474,6 +473,7 @@ export default {
       da: [
         { text: 'Select Option', value: 'None' },
         { text: 'Account Changes', value: 'Account Changes' },
+        { text: 'Content Pilot', value: 'Content Pilot' },
         { text: 'Customer Contact', value: 'Customer Contact' },
         { text: 'General Note', value: 'General Note' },
         { text: 'Optimizations', value: 'Optimizations' },
@@ -484,6 +484,7 @@ export default {
         { text: 'Select Option', value: 'None' },
         { text: 'Account Changes', value: 'Account Changes' },
         { text: 'Account Audit', value: 'Account Audit' },
+        { text: 'Content Pilot', value: 'Content Pilot' },
         { text: 'Customer Contact', value: 'Customer Contact' },
         { text: 'General Note', value: 'General Note' },
         { text: 'Optimizations', value: 'Optimizations' },
@@ -551,6 +552,27 @@ export default {
         seo: [{ text: 'None', value: 'None' }],
         cc: [{ text: 'None', value: 'None' }]
       },
+      'Content Pilot': {
+        da: [
+        { text: 'Select Option', value: 'None' },
+        'Ad Copy',
+        'Descriptions',
+        'H1',
+        'Onpage Content',
+        'Title Tags'
+        ],
+        seo: [
+          { text: 'Select Option', value: 'None' },
+          'Ad Copy',
+          'Descriptions',
+          'H1',
+          'Onpage Content',
+          'Title Tags'
+        ],
+        cc: [
+          { text: 'Select Option', value: 'None' }
+        ]
+      },    
       'Customer Contact': {
         da: [
           { text: 'Select Option', value: 'None' },
@@ -717,18 +739,20 @@ export default {
     },
     onMessage() {
       chrome.runtime.onMessage.addListener((req, sender, res) => {
-        console.log({ req })
         if (req.msg === 'update-ui') {
           this.detectedClient = req.data.hasOwnProperty('client')
           this.client = (req.data.client)
             ? req.data.client
             : this.client
+          console.log(`client(shouldprintfirst): ${this.client}`)
           this.clientLocations = (req.data.locations.length > 0)
             ? req.data.locations
             : []
+          console.log(`locations length(shouldprintsecond): ${this.clientLocations.length}`)
           this.locations = (req.data.selectedLocations)
             ? req.data.selectedLocations
             : []
+          console.log(`selected locations length(shouldprintlast): ${this.locations}`)
           this.autoIsBusy = false
           this.isBusy = false
           res(200)
@@ -754,19 +778,6 @@ export default {
           msg: 'auto-detect',
           url,
           manual
-        }, (res) => {
-          if (res.client) {
-            this.client = res.client
-            this.detectedClient = true
-          }
-          if (res.locations) {
-            this.clientLocations = res.locations
-          }
-          if (res.selectedLocations) {
-            this.locations = res.selectedLocations
-          }
-          this.autoIsBusy = false
-          this.isBusy = false
         })
       })
     },
@@ -828,7 +839,6 @@ export default {
           value: this.client.urn
         }
       }, (res) => {
-        console.log({ res })
         if (res.locations) {
           this.clientLocations = res.locations
         }

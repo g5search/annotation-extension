@@ -420,6 +420,7 @@ export default {
   mixins: [HubHelpers],
   data () {
     return {
+      isSuccess: false,
       editor: null,
       showLocation: false,
       showDates: false,
@@ -649,6 +650,13 @@ export default {
     }
   },
   mounted() {
+    chrome.storage.sync.get('apiKey', (res) => {
+      const { apiKey } = res
+      if (apiKey) {
+        this.isSuccess = true
+        this.$store.dispatch('hasToken')
+      }
+    })
     chrome.storage.sync.get('team', (res) => {
       if (res.team) {
         this.team = res.team
@@ -690,7 +698,8 @@ export default {
     isValid() {
       return this.category !== 'None' &&
         this.client !== null &&
-        this.charLength <= 1000
+        this.charLength <= 1000 &&
+        this.isSuccess === true
     },
     charLength() {
       return this.annotation.html.length

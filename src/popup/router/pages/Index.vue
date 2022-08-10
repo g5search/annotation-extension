@@ -573,7 +573,7 @@ export default {
         cc: [
           { text: 'Select Option', value: 'None' }
         ]
-      },    
+      },
       'Customer Contact': {
         da: [
           { text: 'Select Option', value: 'None' },
@@ -611,7 +611,7 @@ export default {
           'Keyword Strategy Update',
           'Website - Content',
           'Website - Technical',
-          'GMB'
+          'GBP'
         ],
         cc: [{ text: 'Select Option', value: 'None' }]
       },
@@ -637,7 +637,7 @@ export default {
         seo: [
           { text: 'Select Option', value: 'None' },
           'Website',
-          'GMB',
+          'GBP',
           'Business Listings',
           'Reporting Issue'
         ],

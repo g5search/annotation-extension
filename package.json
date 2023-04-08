@@ -19,7 +19,7 @@
     "bootstrap-vue": "^2.12.0",
     "jquery": "^3.5.0",
     "tiptap": "^1.27.0",
-    "tiptap-extensions": "^1.29.1",
+    "tiptap-extensions": "^1.35.2",
     "vue": "^2.6.10",
     "vue-multiselect": "^2.1.6",
     "vue-router": "^3.0.1",
